@@ -151,6 +151,19 @@ Thứ tự: DAU → Conversion rate → AOV → Retention D7 → Churn rate.
 
 ---
 
+## Ngân sách
+
+| Khoản | Chi phí |
+|---|---|
+| DuckDB · DBeaver · Python · Metabase · Looker Studio · BigQuery Sandbox · SQLBolt · Khan Academy · Kaggle | **0đ** |
+| StrataScratch Premium (tùy chọn, hữu ích từ W6) | ~$29/tháng |
+| Google Data Analytics Certificate (tùy chọn, có tài trợ) | ~$49/tháng |
+| **Tối thiểu để hoàn thành 24 tuần** | **0đ** |
+
+Chứng chỉ không thay được portfolio: nhà tuyển dụng đọc CV 30 giây nhưng xem portfolio 5 phút. Phải chọn giữa mua khóa học và có thêm 40h làm project — chọn project.
+
+---
+
 ## Hạn chế của lộ trình này
 
 - Giả định **15h/tuần đều đặn**. Chỉ được 8h/tuần → kéo dài thành ~40 tuần, đừng cắt nội dung.
