@@ -57,6 +57,27 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 
 # TUẦN 3 — Truy vấn cơ bản
 
+## Nội dung cần học — W3
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Thứ tự thực thi logic** | `FROM → WHERE → GROUP BY → HAVING → SELECT → window → ORDER BY → LIMIT`. Giải thích 80% lỗi của người mới | [L2 §2.1](/ly-thuyet/l2-sql#thu-tu-thuc-thi) |
+| **`SELECT` / alias** | Chọn cột, đổi tên bằng `AS`. Alias **không** dùng được trong `WHERE` | [L2 §2.1](/ly-thuyet/l2-sql#thu-tu-thuc-thi) |
+| **`WHERE` + toán tử** | `= != > <` · `BETWEEN` · `IN` · `LIKE` (`%` nhiều ký tự, `_` một ký tự) | [L2 §2.2](/ly-thuyet/l2-sql#bay-null) |
+| **Bẫy NULL** | `!= 'X'` âm thầm loại luôn dòng NULL. Chỉ `IS NULL` mới đúng | [L2 §2.2](/ly-thuyet/l2-sql#bay-null) |
+| **`ORDER BY` / `LIMIT` / `OFFSET`** | Sắp xếp · cắt · bỏ qua N dòng đầu | [Từ điển](/glossary) |
+| **Ép kiểu** | `CAST(x AS INT)`, `x::DATE` | [Từ điển](/glossary) |
+
+**Hướng đi trong tuần**
+
+1. **Dựng sân tập trước tiên** ([L2 §2.0](/ly-thuyet/l2-sql#san-tap), 15') — không có DB để gõ thì không học được SQL.
+2. **T2** — Học thứ tự thực thi **trước** cú pháp. Đây là bản đồ, cú pháp chỉ là từ vựng.
+3. **T3** — SQLBolt bài 1–6 liền mạch trong 1 buổi (giao diện tương tác, đi rất nhanh).
+4. **T4** — 15 bài LeetCode Easy. Sai thì đọc lời giải, rồi **đóng lại và tự viết lại từ đầu**.
+5. **T5–T6** — 10 query Chinook vào `sql/w3-basics.sql`. Mỗi query kèm 1 dòng comment nói nó trả lời câu hỏi gì.
+
+**Dấu hiệu đã hiểu:** nhìn query lỗi "column not found" là đoán ngay được do alias dùng sai chỗ.
+
 | ID | Chủ đề | Cú pháp / khái niệm | Xong |
 |---|---|---|---|
 | W3.1 | `SELECT`, alias | `SELECT col AS ten_moi` | ☐ |
@@ -92,6 +113,26 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 
 # TUẦN 4 — Nhóm và tổng hợp
 
+## Nội dung cần học — W4
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **`GROUP BY`** | Gom dòng cùng giá trị thành nhóm rồi tính 1 số cho mỗi nhóm | [L2 §2.3](/ly-thuyet/l2-sql#group-by-having) |
+| **`HAVING` vs `WHERE`** | `WHERE` lọc **dòng** trước gom; `HAVING` lọc **nhóm** sau gom | [L2 §2.3](/ly-thuyet/l2-sql#group-by-having) |
+| **`COUNT(*)` vs `COUNT(col)` vs `COUNT(DISTINCT)`** | Đếm dòng · đếm giá trị khác NULL · đếm giá trị khác nhau | [L2 §2.3](/ly-thuyet/l2-sql#group-by-having) |
+| **Aggregate bỏ qua NULL** | `AVG` không coi NULL là 0 — mẫu số khác nhau | [L2 §2.2](/ly-thuyet/l2-sql#bay-null) |
+| **Aggregate có điều kiện** | `SUM(CASE WHEN ... THEN 1 ELSE 0 END)` — mẫu câu dùng nhiều nhất khi đi làm | [L2 §2.3](/ly-thuyet/l2-sql#group-by-having) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Nắm cặp `WHERE`/`HAVING` bằng cách viết **cùng một câu hỏi theo 2 cách** và giải thích khác biệt.
+2. **T3** — Ba biến thể `COUNT`. Chạy thật trên Chinook: 3.503 / 2.526 / 853 — ba con số, ba ý nghĩa.
+3. **T4** — 20 bài Easy/Medium.
+4. **T5** — Aggregate có điều kiện: tách 1 cột thành nhiều cột theo phân loại.
+5. **T6** — 10 query vào `sql/w4-aggregate.sql`.
+
+**Dấu hiệu đã hiểu:** trả lời được ngay "vì sao `COUNT(*)` và `COUNT(cot)` ra số khác nhau" mà không cần chạy thử.
+
 | ID | Chủ đề | Điểm cần nắm | Xong |
 |---|---|---|---|
 | W4.1 | `COUNT(*)` vs `COUNT(col)` vs `COUNT(DISTINCT col)` | `COUNT(col)` bỏ qua NULL | ☐ |
@@ -123,6 +164,27 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 ---
 
 # TUẦN 5 — JOIN
+
+## Nội dung cần học — W5
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Mô hình tư duy JOIN** | Mỗi dòng trái tìm **mọi** dòng phải khớp → sinh 1 dòng cho mỗi cặp | [L2 §2.4](/ly-thuyet/l2-sql#join) |
+| **INNER / LEFT / RIGHT / FULL / CROSS / SELF** | 6 kiểu, mỗi kiểu trả lời một loại câu hỏi khác nhau | [L2 §2.4](/ly-thuyet/l2-sql#join) |
+| **Bẫy "LEFT JOIN hóa INNER JOIN"** | Điều kiện bảng phải đặt ở `WHERE` → mất hết dòng NULL. Số thật: 412 / 35 / **89** | [L2 §2.4](/ly-thuyet/l2-sql#join) |
+| **Fan-out** | JOIN 1-nhiều làm số liệu phồng. Số thật: 2.328,60 → **20.848,62** | [L2 §2.4](/ly-thuyet/l2-sql#join) |
+| **Anti-join** | `LEFT JOIN ... WHERE b.id IS NULL` = tìm cái **không** có | [L2 §2.4](/ly-thuyet/l2-sql#join) |
+| **Metric drill: DAU** | Định nghĩa đủ 5 trường — chốt "hoạt động" nghĩa là gì | [Từ điển](/glossary) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Vẽ ERD Chinook ra giấy trước khi viết JOIN đầu tiên. Không nhớ quan hệ thì mở DBeaver → View Diagram.
+2. **T3** — Drill bắt buộc: **vẽ tay kết quả trước khi chạy** (bao nhiêu dòng, cột nào NULL), rồi chạy để đối chiếu. Làm 5 lần trong tuần. Đây là cách nhanh nhất biến JOIN thành phản xạ.
+3. **T4** — Học riêng 2 cái bẫy. Chạy đủ 3 biến thể 412/35/89 rồi tự giải thích bằng lời.
+4. **T5** — Fan-out: chạy 2 câu tổng tiền, thấy chênh 9 lần, rồi viết ra 2 cách sửa.
+5. **T6** — 12 query vào `sql/w5-joins.sql`. **Thói quen bắt buộc: đếm số dòng trước và sau mỗi JOIN.**
+
+**Dấu hiệu đã hiểu:** thấy doanh thu cao bất thường là nghi fan-out ngay, không cần ai nhắc.
 
 | ID | Chủ đề | Điểm cần nắm | Xong |
 |---|---|---|---|
@@ -164,6 +226,27 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 
 # TUẦN 6 — Subquery & CTE
 
+## Nội dung cần học — W6
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Subquery 3 vị trí** | Ở `WHERE` (lọc theo tập) · ở `FROM` (bảng dẫn xuất, phải đặt alias) · ở `SELECT` (scalar, trả đúng 1 giá trị) | [L2 §2.5](/ly-thuyet/l2-sql#subquery-cte) |
+| **Correlated subquery** | Tham chiếu bảng ngoài, chạy lại cho từng dòng → chậm | [L2 §2.5](/ly-thuyet/l2-sql#subquery-cte) |
+| **`EXISTS` vs `IN`** | `EXISTS` an toàn với NULL | [L2 §2.5](/ly-thuyet/l2-sql#subquery-cte) |
+| **Bẫy `NOT IN` + NULL** | Trả về **rỗng hoàn toàn**, dễ hiểu nhầm là "không có ai" | [L2 §2.5](/ly-thuyet/l2-sql#subquery-cte) |
+| **CTE (`WITH`)** | Đặt tên cho bước trung gian → query đọc như các bước suy nghĩ | [L2 §2.5](/ly-thuyet/l2-sql#subquery-cte) |
+| **Metric drill: Conversion rate** | Chốt mẫu số: user hay session? | [Từ điển](/glossary) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Viết 1 câu hỏi theo cả 2 cách (subquery lồng và CTE), tự thấy cái nào đọc được.
+2. **T3** — Quy tắc: **lồng quá 2 tầng → chuyển sang CTE**. Áp dụng ngay: viết lại 5 query của W5 thành CTE.
+3. **T4** — Chạy ví dụ `NOT IN` với NULL (0 dòng) so với `NOT EXISTS` (2 dòng). Hiểu tại sao, không học vẹt.
+4. **T5** — 20 bài StrataScratch Medium — đề lấy từ phỏng vấn thật, khó hơn LeetCode Easy một bậc.
+5. **T6** — 8 query mới vào `sql/w6-cte.sql`, trong đó có 1 chuỗi CTE 3 tầng: lọc → tổng hợp → xếp hạng.
+
+**Dấu hiệu đã hiểu:** query dài 40 dòng của mình vẫn đọc được sau 1 tuần không đụng tới.
+
 | ID | Chủ đề | Điểm cần nắm | Xong |
 |---|---|---|---|
 | W6.1 | Subquery trong `WHERE` | `WHERE id IN (SELECT ...)` | ☐ |
@@ -196,6 +279,29 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 ---
 
 # TUẦN 7 — Window functions
+
+## Nội dung cần học — W7
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Window vs `GROUP BY`** | Window **giữ nguyên số dòng**, `GROUP BY` gộp dòng lại | [L2 §2.6](/ly-thuyet/l2-sql#window) |
+| **`PARTITION BY` / `ORDER BY` trong `OVER`** | Chia nhóm / thứ tự trong nhóm | [L2 §2.6](/ly-thuyet/l2-sql#window) |
+| **`ROW_NUMBER` vs `RANK` vs `DENSE_RANK`** | 1,2,3 · 1,1,3 · 1,1,2 khi hòa | [L2 §2.6](/ly-thuyet/l2-sql#window) |
+| **`LAG` / `LEAD`** | Lấy dòng trước/sau → cách tính MoM | [L2 §2.6](/ly-thuyet/l2-sql#window) |
+| **Running total / moving average** | `SUM() OVER (ORDER BY ...)` · `AVG() OVER (... ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)` | [L2 §2.6](/ly-thuyet/l2-sql#window) |
+| **Frame clause** | Quy định lấy bao nhiêu dòng quanh dòng hiện tại — `LAST_VALUE` sai nếu quên | [L2 §2.6](/ly-thuyet/l2-sql#window) |
+| **`NTILE`** | Chia n nhóm bằng nhau theo thứ hạng — nền của RFM | [L2 §2.6](/ly-thuyet/l2-sql#window) |
+| **Metric drill: AOV** | Mẫu số là **đơn duy nhất**, không phải số dòng | [Từ điển](/glossary) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Chỉ học **một câu**: window giữ nguyên số dòng. Chạy 1 query `GROUP BY` và 1 query window cạnh nhau, so số dòng.
+2. **T3** — Cụm xếp hạng (`ROW_NUMBER/RANK/DENSE_RANK`) + mẫu **top-N mỗi nhóm** = CTE + `ROW_NUMBER` + lọc `rn <= N`. Đây là dạng đề phỏng vấn phổ biến nhất.
+3. **T4** — Cụm so sánh theo thời gian (`LAG/LEAD` → MoM) và cụm lũy kế (`SUM OVER`, moving average).
+4. **T5** — Bẫy: `WHERE ROW_NUMBER() OVER (...) = 1` luôn lỗi. Hiểu qua thứ tự thực thi, rồi học `QUALIFY`.
+5. **T6–T7** — 10 query vào `sql/w7-window.sql` — đúng 10 dạng hay hỏi nhất khi phỏng vấn.
+
+**Dấu hiệu đã hiểu:** viết được "top 3 sản phẩm mỗi tháng" từ đầu, không tra cứu, dưới 15 phút.
 
 Đây là kỹ năng phân biệt Fresher và Junior. Học kỹ.
 
@@ -244,6 +350,27 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 
 # TUẦN 8 — Ngày tháng, CASE WHEN, NULL
 
+## Nội dung cần học — W8
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **`DATE_TRUNC` / `EXTRACT`** | Gom về đầu tháng/tuần/quý · trích năm, thứ trong tuần | [L2 §2.7](/ly-thuyet/l2-sql#date-case-null) |
+| **Calendar table** | `generate_series` tạo đủ kỳ — nếu không, tháng 0 đơn sẽ **biến mất** khỏi báo cáo | [L2 §2.7](/ly-thuyet/l2-sql#date-case-null) |
+| **`CASE WHEN`** | Phân nhóm (binning) và xoay bảng (pivot) | [L2 §2.7](/ly-thuyet/l2-sql#date-case-null) |
+| **`COALESCE` / `NULLIF`** | Giá trị mặc định · tránh chia cho 0 | [L2 §2.7](/ly-thuyet/l2-sql#date-case-null) |
+| **Bẫy chia số nguyên** | `3/4` = **0** trên SQLite/Postgres/SQL Server, `0.75` trên DuckDB/BigQuery/MySQL | [L2 §2.7](/ly-thuyet/l2-sql#date-case-null) |
+| **Metric drill: Retention D7** | "Đúng ngày thứ 7" hay "trong vòng 7 ngày" — hai con số rất khác nhau | [Từ điển](/glossary) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Cụm ngày tháng. Nguyên tắc: gom theo tháng bằng `DATE_TRUNC`, **không** so sánh chuỗi `'2023-03'`.
+2. **T3** — Calendar table. Làm 1 lần rồi dùng lại suốt: `CROSS JOIN`/`generate_series` + `LEFT JOIN` dữ liệu vào.
+3. **T4** — `CASE WHEN` hai công dụng. Pivot ngang bằng `SUM(CASE WHEN ...)` là kỹ thuật dùng hằng ngày khi làm báo cáo.
+4. **T5** — Mẫu tính tỷ lệ an toàn: `COUNT(a) * 1.0 / NULLIF(COUNT(b), 0)`. Học thuộc, viết mọi lúc.
+5. **T6–T7** — **Deliverable: bộ 12 query báo cáo tháng** → `sql/w8-monthly-report.sql`. Đây là bộ query gần nhất với việc thật của DA.
+
+**Dấu hiệu đã hiểu:** tự phát hiện báo cáo bị thiếu tháng vì không dùng calendar table.
+
 | ID | Chủ đề | Xong |
 |---|---|---|
 | W8.1 | Truncate ngày: `DATE_TRUNC('month', d)` — gom về đầu tháng/tuần/quý | ☐ |
@@ -283,6 +410,28 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 
 # TUẦN 9 — Phân tích thực chiến + BigQuery
 
+## Nội dung cần học — W9
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Funnel** | Đếm user qua từng bước, tính tỷ lệ rơi. Phải nêu rõ: cửa sổ thời gian · có ép thứ tự không · đếm user hay session | [L2 §2.8](/ly-thuyet/l2-sql#funnel-cohort-rfm) |
+| **Cohort retention** | Nhóm theo tháng bắt đầu, đo % quay lại — tách "sản phẩm tốt lên" khỏi "đổ tiền mua user mới" | [L2 §2.8](/ly-thuyet/l2-sql#funnel-cohort-rfm) |
+| **RFM** | Recency · Frequency · Monetary + `NTILE(5)` → phân khúc dẫn tới hành động | [L2 §2.8](/ly-thuyet/l2-sql#funnel-cohort-rfm) |
+| **`QUALIFY`** | Lọc thẳng kết quả window (DuckDB/BigQuery/Snowflake) | [L2 §2.6](/ly-thuyet/l2-sql#window) |
+| **Bytes scanned** | Thứ bị tính quota trên BigQuery — `SELECT *` đốt 1TB free rất nhanh | [Từ điển](/glossary) |
+| **Debug query** | 5 bước khi số ra lạ — câu phỏng vấn hay gặp | [L2 §2.9](/ly-thuyet/l2-sql#debug-query) |
+| **Metric drill: Churn rate** | Phải chốt ngưỡng "bao lâu không mua thì coi là mất" với business | [Từ điển](/glossary) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Chuyển sang BigQuery Sandbox. Việc đầu tiên với `thelook_ecommerce`: **xác định grain từng bảng**, không viết query vội.
+2. **T3** — Funnel. Học **cấu trúc** (gom cờ theo user rồi tính tỷ lệ), không học thuộc cú pháp.
+3. **T4** — Cohort. Ba bước cố định: `first_month` → `activity` → tỷ lệ theo cohort. Nhớ 3 bước này là viết lại được ở mọi dataset.
+4. **T5** — RFM + `NTILE(5)`. Kết thúc bằng **bảng phân khúc kèm hành động đề xuất**, không dừng ở điểm số.
+5. **T6–T7** — 3 query lớn vào `sql/w9-analytics.sql` + rà lại [CHECKPOINT 2](#checkpoint-2).
+
+**Dấu hiệu đã hiểu:** trình bày được funnel của mình **kèm hạn chế** (không ép thứ tự thời gian) mà không đợi ai hỏi.
+
 | ID | Chủ đề | Xong |
 |---|---|---|
 | W9.1 | Chuyển sang BigQuery Sandbox, đọc `techstack/storage/BIGQUERY.md` Level 1 | ☐ |
@@ -320,7 +469,7 @@ WITH step_users AS (
 
 ---
 
-## ✅ CHECKPOINT 2 (cuối W9)
+## ✅ CHECKPOINT 2 (cuối W9) {#checkpoint-2}
 
 Pass khi **cả 6** điều đúng:
 

@@ -40,6 +40,27 @@ mkdir olist && cd olist
 
 # TUẦN 13 — Python cơ bản
 
+## Nội dung cần học — W13
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Kiểu dữ liệu Python** | `int/float/str/bool` · `list/dict/set/tuple` | [L4 §4.0](/ly-thuyet/l4-python#chay-ngay) |
+| **Luồng điều khiển** | `if/for/while` · `enumerate` · `zip` | [Từ điển](/glossary) |
+| **Hàm + type hint** | `def growth(cur: float, prev: float) -> float:` | [Từ điển](/glossary) |
+| **Comprehension** | `[x for x in data if ...]` — thay cho vòng lặp dài | [Từ điển](/glossary) |
+| **`try/except`** | Bắt `ZeroDivisionError`, `KeyError`, `ValueError` | [Từ điển](/glossary) |
+| **Jupyter workflow** | Markdown cell xen kẽ · **`Restart & Run All` phải chạy sạch** | [L4 §4.1](/ly-thuyet/l4-python#dataframe) |
+
+**Hướng đi trong tuần**
+
+1. **Nếu đã biết lập trình** (React Native/TypeScript): rút W13 còn 2 buổi, dồn thời gian sang W15 — làm sạch dữ liệu mới là phần tốn công nhất khi đi làm.
+2. **T2** — Kiểu dữ liệu. Học đủ dùng, không đào sâu OOP/decorator — không cần cho phân tích.
+3. **T3** — Hàm + comprehension. Viết 1 hàm `growth(cur, prev)` xử lý được mẫu số bằng 0 — dùng lại suốt về sau.
+4. **T4–T5** — 15 bài tập. Cố tình **chưa dùng pandas**: đọc CSV bằng module `csv` để hiểu pandas đang giúp mình cái gì.
+5. **T6** — Kỷ luật Jupyter: mỗi phần có markdown cell giải thích, cuối buổi luôn `Restart & Run All`.
+
+**Dấu hiệu đã hiểu:** notebook chạy lại từ đầu không lỗi, không cần chạy tay từng cell theo thứ tự riêng.
+
 ## W13.1 — Kiểu dữ liệu & biến (T2, 2h)
 
 | ID | Chủ đề | Bài tập | Xong |
@@ -99,6 +120,30 @@ Lưu vào `notebooks/w13-python-basics.ipynb`.
 ---
 
 # TUẦN 14 — Pandas
+
+## Nội dung cần học — W14
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **DataFrame / Series** | Bảng SQL trong bộ nhớ / một cột | [L4 §4.1](/ly-thuyet/l4-python#dataframe) |
+| **7 lệnh khám phá** | `shape · head · dtypes · isna · describe · value_counts · duplicated` | [L4 §4.1](/ly-thuyet/l4-python#dataframe) |
+| **`loc` vs `iloc`** | Theo **nhãn** vs theo **vị trí** | [L4 §4.3](/ly-thuyet/l4-python#loc-iloc) |
+| **Boolean mask** | `df[df.a > 1]` ↔ `WHERE`. Nhiều điều kiện **bắt buộc có ngoặc** | [L4 §4.2](/ly-thuyet/l4-python#sql-pandas) |
+| **`groupby().agg()`** | ↔ `GROUP BY` | [L4 §4.2](/ly-thuyet/l4-python#sql-pandas) |
+| **`transform`** | ↔ window function — giữ nguyên số dòng | [L4 §4.2](/ly-thuyet/l4-python#sql-pandas) |
+| **`merge`** | ↔ `JOIN`, có `how=` — **fan-out xảy ra y hệt SQL** | [L4 §4.2](/ly-thuyet/l4-python#sql-pandas) · [L2 §2.4](/ly-thuyet/l2-sql#join) |
+| **`pivot_table` / `melt`** | Xoay ngang / chuyển wide sang long | [L4 §4.2](/ly-thuyet/l4-python#sql-pandas) |
+
+**Hướng đi trong tuần**
+
+1. **Nguyên tắc xuyên suốt:** học pandas bằng cách **dịch từ SQL đã biết**, không học như ngôn ngữ mới. Mở [bảng chuyển đổi](/ly-thuyet/l4-python#sql-pandas) để cạnh bàn phím.
+2. **T2** — 7 lệnh khám phá trên Olist. Kiểm tra grain bằng `duplicated(subset=[...])`.
+3. **T3** — `loc/iloc` + boolean mask. Bẫy ngoặc: `df[(df.a>1) & (df.b<2)]`.
+4. **T4** — `groupby` → `transform` → `rank/shift/rolling/cumsum`. Đối chiếu từng cái với window function đã học ở W7.
+5. **T5** — `merge`. **Đếm số dòng trước và sau**, đúng thói quen của W5.
+6. **T6–T7** — Làm lại 10 query SQL của W8 bằng pandas, **so khớp từng con số**. Lệch 1 đồng cũng phải tìm ra nguyên nhân — đây là buổi học được nhiều nhất cả stage.
+
+**Dấu hiệu đã hiểu:** nhìn `df.groupby(...).agg(...)` là đọc ra ngay câu SQL tương đương và ngược lại.
 
 ## W14.1 — Nạp và khám phá (T2, 2h)
 
@@ -179,6 +224,27 @@ Kết thúc buổi, viết bảng đối chiếu vào `notes/sql-pandas-map.md`:
 
 # TUẦN 15 — Làm sạch dữ liệu
 
+## Nội dung cần học — W15
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Log làm sạch** | Bảng "trước → sau" từng bước — thứ phân biệt notebook nghiệp dư và chuyên nghiệp | [L4 §4.4](/ly-thuyet/l4-python#lam-sach) |
+| **Missing: vì sao thiếu** | Thiếu ngẫu nhiên khác thiếu có hệ thống. Điền mean sai chỗ = bịa dữ liệu | [L4 §4.4](/ly-thuyet/l4-python#lam-sach) |
+| **Trùng theo khóa nghiệp vụ** | Cột ID nhân tạo che mất dòng trùng thật | [L4 §4.1](/ly-thuyet/l4-python#dataframe) |
+| **Chuẩn hóa text/ngày** | `.str.strip().str.lower()` · `pd.to_datetime` · gộp biến thể | [L4 §4.4](/ly-thuyet/l4-python#lam-sach) |
+| **Outlier** | Chỉ loại khi **chứng minh được là lỗi** | [L1 §1.4](/ly-thuyet/l1-foundation#iqr-outlier) |
+| **Kiểm tra logic** | Ship trước order · số lượng ≤ 0 · giá âm | [L4 §4.4](/ly-thuyet/l4-python#lam-sach) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Dựng khung `log` dùng lại được ([mẫu ở L4 §4.4](/ly-thuyet/l4-python#lam-sach)). Mọi bước xóa/sửa đều đi qua khung này.
+2. **T3** — Missing. Với mỗi cột thiếu, **trả lời "vì sao thiếu" trước khi quyết định xử lý**. Ví dụ Olist: thiếu ngày giao vì đơn chưa giao → giữ nguyên, lọc theo `order_status` khi phân tích.
+3. **T4** — Trùng lặp: xác định khóa nghiệp vụ trước, rồi mới `drop_duplicates(subset=...)`.
+4. **T5** — Chuẩn hóa text và ngày. Kiểm tra bằng `value_counts()` để phát hiện biến thể ("HCM" vs "Ho Chi Minh").
+5. **T6–T7** — Notebook cleaning hoàn chỉnh, kết bằng bảng log và **danh sách câu hỏi cần hỏi người vận hành** — thứ nên đưa vào mục Hạn chế thay vì tự quyết im lặng.
+
+**Dấu hiệu đã hiểu:** không xóa dòng nào mà không ghi lại số lượng và lý do.
+
 Đây là tuần quan trọng nhất Stage 4. Trong việc thật, làm sạch chiếm phần lớn thời gian.
 
 ## W15.1 — Missing data (T2, 2h)
@@ -248,6 +314,26 @@ def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
 
 # TUẦN 16 — Visualization + PORTFOLIO #2
 
+## Nội dung cần học — W16
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Chart khám phá vs chart trình bày** | Cho mình (nhanh, xấu cũng được) vs cho người khác (có kết luận, chú thích) | [L4 §4.5](/ly-thuyet/l4-python#visualization) |
+| **Tiêu đề = câu kết luận** | "Furniture chiếm 32% doanh thu nhưng chỉ 6% lợi nhuận", không phải "Doanh thu theo Category" | [L4 §4.5](/ly-thuyet/l4-python#visualization) |
+| **Bộ 5 chart EDA** | hist · barh · time series · scatter · heatmap tương quan | [L4 §4.5](/ly-thuyet/l4-python#visualization) |
+| **Bẫy heatmap** | Chỉ bắt quan hệ tuyến tính — luôn vẽ scatter trước khi tin | [L1 §1.5](/ly-thuyet/l1-foundation#tuong-quan) |
+| **Quy trình EDA 6 bước** | Câu hỏi → Dữ liệu → Làm sạch → Findings → Hạn chế → Đề xuất | [L4 §4.6](/ly-thuyet/l4-python#quy-trinh-eda) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Bộ 5 chart, vẽ nhanh 20 cái để **tìm** cái đáng kể. Giai đoạn này xấu không sao.
+2. **T3** — Chuyển từ khám phá sang trình bày: giữ 3–5 chart, mỗi cái đặt tiêu đề là câu kết luận có số.
+3. **T4** — **Viết phần 1 (Câu hỏi & giả thuyết) trước khi viết code** cho Portfolio #2. Tối thiểu 3 câu hỏi, mỗi câu kèm giả thuyết và cách kiểm chứng.
+4. **T5–T7** — Ráp notebook theo đúng 6 mục. Phần **Hạn chế** không được bỏ trống — đó là chỗ nhà tuyển dụng đọc kỹ nhất.
+5. **CN** — `Restart & Run All` + rà [CHECKPOINT 3](#checkpoint-3).
+
+**Dấu hiệu đã hiểu:** từ CSV thô ra notebook có insight trong ≤ 4h mà không copy code mẫu.
+
 ## W16.1 — Matplotlib & Seaborn (T2 + T3, 4h)
 
 | ID | Chart | Cú pháp | Dùng khi | Xong |
@@ -315,7 +401,7 @@ git push
 
 ---
 
-## ✅ CHECKPOINT 3 (cuối W16)
+## ✅ CHECKPOINT 3 (cuối W16) {#checkpoint-3}
 
 Pass khi **cả 5** điều đúng:
 

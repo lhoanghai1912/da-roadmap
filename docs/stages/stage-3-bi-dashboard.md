@@ -26,6 +26,27 @@ Measure vs dimension, star schema, filter context, spec Portfolio #1 — định
 
 # TUẦN 10 — Looker Studio
 
+## Nội dung cần học — W10
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Dimension vs Metric** | Chia theo cái gì / đo cái gì. Một cột số có thể là cả hai tùy cách dùng | [L3 §3.2](/ly-thuyet/l3-bi#measure-dimension) |
+| **Aggregation mặc định** | Sum / Average / Count Distinct — đặt sai là mọi chart sai theo | [L3 §3.2](/ly-thuyet/l3-bi#measure-dimension) |
+| **Calculated field** | Cột tính trong BI. **Tỷ số phải là `SUM(a)/SUM(b)`**, không phải trung bình của tỷ số | [L3 §3.2](/ly-thuyet/l3-bi#measure-dimension) |
+| **3 cấp filter** | Chart · trang · report — không phân biệt thì số "không khớp" | [L3 §3.4](/ly-thuyet/l3-bi#filter-context) |
+| **Blend data** | Ghép nguồn theo khóa chung, tương đương `LEFT JOIN` nhưng hạn chế hơn | [L3 §3.6](/ly-thuyet/l3-bi#looker-metabase) |
+| **Mốc so sánh** | Con số không có kỳ trước / target thì gần như vô dụng | [L3 §3.1](/ly-thuyet/l3-bi#dashboard-la-gi) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Kết nối 2 nguồn (Sheets + BigQuery). Việc đầu tiên: sửa kiểu dữ liệu và aggregation mặc định. Bỏ qua bước này thì mọi chart sau đều sai.
+2. **T3** — 8 loại chart, làm theo thứ tự: scorecard → scorecard có % so kỳ trước → time series → bar → stacked → table → scatter → geo. Mỗi chart tự hỏi: **nó trả lời câu hỏi gì?**
+3. **T4** — Calculated field + filter. Test filter bằng cách chọn 1 region rồi cộng tay xem có khớp không.
+4. **T5** — Blend. Nguyên tắc: **tính nặng làm ở tầng SQL**, BI chỉ hiển thị. Blend nhiều tầng là dấu hiệu nên viết lại query.
+5. **T6–T7** — Dashboard 1 trang, share link "ai có link đều xem được", dán vào README.
+
+**Dấu hiệu đã hiểu:** giải thích được vì sao margin không được lấy trung bình từ cột margin của từng dòng.
+
 ## W10.1 — Kết nối và làm quen (T2, 2h)
 
 | ID | Việc | Xong |
@@ -81,6 +102,28 @@ Dashboard 1 trang gồm: 3 scorecard (doanh thu, số đơn, AOV — mỗi cái 
 ---
 
 # TUẦN 11 — Metabase + Data Modeling
+
+## Nội dung cần học — W11
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Fact table** | Bảng sự kiện: nhiều dòng, có số để cộng, chứa khóa ngoại | [L3 §3.3](/ly-thuyet/l3-bi#star-schema) |
+| **Dimension table** | Bảng mô tả: ít dòng, dùng để lọc và cắt lát | [L3 §3.3](/ly-thuyet/l3-bi#star-schema) |
+| **Star schema** | Fact ở giữa, dim xung quanh — cấu trúc chuẩn cho BI | [L3 §3.3](/ly-thuyet/l3-bi#star-schema) |
+| **Grain của fact** | Quyết định **đầu tiên** khi thiết kế, trước khi chọn cột | [L1 §1.1](/ly-thuyet/l1-foundation#grain) |
+| **Date dimension** | Bảng lịch riêng để có tuần/quý/ngày lễ/cùng kỳ, và để kỳ trống vẫn hiện | [L3 §3.3](/ly-thuyet/l3-bi#star-schema) |
+| **Model (Metabase)** | Lớp dữ liệu đã curated cho người khác dùng lại | [L3 §3.6](/ly-thuyet/l3-bi#looker-metabase) |
+| **SQL có tham số** | `{{start_date}}` — biến query thành công cụ tự phục vụ | [L3 §3.6](/ly-thuyet/l3-bi#looker-metabase) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Dựng Metabase bằng Docker. **Giới hạn 1 buổi**: driver DuckDB đôi khi kén phiên bản, tắc thì chuyển Postgres hoặc dùng dữ liệu mẫu sẵn có rồi đi tiếp. Đừng đốt cả tuần vào cài đặt.
+2. **T3** — Question GUI trước, SQL sau, rồi SQL có tham số. Cuối buổi gom 6 question vào 1 dashboard có filter.
+3. **T4** — Star schema trên giấy trước, code sau. Tách `superstore` thành `dim_customer` / `dim_product` / `fact_sales`, kiểm chứng `SUM(sales)` vẫn đúng 2.297.201.
+4. **T5** — Vẽ star schema cho `thelook_ecommerce`. Đây là thứ hay bị hỏi khi phỏng vấn BI.
+5. **T6** — Chụp màn hình vào `01-sales-dashboard/screenshots/` — Metabase chạy local, nhà tuyển dụng không mở được.
+
+**Dấu hiệu đã hiểu:** nhìn một bảng biết ngay nó là fact hay dimension, và nói được grain của fact.
 
 ## W11.1 — Dựng Metabase (T2, 2h)
 
@@ -139,6 +182,27 @@ Metabase chạy local, có: 1 Model curated · 6 Question (2 GUI, 4 SQL) · 1 Da
 ---
 
 # TUẦN 12 — Thiết kế + PORTFOLIO #1
+
+## Nội dung cần học — W12
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **1 dashboard = 1 câu hỏi chính** | Không phải nơi trưng bày mọi chart vẽ được | [L3 §3.1](/ly-thuyet/l3-bi#dashboard-la-gi) |
+| **Bố cục theo hướng đọc** | Card trên · xu hướng trái · so sánh phải · chi tiết dưới | [L3 §3.5](/ly-thuyet/l3-bi#thiet-ke) |
+| **Màu có chủ đích** | 1 màu nhấn + xám. Đỏ/xanh chỉ dành cho tốt/xấu | [L3 §3.5](/ly-thuyet/l3-bi#thiet-ke) |
+| **Mật độ** | Tối đa 5–7 thành phần một trang | [L3 §3.5](/ly-thuyet/l3-bi#thiet-ke) |
+| **Insight đạt chuẩn** | Có số · có so sánh · có hàm ý hành động | [L3 §3.7](/ly-thuyet/l3-bi#spec-portfolio-1) |
+| **Non-additive measure** | `COUNT(DISTINCT user)` cộng 12 tháng ≠ cả năm | [L3 §3.4](/ly-thuyet/l3-bi#filter-context) |
+
+**Hướng đi trong tuần**
+
+1. **T2–T3** — Đọc nguyên tắc thiết kế, rồi **vẽ tay bố cục ra giấy** trước khi mở Looker Studio. Mỗi ô ghi: câu hỏi nó trả lời · chart type · dimension · measure · filter.
+2. **T4–T5** — Dựng dashboard theo bản vẽ. Làm xong phần khung mới trang trí, không làm ngược.
+3. **T6** — Viết README: nguồn dữ liệu · công thức từng metric (5 trường) · **3 insight có số** · **2 đề xuất hành động** · hạn chế.
+4. **T7** — Test bằng người thật: đưa cho ai đó xem 5 giây, hỏi "doanh thu đang tăng hay giảm?". Không trả lời được → sửa bố cục, không sửa màu.
+5. **CN** — Đối chiếu 6 tiêu chí đạt trong [L3 §3.7](/ly-thuyet/l3-bi#spec-portfolio-1). Thiếu tiêu chí nào thì Portfolio #1 chưa xong.
+
+**Dấu hiệu đã hiểu:** phát hiện Furniture 32% doanh thu nhưng biên 2,5% nổi lên trong 5 giây, không cần đào.
 
 ## W12.1 — Nguyên tắc thiết kế (T2 + T3, 4h)
 

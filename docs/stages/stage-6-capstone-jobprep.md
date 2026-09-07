@@ -25,6 +25,27 @@ README chuẩn, khung case study 5 bước, 20 câu phỏng vấn — định ng
 
 # TUẦN 20–21 — CAPSTONE
 
+## Nội dung cần học — W20–21
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Funnel** | 3 quyết định phải nêu: cửa sổ thời gian · có ép thứ tự không · đếm user hay session | [L6 §6.1](/ly-thuyet/l6-capstone-interview#ba-dang-phan-tich) |
+| **Cohort** | Đọc ngang = sản phẩm giữ chân tốt dần không · đọc dọc = chất lượng user mới | [L6 §6.1](/ly-thuyet/l6-capstone-interview#ba-dang-phan-tich) |
+| **RFM** | Phân khúc chỉ có giá trị khi mỗi nhóm dẫn tới **hành động khác nhau** | [L6 §6.1](/ly-thuyet/l6-capstone-interview#ba-dang-phan-tich) |
+| **Mẫu SQL 3 dạng** | Cấu trúc query cho funnel / cohort / RFM | [L2 §2.8](/ly-thuyet/l2-sql#funnel-cohort-rfm) |
+| **README chuẩn** | Tiêu đề là **kết luận có số**, không phải nhãn | [L6 §6.2](/ly-thuyet/l6-capstone-interview#readme-chuan) |
+
+**Hướng đi 2 tuần**
+
+1. **W20 T2** — Khám phá schema `thelook_ecommerce`, xác định grain từng bảng. Viết `notes/capstone-data-dictionary.md` trước khi viết query.
+2. **W20 T3–T5** — Lớp SQL theo thứ tự: funnel → cohort → RFM. Mỗi query xong thì **kiểm tra tổng** với một query độc lập (thói quen [debug 5 bước](/ly-thuyet/l2-sql#debug-query)).
+3. **W20 T6–T7** — Lớp Python: kiểm định khác biệt conversion giữa nhóm + heatmap cohort.
+4. **W21 T2–T4** — Dashboard 3 trang: Tổng quan · Funnel · Cohort. Mỗi trang **1 câu hỏi chính**.
+5. **W21 T5–T6** — README 6 mục + slide 5 trang cho stakeholder.
+6. **W21 T7** — Tiêu chí đạt: người ngoài đọc README trong 3 phút hiểu được vấn đề, con số, và nên làm gì tiếp.
+
+**Dấu hiệu đã hiểu:** tự nêu hạn chế của funnel trước khi người khác kịp hỏi.
+
 ## Spec: E-commerce Funnel & Cohort Analysis
 
 **Dataset:** `bigquery-public-data.thelook_ecommerce` (BigQuery Sandbox, free)
@@ -127,6 +148,26 @@ FROM step_users;
 
 # TUẦN 22 — Đóng gói portfolio & CV
 
+## Nội dung cần học — W22
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Cấu trúc README** | TL;DR → ảnh → câu hỏi → dữ liệu → phương pháp → findings → hạn chế → đề xuất → cách chạy lại | [L6 §6.2](/ly-thuyet/l6-capstone-interview#readme-chuan) |
+| **3 lỗi README mất điểm** | Không ảnh · không hạn chế · đề xuất chung chung | [L6 §6.2](/ly-thuyet/l6-capstone-interview#readme-chuan) |
+| **CV 1 trang** | Projects đứng **trên** học vấn; mỗi project 3 dòng có số và link | [L6 §6.6](/ly-thuyet/l6-capstone-interview#cv-fresher) |
+| **Từ cần tránh trong CV** | "đam mê dữ liệu", "ham học hỏi" — không kiểm chứng được | [L6 §6.6](/ly-thuyet/l6-capstone-interview#cv-fresher) |
+| **Conventional commit** | `feat/fix/chore/docs` + branch theo tính năng | [Từ điển](/glossary) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Dọn Git: branch, commit message, xóa file rác, kiểm tra **không có dữ liệu nặng hay thông tin nhạy cảm** trong lịch sử.
+2. **T3** — README cho từng project. Bắt đầu bằng việc **đổi tiêu đề thành kết luận có số**.
+3. **T4** — README gốc của repo: bảng 4 project + link + kỹ năng chứng minh.
+4. **T5–T6** — CV. Viết phần Projects trước, tóm tắt viết sau cùng (dễ hơn nhiều).
+5. **T7–CN** — Đọc **30 JD thật** trên ITViec/TopDev/LinkedIn, lập bảng kỹ năng xuất hiện ≥15/30 lần. Đây cũng là cách tự kiểm chứng phần thị trường mà lộ trình này thừa nhận là lấy từ repo gốc, chưa xác minh độc lập.
+
+**Dấu hiệu đã hiểu:** người lạ đọc README 3 phút là hiểu vấn đề, con số và đề xuất.
+
 ## W22.1 — Git chuyên nghiệp (T2, 2h)
 
 | ID | Việc | Xong |
@@ -208,6 +249,23 @@ Chuyển hướng sang Data Analyst. 24 tuần tự học, 4 project end-to-end.
 
 # TUẦN 23 — Luyện kỹ thuật
 
+## Nội dung cần học — W23
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **20 câu kỹ thuật** | 12 câu SQL + 8 câu phân tích/metric, mỗi câu có ý bắt buộc phải nêu | [L6 §6.5](/ly-thuyet/l6-capstone-interview#cau-hoi-phong-van) |
+| **Nói kỹ thuật bằng lời** | Giải thích window function, fan-out, p-value mà không viết code | [L2 §2.4](/ly-thuyet/l2-sql#join) · [L5 §5.4](/ly-thuyet/l5-stats#p-value) |
+| **Debug query 5 bước** | Đếm dòng từng bước → kiểm grain → soi NULL → đối chiếu tổng → thu nhỏ bài toán | [L2 §2.9](/ly-thuyet/l2-sql#debug-query) |
+| **Đọc & sửa query sai** | Dạng đề rất hay gặp ở vòng technical | [L2 §2.9](/ly-thuyet/l2-sql#debug-query) |
+
+**Hướng đi trong tuần**
+
+1. **T2–T4** — 30 câu SQL. Cách luyện đúng: **viết đáp án ra giấy → đọc to → bấm giờ ≤ 90 giây/câu**. Câu nào phải nhìn ghi chú là câu chưa thuộc.
+2. **T5–T6** — Luyện nói: quay video giải thích 3 khái niệm khó nhất (window function · fan-out · p-value) cho người không biết SQL nghe.
+3. **CN** — Đề "số trên dashboard không khớp kế toán": trả lời theo 5 bước debug + kiểm tra khoảng thời gian, múi giờ, định nghĩa doanh thu, bộ lọc mặc định.
+
+**Dấu hiệu đã hiểu:** giải thích được fan-out bằng ví dụ số (2.328,60 → 20.848,62) mà không cần vẽ.
+
 ## W23.1 — 30 câu SQL (T2–T4, 6h)
 
 Tự viết câu trả lời vào `notes/interview-sql.md`, **có giải thích chứ không chỉ code**.
@@ -267,6 +325,27 @@ Luyện giải thích **không dùng màn hình**, mỗi câu 60–90 giây:
 ---
 
 # TUẦN 24 — Case study & Mock interview
+
+## Nội dung cần học — W24
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Khung case 5 bước** | Clarify → Structure → Analyze → Recommend → Measure | [L6 §6.4](/ly-thuyet/l6-capstone-interview#case-study) |
+| **Bước Clarify** | Hỏi lại trước khi phân tích — chỗ lọc phần lớn ứng viên | [L6 §6.4](/ly-thuyet/l6-capstone-interview#case-study) |
+| **Cây phân rã metric** | Doanh thu = số đơn × AOV; số đơn = số khách × tần suất | [L6 §6.4](/ly-thuyet/l6-capstone-interview#case-study) |
+| **Kiểm tra lỗi dữ liệu trước** | Tag tracking hỏng cũng làm doanh thu "giảm 15%" | [L6 §6.4](/ly-thuyet/l6-capstone-interview#case-study) |
+| **BLUF** | Nói kết luận trước, giải thích sau | [L6 §6.3](/ly-thuyet/l6-capstone-interview#ke-chuyen) |
+| **Khung 5 phút** | 30s bối cảnh · 30s kết luận · 2' bằng chứng · 1' đề xuất · 1' hạn chế | [L6 §6.3](/ly-thuyet/l6-capstone-interview#ke-chuyen) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Học khung 5 bước qua đề mẫu "doanh thu giảm 15%". Chú ý: **bước Clarify viết ra ít nhất 5 câu hỏi**.
+2. **T3–T4** — Viết đủ 3 case, mỗi case đủ 5 bước. Đề gợi ý: conversion giảm đột ngột · có nên mở thị trường mới · đánh giá tính năng mới sau 1 tháng.
+3. **T5** — Behavioral: chuẩn bị 5 câu chuyện theo khung STAR, lấy từ chính 4 project đã làm.
+4. **T6–T7** — Mock interview có **ghi âm**. Nghe lại đếm: có nói kết luận trong 60 giây đầu không · có câu nào không kèm số không.
+5. **CN** — **Nộp 10 hồ sơ.** Nộp là một phần của việc học, không phải bước sau khi học xong. Vòng phỏng vấn đầu dạy nhiều hơn 2 tuần tự ôn.
+
+**Dấu hiệu đã sẵn sàng:** bị ngắt ở phút thứ 2 khi trình bày mà người nghe vẫn nắm được kết luận.
 
 ## W24.1 — Khung case study 5 bước (T2, 2h)
 
@@ -330,7 +409,7 @@ Chuẩn bị theo khung **STAR** (Tình huống → Nhiệm vụ → Hành độ
 
 ---
 
-## ✅ CHECKPOINT 4 — Sẵn sàng ứng tuyển
+## ✅ CHECKPOINT 4 — Sẵn sàng ứng tuyển {#checkpoint-4}
 
 - [ ] 4 project public trên GitHub, mỗi cái có README đủ 6 mục
 - [ ] ≥ 150 bài SQL đã giải, có link profile

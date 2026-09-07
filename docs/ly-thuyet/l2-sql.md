@@ -15,7 +15,7 @@ Chinook dùng ở đây: 11 bảng · 412 hóa đơn · 59 khách · 24 quốc g
 
 ---
 
-## 2.0 — Dựng sân tập (làm 1 lần, 15 phút)
+## 2.0 — Dựng sân tập (làm 1 lần, 15 phút) {#san-tap}
 
 ```bash
 cd ~/Documents/Study/DA/da-portfolio/data
@@ -42,7 +42,7 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 
 ---
 
-## 2.1 — SQL là gì và chạy theo thứ tự nào
+## 2.1 — SQL là gì và chạy theo thứ tự nào {#thu-tu-thuc-thi}
 
 **Định nghĩa.** SQL là ngôn ngữ *khai báo*: mình mô tả kết quả muốn có, database tự quyết cách lấy. Khác hoàn toàn Python/JS nơi mình chỉ đạo từng bước.
 
@@ -84,7 +84,7 @@ d) **Lỗi** — không được dùng aggregate trong WHERE. Đó chính là l�
 
 ---
 
-## 2.2 — SELECT, WHERE và bẫy NULL
+## 2.2 — SELECT, WHERE và bẫy NULL {#bay-null}
 
 **Định nghĩa.** `SELECT` chọn cột, `WHERE` giữ lại dòng thỏa điều kiện. Điều kiện trả về TRUE / FALSE / **UNKNOWN** (khi dính NULL) — chỉ dòng TRUE được giữ.
 
@@ -130,7 +130,7 @@ SELECT COUNT(*) FROM Track WHERE LOWER(Name) LIKE '%love%';
 
 ---
 
-## 2.3 — GROUP BY, HAVING và các hàm tổng hợp
+## 2.3 — GROUP BY, HAVING và các hàm tổng hợp {#group-by-having}
 
 **Định nghĩa.** `GROUP BY` gom các dòng cùng giá trị thành 1 nhóm; hàm aggregate (`COUNT/SUM/AVG/MIN/MAX`) tính ra 1 số cho mỗi nhóm. `HAVING` lọc trên kết quả nhóm.
 
@@ -184,7 +184,7 @@ FROM Invoice GROUP BY 1 ORDER BY hd_lon DESC;
 
 ---
 
-## 2.4 — JOIN: mô hình tư duy + 2 cái bẫy chết người
+## 2.4 — JOIN: mô hình tư duy + 2 cái bẫy chết người {#join}
 
 **Định nghĩa.** JOIN ghép dòng của hai bảng theo điều kiện khớp. Hình dung: với **mỗi dòng bảng trái**, database đi tìm **mọi dòng bảng phải** thỏa điều kiện `ON`, rồi ghép ra 1 dòng cho mỗi cặp khớp.
 
@@ -297,7 +297,7 @@ Câu 4: kết quả 0 nghĩa là dataset đã "sạch" theo hướng này — kh
 
 ---
 
-## 2.5 — Subquery, CTE và bẫy NOT IN
+## 2.5 — Subquery, CTE và bẫy NOT IN {#subquery-cte}
 
 **Định nghĩa.** Subquery = query lồng trong query. CTE (`WITH ... AS (...)`) = đặt tên cho bước trung gian, viết query như liệt kê các bước suy nghĩ.
 
@@ -365,7 +365,7 @@ Bản `NOT IN`: nếu danh sách con chứa NULL (ví dụ khi join hụt làm s
 
 ---
 
-## 2.6 — Window functions (kỹ năng phân biệt fresher và junior)
+## 2.6 — Window functions (kỹ năng phân biệt fresher và junior) {#window}
 
 **Định nghĩa.** Window function tính toán dựa trên một nhóm dòng liên quan **mà không gộp dòng lại**. GROUP BY: 100 dòng → 5 dòng. Window: 100 dòng → vẫn 100 dòng, thêm cột kết quả.
 
@@ -494,7 +494,7 @@ FROM Invoice;
 
 ---
 
-## 2.7 — Ngày tháng, CASE WHEN, chia số và NULL
+## 2.7 — Ngày tháng, CASE WHEN, chia số và NULL {#date-case-null}
 
 **DATE_TRUNC** gom về đầu kỳ: `DATE_TRUNC('month', d)` biến 2023-03-17 thành 2023-03-01. Đây là cách chuẩn để gom theo tháng — **không** dùng chuỗi `'2023-03'` để so sánh lớn/nhỏ.
 
@@ -561,7 +561,7 @@ SELECT ROUND(100 * SUM(chi) / MAX(tong), 1) AS pct_top5 FROM r WHERE hang <= 5;
 
 ---
 
-## 2.8 — Ba mẫu phân tích thực chiến (W9)
+## 2.8 — Ba mẫu phân tích thực chiến (W9) {#funnel-cohort-rfm}
 
 Đây là 3 dạng query mà hầu hết bài test DA đều hỏi. Học thuộc **cấu trúc**, không phải cú pháp.
 
@@ -614,7 +614,7 @@ FROM base;
 
 ---
 
-## 2.9 — Kỹ năng debug query (không có trong stage file, nhưng phỏng vấn hay hỏi)
+## 2.9 — Kỹ năng debug query (không có trong stage file, nhưng phỏng vấn hay hỏi) {#debug-query}
 
 Khi query ra số lạ, kiểm tra theo thứ tự:
 

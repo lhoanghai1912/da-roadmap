@@ -15,7 +15,7 @@ Số thật dùng làm ví dụ (từ `superstore.csv`, đã chạy kiểm chứ
 
 ---
 
-## 3.1 — Dashboard là gì và không phải là gì
+## 3.1 — Dashboard là gì và không phải là gì {#dashboard-la-gi}
 
 **Định nghĩa.** Dashboard = một màn hình trả lời **một** câu hỏi kinh doanh chính, cập nhật định kỳ, giúp người xem quyết định làm gì tiếp theo.
 
@@ -50,7 +50,7 @@ c) "Tính năng mới có được dùng không, và nó ảnh hưởng thế n�
 
 ---
 
-## 3.2 — Measure vs Dimension (khái niệm gốc của mọi công cụ BI)
+## 3.2 — Measure vs Dimension (khái niệm gốc của mọi công cụ BI) {#measure-dimension}
 
 **Định nghĩa.** **Measure** = cột số được tổng hợp (SUM, AVG…). **Dimension** = cột dùng để cắt lát/nhóm/lọc.
 
@@ -78,7 +78,7 @@ c) "Tính năng mới có được dùng không, và nó ảnh hưởng thế n�
 
 ---
 
-## 3.3 — Star schema: tại sao dashboard cần mô hình dữ liệu
+## 3.3 — Star schema: tại sao dashboard cần mô hình dữ liệu {#star-schema}
 
 **Định nghĩa.** **Fact table** ghi sự kiện đã xảy ra (nhiều dòng, có cột số để cộng). **Dimension table** mô tả (ít dòng, dùng để lọc). Nối fact ở giữa với các dim xung quanh = **star schema**.
 
@@ -124,7 +124,7 @@ Nếu `dim_product` nhiều dòng hơn số `Product ID` duy nhất → cùng m�
 
 ---
 
-## 3.4 — Filter context: vì sao tổng các phần khác tổng chung
+## 3.4 — Filter context: vì sao tổng các phần khác tổng chung {#filter-context}
 
 **Định nghĩa.** Mỗi biểu đồ tính toán trong phạm vi bộ lọc đang áp lên nó (filter dashboard + filter riêng của chart + phạm vi ngày).
 
@@ -144,7 +144,7 @@ Ba nguyên nhân khiến số không khớp nhau trên cùng một dashboard:
 
 ---
 
-## 3.5 — Thiết kế: bố cục, màu, mật độ thông tin
+## 3.5 — Thiết kế: bố cục, màu, mật độ thông tin {#thiet-ke}
 
 **Nguyên tắc bố cục** — mắt đọc trái→phải, trên→dưới:
 ```
@@ -171,7 +171,7 @@ Ba nguyên nhân khiến số không khớp nhau trên cùng một dashboard:
 
 ---
 
-## 3.6 — Looker Studio và Metabase: chọn cái nào cho việc gì
+## 3.6 — Looker Studio và Metabase: chọn cái nào cho việc gì {#looker-metabase}
 
 | | Looker Studio | Metabase |
 |---|---|---|
@@ -190,7 +190,7 @@ docker run -d -p 3000:3000 -v metabase-data:/metabase.db --name metabase metabas
 
 ---
 
-## 3.7 — Spec Portfolio #1 và tiêu chí chấm
+## 3.7 — Spec Portfolio #1 và tiêu chí chấm {#spec-portfolio-1}
 
 Câu hỏi chính: **"Doanh thu và lợi nhuận đang diễn biến ra sao, nhóm nào kéo tăng, nhóm nào kéo giảm, và nên làm gì?"**
 

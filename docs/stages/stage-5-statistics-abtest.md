@@ -28,6 +28,27 @@ P-value giải thích cho sếp, cỡ mẫu, đọc kết quả A/B, 4 bẫy —
 
 # TUẦN 17 — Nền tảng suy diễn
 
+## Nội dung cần học — W17
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Population vs Sample** | Toàn bộ đối tượng vs phần quan sát được | [L5 §5.1](/ly-thuyet/l5-stats#mau-sai-so) |
+| **Sampling bias** | Mẫu lệch thì n lớn chỉ làm ta **tự tin hơn vào số sai** | [L5 §5.1](/ly-thuyet/l5-stats#mau-sai-so) |
+| **CLT** | Trung bình mẫu tiệm cận phân phối chuẩn dù tổng thể lệch — lý do t-test dùng được cho doanh thu | [L5 §5.2](/ly-thuyet/l5-stats#clt) |
+| **Standard error** | `SD/√n` — muốn giảm sai số một nửa phải tăng mẫu **gấp 4** | [L5 §5.1](/ly-thuyet/l5-stats#mau-sai-so) |
+| **Khoảng tin cậy** | Cách diễn giải đúng và cách diễn giải sai rất phổ biến | [L5 §5.3](/ly-thuyet/l5-stats#khoang-tin-cay) |
+| **Confounder · Simpson** | Biến gây nhiễu · xu hướng đảo ngược khi gộp nhóm | [L5 §5.7](/ly-thuyet/l5-stats#bon-bay) · [L1 §1.5](/ly-thuyet/l1-foundation#tuong-quan) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Nhận diện phân phối bằng mắt trước khi tính. Doanh thu, thời gian chờ: gần như luôn lệch phải.
+2. **T3** — **Mô phỏng CLT bằng code** với n = 5, 30, 100. Nhìn `sd` giảm theo `1/√n` — hiểu bằng tay mạnh hơn đọc định nghĩa 10 lần.
+3. **T4** — Khoảng tin cậy. Học **câu diễn giải đúng thuộc lòng**, vì đây là câu hay bị hỏi và hay trả lời sai.
+4. **T5–T6** — Anscombe's quartet: 4 dataset cùng thống kê, khác hẳn hình dạng. Kết luận: **luôn vẽ trước khi tin hệ số**. Thêm 1 ví dụ Simpson tự dựng.
+5. **T7** — Notebook `w17-stats-foundation.ipynb`.
+
+**Dấu hiệu đã hiểu:** nghe "khảo sát 5.000 người nên rất đáng tin" là hỏi ngay "5.000 người đó được chọn thế nào?".
+
 ## W17.1 — Phân phối (T2, 2h)
 
 | ID | Chủ đề | Nội dung cần nắm | Xong |
@@ -94,6 +115,28 @@ Trong báo cáo thực tế, luôn kèm CI thay vì chỉ đưa 1 con số. "Con
 ---
 
 # TUẦN 18 — Kiểm định giả thuyết
+
+## Nội dung cần học — W18
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **H0 / H1** | Kiểm định luôn xuất phát từ giả định "không có khác biệt" | [L5 §5.4](/ly-thuyet/l5-stats#p-value) |
+| **p-value** | Xác suất thấy kết quả cực đoan như dữ liệu hiện có **nếu H0 đúng** — và 3 điều nó **không** phải | [L5 §5.4](/ly-thuyet/l5-stats#p-value) |
+| **Alpha** | Ngưỡng chấp nhận báo động giả, **chốt trước khi chạy** | [L5 §5.5](/ly-thuyet/l5-stats#power-mde) |
+| **Lỗi loại I / II** | Báo động giả / bỏ sót khác biệt thật | [L5 §5.5](/ly-thuyet/l5-stats#power-mde) |
+| **Power** | Khả năng phát hiện khác biệt thật, chuẩn ngành 80% | [L5 §5.5](/ly-thuyet/l5-stats#power-mde) |
+| **t-test · chi-square · Mann-Whitney** | So trung bình · so tỷ lệ · bản không giả định phân phối chuẩn | [L5 §5.6](/ly-thuyet/l5-stats#doc-ket-qua-ab) |
+| **Effect size** | Độ lớn tác động — khác hoàn toàn "có ý nghĩa thống kê" | [L5 §5.5](/ly-thuyet/l5-stats#power-mde) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Khung kiểm định. Học theo trình tự **câu hỏi → chọn test → điều kiện áp dụng**, không học danh sách công thức rời.
+2. **T3** — Chọn test theo loại dữ liệu: tỷ lệ (mua/không) → chi-square hoặc z-test tỷ lệ; giá trị liên tục lệch mạnh → Mann-Whitney hoặc bootstrap.
+3. **T4** — Effect size + vấn đề so sánh bội (test 10 metric cùng lúc thì gần như chắc chắn có 1 cái "có ý nghĩa" do ngẫu nhiên).
+4. **T5–T6** — **Bài viết ≤150 từ: giải thích p-value cho Giám đốc Marketing.** Tiêu chí: không dùng chữ "giả thuyết không", "bác bỏ"; phải nêu hàm ý hành động. Có [bản mẫu đạt chuẩn](/ly-thuyet/l5-stats#p-value) để tự đối chiếu sau khi tự viết.
+5. **CN** — Đọc to bài viết cho người không làm dữ liệu nghe. Họ không hiểu → viết lại.
+
+**Dấu hiệu đã hiểu:** nói được 3 điều p-value không phải, không cần nhìn ghi chú.
 
 ## W18.1 — Khung kiểm định (T2, 2h)
 
@@ -164,6 +207,28 @@ Mỗi test viết đủ: H0, H1, test chọn và lý do, kết quả (statistic,
 ---
 
 # TUẦN 19 — A/B Testing + PORTFOLIO #3
+
+## Nội dung cần học — W19
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Metric chính vs guardrail** | Đúng 1 metric chính · 2–3 chỉ số không được xấu đi | [L5 §5.8](/ly-thuyet/l5-stats#checklist-ab) |
+| **MDE** | Mức tác động nhỏ nhất đáng phát hiện — **quyết định kinh doanh**, không phải kỹ thuật | [L5 §5.5](/ly-thuyet/l5-stats#power-mde) |
+| **Cỡ mẫu** | Từ baseline + MDE + alpha + power. **MDE giảm ½ → mẫu ×4** | [L5 §5.5](/ly-thuyet/l5-stats#power-mde) |
+| **Thời gian chạy** | `n×2 / lượng user mỗi ngày`, làm tròn lên **bội số của 7** | [L5 §5.5](/ly-thuyet/l5-stats#power-mde) |
+| **Peeking** | Dừng ngay khi thấy p < 0,05 → báo động giả tăng lên 20–30% | [L5 §5.7](/ly-thuyet/l5-stats#bon-bay) |
+| **SRM** | Tỷ lệ chia nhóm lệch → kết quả vứt đi. **Kiểm tra đầu tiên** | [L5 §5.7](/ly-thuyet/l5-stats#bon-bay) |
+| **Novelty effect** | Phản ứng tích cực vì thấy lạ, tan sau 1–2 tuần | [L5 §5.7](/ly-thuyet/l5-stats#bon-bay) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Viết giả thuyết đúng khuôn: *"Nếu [thay đổi] thì [metric] sẽ [tăng/giảm] khoảng [MDE] vì [lý do]"*. Không có "vì" thì chưa phải giả thuyết.
+2. **T3** — Tính cỡ mẫu bằng code. Chạy 3 kịch bản MDE để **cảm nhận quy luật ×4**, rồi đổi ra số ngày chạy.
+3. **T4** — Đọc kết quả: [ví dụ đầy đủ p = 0,0582, CI 95% [−0,02%; +1,22%]](/ly-thuyet/l5-stats#doc-ket-qua-ab). Học cách kết luận **và 3 cách kết luận sai**.
+4. **T5–T7** — Portfolio #3 theo đúng [checklist 2 phần](/ly-thuyet/l5-stats#checklist-ab): trước khi chạy (8 mục) và sau khi chạy (6 mục). Thứ tự bắt buộc: **SRM trước, metric chính sau**.
+5. **CN** — Phần Hạn chế phải nêu: thời gian chạy, novelty, đơn vị ngẫu nhiên hóa, khả năng rò rỉ giữa hai nhóm.
+
+**Dấu hiệu đã hiểu:** kết luận của mình luôn kèm khoảng tin cậy, không bao giờ chỉ đưa p-value.
 
 ## W19.1 — Thiết kế thí nghiệm (T2, 2h)
 

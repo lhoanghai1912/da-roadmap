@@ -17,7 +17,7 @@ Số nền của dataset — kiểm chứng bằng lệnh ở cuối file: 9.994
 
 ---
 
-## 1.1 — Grain (độ mịn): khái niệm quan trọng nhất
+## 1.1 — Grain (độ mịn): khái niệm quan trọng nhất {#grain}
 
 **Định nghĩa.** Grain là câu trả lời cho câu hỏi *"một dòng trong bảng này đại diện cho cái gì?"*. Viết ra bằng một câu đầy đủ trước khi tính bất cứ thứ gì.
 
@@ -47,7 +47,7 @@ Sai grain không báo lỗi. Query chạy ngon, ra số đẹp, và sai. Đó l�
 
 ---
 
-## 1.2 — Kiểu dữ liệu và NULL
+## 1.2 — Kiểu dữ liệu và NULL {#kieu-du-lieu-null}
 
 **Định nghĩa.** Kiểu dữ liệu quy định giá trị nào hợp lệ và phép tính nào được phép. NULL = "không có giá trị / không biết", khác `0`, khác chuỗi rỗng.
 
@@ -77,7 +77,7 @@ Ba giá trị khác nhau hoàn toàn:
 
 ---
 
-## 1.3 — Mean vs Median: câu phỏng vấn xuất hiện nhiều nhất
+## 1.3 — Mean vs Median: câu phỏng vấn xuất hiện nhiều nhất {#mean-median}
 
 **Định nghĩa.** Mean = tổng / số lượng. Median = giá trị đứng giữa khi đã sắp xếp. Mean bị giá trị cực đoan kéo, median thì không.
 
@@ -113,7 +113,7 @@ Cách nói đúng: *"Phân phối lệch phải mạnh — median 54$, mean 230$
 
 ---
 
-## 1.4 — Outlier và quy tắc IQR
+## 1.4 — Outlier và quy tắc IQR {#iqr-outlier}
 
 **Định nghĩa.** IQR = Q3 − Q1. Ngưỡng ngoại lai: dưới `Q1 − 1,5×IQR`, trên `Q3 + 1,5×IQR`. Đây là quy ước, không phải chân lý.
 
@@ -138,7 +138,7 @@ Diễn giải: 11,7% là quá nhiều để gọi là "bất thường". Kết l
 
 ---
 
-## 1.5 — Tương quan và bẫy nhân quả
+## 1.5 — Tương quan và bẫy nhân quả {#tuong-quan}
 
 **Định nghĩa.** Hệ số tương quan r ∈ [−1, 1] đo mức độ hai biến **số** đi cùng nhau theo quan hệ tuyến tính. |r| < 0,3 yếu · 0,3–0,7 vừa · > 0,7 mạnh (quy ước thô).
 
@@ -177,7 +177,7 @@ Cách nói đúng trong báo cáo: *"Có liên hệ rõ giữa mức chiết kh�
 
 ---
 
-## 1.6 — Chọn đúng loại chart
+## 1.6 — Chọn đúng loại chart {#chon-chart}
 
 **Định nghĩa.** Chart không chọn theo "đẹp" mà theo **loại câu hỏi**.
 
@@ -205,7 +205,7 @@ a) Line (thời gian, 12 điểm) — hoặc bar nếu muốn nhấn so sánh t�
 
 ---
 
-## 1.7 — Pivot table và tăng trưởng MoM
+## 1.7 — Pivot table và tăng trưởng MoM {#pivot-mom}
 
 **Định nghĩa.** Pivot table = gom nhóm dữ liệu theo 1–2 chiều rồi tính tổng hợp. Chính là `GROUP BY` phiên bản kéo thả. MoM growth = `(kỳ này − kỳ trước) / kỳ trước`.
 
@@ -236,7 +236,7 @@ a) Line (thời gian, 12 điểm) — hoặc bar nếu muốn nhấn so sánh t�
 
 ---
 
-## 1.8 — Đọc một dataset lạ trong 15 phút
+## 1.8 — Đọc một dataset lạ trong 15 phút {#doc-dataset-la}
 
 Quy trình áp dụng cho mọi dataset, làm theo đúng thứ tự:
 
