@@ -3,6 +3,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   mainSidebar: [
     'intro',
+    'ban-do-24-tuan',
     'phan-tich-repo',
     {
       type: 'category',

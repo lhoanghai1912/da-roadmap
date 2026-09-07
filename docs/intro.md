@@ -39,6 +39,10 @@ Không lấy từ tài liệu thứ cấp. Ví dụ: Superstore có 9.994 dòng 
 
 ## Bản đồ 7 stage
 
+:::tip Xem toàn bộ 24 tuần trên một trang
+[**Bản đồ 24 tuần**](/ban-do) — mỗi tuần học gì, làm ra artifact gì, cổng ra từng stage.
+:::
+
 | Stage | Tuần | Giờ | Chủ đề | Deliverable | Cổng ra |
 |---|---|---|---|---|---|
 | [**0**](./stages/stage-0-setup) | W0 | 4h | Dựng môi trường macOS | Môi trường chạy được + repo GitHub | 5 verify |

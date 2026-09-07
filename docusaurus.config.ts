@@ -79,6 +79,7 @@ const config: Config = {
       logo: { alt: 'DA Roadmap', src: 'img/favicon.svg' },
       items: [
         { type: 'docSidebar', sidebarId: 'mainSidebar', position: 'left', label: 'Lộ trình' },
+        { to: '/ban-do', label: 'Bản đồ 24 tuần', position: 'left' },
         { to: '/ly-thuyet', label: 'Lý thuyết', position: 'left' },
         { to: '/bai-tap', label: 'Bài tập & tự chấm', position: 'left' },
         { to: '/glossary', label: 'Thuật ngữ', position: 'left' },
@@ -97,6 +98,7 @@ const config: Config = {
           title: 'Lộ trình',
           items: [
             { label: 'Tổng quan', to: '/' },
+            { label: 'Bản đồ 24 tuần', to: '/ban-do' },
             { label: 'Stage 0 — Setup', to: '/stages/stage-0-setup' },
             { label: 'Stage 2 — SQL', to: '/stages/stage-2-sql' },
             { label: 'Lý thuyết L2 — SQL', to: '/ly-thuyet/l2-sql' },
