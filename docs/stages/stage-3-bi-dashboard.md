@@ -18,6 +18,10 @@ format: md
 
 **Lưu ý macOS:** Power BI Desktop không chạy native trên macOS. Stage này dùng **Looker Studio** (trình duyệt, free) + **Metabase** (Docker, free). Khái niệm học được — data model, measure, filter context, star schema — chuyển thẳng sang Power BI/Tableau sau này. Xem mục cuối file về lộ trình bổ sung Power BI nếu nhắm banking.
 
+:::tip Lý thuyết đi kèm
+Measure vs dimension, star schema, filter context, spec Portfolio #1 — định nghĩa + ví dụ + bài tập có đáp án: [L3 — BI & Dashboard](../ly-thuyet/l3-bi.md) · tra từ: [Từ điển thuật ngữ](../glossary.md)
+:::
+
 ---
 
 # TUẦN 10 — Looker Studio

@@ -17,6 +17,10 @@ format: md
 | **Output** | **PORTFOLIO #4 — Capstone** · CV · 30 câu Q&A · 3 case study · 1 mock interview |
 | **Checkpoint** | CHECKPOINT 4 — sẵn sàng ứng tuyển |
 
+:::tip Lý thuyết đi kèm
+README chuẩn, khung case study 5 bước, 20 câu phỏng vấn — định nghĩa + ví dụ + bài tập có đáp án: [L6 — Capstone & Phỏng vấn](../ly-thuyet/l6-capstone-interview.md) · tra từ: [Từ điển thuật ngữ](../glossary.md)
+:::
+
 ---
 
 # TUẦN 20–21 — CAPSTONE

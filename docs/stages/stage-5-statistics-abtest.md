@@ -20,6 +20,10 @@ format: md
 
 **Tài liệu chính:** [Khan Academy Statistics & Probability](https://www.khanacademy.org/math/statistics-probability) (free, đủ dùng) · *The Art of Statistics* — David Spiegelhalter · *Naked Statistics* chương 5–10.
 
+:::tip Lý thuyết đi kèm
+P-value giải thích cho sếp, cỡ mẫu, đọc kết quả A/B, 4 bẫy — định nghĩa + ví dụ + bài tập có đáp án: [L5 — Thống kê suy diễn](../ly-thuyet/l5-stats.md) · tra từ: [Từ điển thuật ngữ](../glossary.md)
+:::
+
 ---
 
 # TUẦN 17 — Nền tảng suy diễn

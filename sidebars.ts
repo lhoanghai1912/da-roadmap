@@ -21,6 +21,27 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Lý thuyết — định nghĩa & ví dụ',
+      collapsed: false,
+      link: {
+        type: 'generated-index',
+        title: 'Lý thuyết — định nghĩa & ví dụ',
+        description:
+          'Stage trả lời "làm gì, tuần nào". Lý thuyết trả lời "cái đó là gì, ví dụ ra sao, tự kiểm tra thế nào". Mỗi khái niệm: định nghĩa → ví dụ đã chạy thật trên dữ liệu → bài tập → đáp án.',
+        slug: '/ly-thuyet',
+      },
+      items: [
+        'ly-thuyet/l1-foundation',
+        'ly-thuyet/l2-sql',
+        'ly-thuyet/l3-bi',
+        'ly-thuyet/l4-python',
+        'ly-thuyet/l5-stats',
+        'ly-thuyet/l6-capstone-interview',
+      ],
+    },
+    'glossary',
+    {
+      type: 'category',
       label: 'Bài tập & tự chấm',
       collapsed: false,
       link: { type: 'doc', id: 'bai-tap/bai-tap-index' },

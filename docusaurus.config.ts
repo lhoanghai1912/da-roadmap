@@ -79,7 +79,9 @@ const config: Config = {
       logo: { alt: 'DA Roadmap', src: 'img/favicon.svg' },
       items: [
         { type: 'docSidebar', sidebarId: 'mainSidebar', position: 'left', label: 'Lộ trình' },
+        { to: '/ly-thuyet', label: 'Lý thuyết', position: 'left' },
         { to: '/bai-tap', label: 'Bài tập & tự chấm', position: 'left' },
+        { to: '/glossary', label: 'Thuật ngữ', position: 'left' },
         { to: '/phan-tich-repo', label: 'Phân tích repo gốc', position: 'left' },
         {
           href: `https://github.com/${GITHUB_USER}/${REPO_NAME}`,
@@ -97,6 +99,8 @@ const config: Config = {
             { label: 'Tổng quan', to: '/' },
             { label: 'Stage 0 — Setup', to: '/stages/stage-0-setup' },
             { label: 'Stage 2 — SQL', to: '/stages/stage-2-sql' },
+            { label: 'Lý thuyết L2 — SQL', to: '/ly-thuyet/l2-sql' },
+            { label: 'Từ điển thuật ngữ', to: '/glossary' },
             { label: 'Stage 6 — Capstone', to: '/stages/stage-6-capstone-jobprep' },
           ],
         },

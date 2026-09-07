@@ -27,7 +27,20 @@ format: md
 ```bash
 # Tải về, để trong data/ (đã gitignore)
 mv ~/Downloads/Sample*Superstore*.csv ~/Documents/Study/DA/da-portfolio/data/superstore.csv
+
+# BAT BUOC: file goc ma hoa Windows-1252, KHONG phai UTF-8.
+# Khong chuyen thi DuckDB bao loi o dong 13, pandas bao UnicodeDecodeError.
+cd ~/Documents/Study/DA/da-portfolio/data
+iconv -f WINDOWS-1252 -t UTF-8 superstore.csv > superstore_utf8.csv
 ```
+
+:::warning Bẫy đầu tiên gần như ai cũng gặp
+File Superstore trên Kaggle mã hóa **Windows-1252**, không phải UTF-8 (chứa byte `0xa0`, `0x93`, `0x94`). Đọc thẳng bằng DuckDB sẽ lỗi ngay dòng 13. Trong Python đọc được bằng `pd.read_csv(..., encoding="cp1252")`.
+:::
+
+:::tip Lý thuyết đi kèm
+Định nghĩa từng khái niệm + ví dụ đã chạy thật + bài tập có đáp án: [L1 — Nền tảng dữ liệu](../ly-thuyet/l1-foundation.md) · tra từ: [Từ điển thuật ngữ](../glossary.md)
+:::
 
 ---
 

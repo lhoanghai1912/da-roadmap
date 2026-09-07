@@ -19,6 +19,24 @@ Roadmap gốc trả lời **"học gì"**. Trang này trả lời **"làm gì, b
 
 ---
 
+## Ba lớp tài liệu
+
+| Lớp | Trả lời câu hỏi | Dạng nội dung |
+|---|---|---|
+| **[7 Stage](/stages)** | Làm gì, tuần nào, deliverable gì | Bảng task có ID + checkbox + tiêu chí đạt |
+| **[Lý thuyết](/ly-thuyet)** | Cái đó *là gì*, ví dụ ra sao | Định nghĩa → ví dụ đã chạy thật trên dữ liệu → bài tập → đáp án |
+| **[Bài tập & tự chấm](/bai-tap)** | Mình hiểu thật chưa | Quiz, bài tính tay có kiểm tra kết quả, rubric |
+
+Tra thuật ngữ lạ: **[Từ điển thuật ngữ](/glossary)** — ~110 mục, định nghĩa từ 0 kèm ví dụ.
+
+Nhịp mỗi tuần: đọc **Lý thuyết** (30–45') → làm theo **Stage** → cuối tuần làm **Bài tập** tự chấm.
+
+:::info Số liệu trong phần Lý thuyết đều đã chạy kiểm chứng
+Không lấy từ tài liệu thứ cấp. Ví dụ: Superstore có 9.994 dòng nhưng chỉ **5.009 đơn hàng** · mean `Sales` 229,86 vs median 54,49 · Chinook fan-out làm doanh thu phồng từ 2.328,60 lên **20.848,62** · cùng một điều kiện đặt ở `ON` hay `WHERE` cho 89 hay 35 dòng.
+:::
+
+---
+
 ## Bản đồ 7 stage
 
 | Stage | Tuần | Giờ | Chủ đề | Deliverable | Cổng ra |
