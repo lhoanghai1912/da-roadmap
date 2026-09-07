@@ -36,23 +36,20 @@ Roadmap gốc trả lời **"học gì"**. Trang này trả lời **"làm gì, b
 ## Dòng thời gian
 
 ```mermaid
-gantt
-    title Lộ trình 24 tuần
-    dateFormat X
-    axisFormat T%s
+flowchart LR
+    S0["Stage 0<br/>Setup<br/>W0 · 4h"]
+    S1["Stage 1<br/>Sheets + Stats<br/>W1-2 · 30h"]
+    S2["Stage 2<br/>SQL<br/>W3-9 · 105h"]
+    S3["Stage 3<br/>BI Dashboard<br/>W10-12 · 45h"]
+    S4["Stage 4<br/>Python<br/>W13-16 · 60h"]
+    S5["Stage 5<br/>Stats + A/B<br/>W17-19 · 45h"]
+    S6["Stage 6<br/>Capstone + Job<br/>W20-24 · 75h"]
 
-    section Nền tảng
-    Stage 0 — Setup           :done, s0, 0, 1
-    Stage 1 — Sheets & Stats  :s1, 1, 2
-
-    section Kỹ năng lõi
-    Stage 2 — SQL             :crit, s2, 3, 7
-    Stage 3 — BI Dashboard    :s3, 10, 3
-    Stage 4 — Python          :s4, 13, 4
-
-    section Nâng cao
-    Stage 5 — Stats & A/B     :s5, 17, 3
-    Stage 6 — Capstone & Job  :crit, s6, 20, 5
+    S0 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    S1 -.-> CP1{{"CP 1"}}
+    S2 -.-> CP2{{"CP 2"}}
+    S4 -.-> CP3{{"CP 3"}}
+    S6 -.-> CP4{{"CP 4"}}
 ```
 
 ---

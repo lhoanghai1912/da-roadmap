@@ -18,7 +18,6 @@ const config: Config = {
   trailingSlash: false,
 
   onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
 
   i18n: {
     defaultLocale: 'vi',
@@ -27,6 +26,9 @@ const config: Config = {
 
   markdown: {
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
   },
   themes: [
     '@docusaurus/theme-mermaid',
