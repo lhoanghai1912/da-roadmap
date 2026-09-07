@@ -1,0 +1,115 @@
+/* DA Roadmap — theme */
+
+:root {
+  --ifm-color-primary: #1f6feb;
+  --ifm-color-primary-dark: #1a63d4;
+  --ifm-color-primary-darker: #185dc8;
+  --ifm-color-primary-darkest: #144da5;
+  --ifm-color-primary-light: #377ded;
+  --ifm-color-primary-lighter: #4385ee;
+  --ifm-color-primary-lightest: #689df1;
+
+  --ifm-code-font-size: 92%;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.7;
+  --ifm-heading-font-weight: 650;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #58a6ff;
+  --ifm-color-primary-dark: #3d96ff;
+  --ifm-color-primary-darker: #2f8eff;
+  --ifm-color-primary-darkest: #0272ff;
+  --ifm-color-primary-light: #73b4ff;
+  --ifm-color-primary-lighter: #81bcff;
+  --ifm-color-primary-lightest: #aed3ff;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.12);
+}
+
+/* Bang: gon hon, de doc bang dai nhieu cot */
+.markdown table {
+  display: table;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.markdown table th {
+  background: var(--ifm-table-head-background);
+  white-space: nowrap;
+}
+
+.markdown table td:first-child {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Checkbox trong bang task */
+.markdown table td:last-child {
+  text-align: center;
+}
+
+/* Blockquote = ghi chu quan trong */
+.markdown blockquote {
+  border-left: 4px solid var(--ifm-color-primary);
+  background: var(--ifm-color-emphasis-100);
+  padding: 0.8rem 1rem;
+  border-radius: 0 6px 6px 0;
+}
+
+/* Heading tuan noi bat */
+.markdown h1 {
+  --ifm-h1-font-size: 2.1rem;
+}
+
+.markdown > h1:first-child {
+  margin-bottom: 1.2rem;
+}
+
+/* Code block */
+.theme-code-block {
+  box-shadow: none !important;
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+/* Trang chu: card stage */
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.stage-card {
+  display: block;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 10px;
+  transition: all 0.15s ease;
+  text-decoration: none !important;
+  color: inherit;
+}
+
+.stage-card:hover {
+  border-color: var(--ifm-color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.stage-card h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1.05rem;
+  color: var(--ifm-color-primary);
+}
+
+.stage-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.stage-card .stage-meta {
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-top: 0.4rem;
+}
