@@ -1,0 +1,144 @@
+---
+id: bai-tap-stage-1
+title: Bài tập Stage 1 — Nền tảng & Thống kê mô tả
+sidebar_label: Stage 1
+sidebar_position: 2
+slug: /bai-tap/stage-1
+description: Quiz 10 câu, 6 bài tính tay có kiểm tra kết quả, rubric chấm sheet Superstore.
+---
+
+import Quiz from '@site/src/components/Quiz';
+import Rubric from '@site/src/components/Quiz/Rubric';
+import NumericCheck from '@site/src/components/Quiz/NumericCheck';
+import { stage1Quiz } from '@site/src/data/quiz/stage1';
+import { rubricStage1 } from '@site/src/data/rubrics';
+
+# Bài tập Stage 1
+
+Làm sau khi học xong [Stage 1 — Nền tảng](../stages/stage-1-foundation).
+
+## Phần A — Quiz khái niệm
+
+Tập trung vào grain, mean vs median, outlier, chọn chart. Đây là những chỗ người mới sai nhiều nhất và cũng là chỗ hay bị hỏi ở vòng phỏng vấn.
+
+<Quiz id="stage1" questions={stage1Quiz} />
+
+---
+
+## Phần B — Bài tính tay
+
+Tính bằng máy tính hoặc spreadsheet, gõ kết quả vào ô để kiểm tra. Sai thì bấm "Xem đáp án" để đọc cách tính.
+
+### B1. Tăng trưởng MoM
+
+Doanh thu tháng 3 = 84.500, tháng 4 = 97.175. Tăng trưởng MoM bằng bao nhiêu phần trăm?
+
+<NumericCheck
+  id="s1b1"
+  answer={15}
+  tolerance={0.1}
+  unit="%"
+  explain="(97175 − 84500) / 84500 × 100 = 12675 / 84500 × 100 = 15%. Mẫu số luôn là kỳ gốc (tháng trước), không phải tháng này."
+/>
+
+### B2. Ngưỡng outlier IQR
+
+Một cột có Q1 = 24, Q3 = 88. Ngưỡng trên để coi là outlier là bao nhiêu?
+
+<NumericCheck
+  id="s1b2"
+  answer={184}
+  tolerance={0.5}
+  explain="IQR = 88 − 24 = 64. Ngưỡng trên = Q3 + 1.5 × IQR = 88 + 96 = 184. Ngưỡng dưới = 24 − 96 = −72."
+/>
+
+### B3. Biên lợi nhuận
+
+Doanh thu 1.250.000, lợi nhuận 87.500. Biên lợi nhuận là bao nhiêu phần trăm?
+
+<NumericCheck
+  id="s1b3"
+  answer={7}
+  tolerance={0.05}
+  unit="%"
+  explain="87500 / 1250000 × 100 = 7%. Chú ý mẫu số là doanh thu, không phải chi phí."
+/>
+
+### B4. Số đơn hàng đúng grain
+
+File có 9.994 dòng, grain là dòng-sản-phẩm. Trong đó có 5.009 giá trị Order ID khác nhau. Số đơn hàng thực tế là bao nhiêu?
+
+<NumericCheck
+  id="s1b4"
+  answer={5009}
+  tolerance={0.5}
+  unit="đơn"
+  explain="Đếm giá trị duy nhất của Order ID = 5.009 đơn. Đếm 9.994 dòng là đếm số dòng-sản-phẩm, không phải số đơn. Sai grain là lỗi âm thầm — không báo lỗi, chỉ ra số sai."
+/>
+
+### B5. AOV
+
+Doanh thu 2.297.200, có 5.009 đơn hàng. AOV (giá trị đơn hàng trung bình) là bao nhiêu?
+
+<NumericCheck
+  id="s1b5"
+  answer={458.63}
+  tolerance={0.5}
+  explain="2297200 / 5009 ≈ 458,63. Mẫu số phải là SỐ ĐƠN DUY NHẤT, không phải số dòng. Nếu lấy 2297200/9994 sẽ ra 229,86 — sai một nửa."
+/>
+
+### B6. Đóng góp của top khách hàng
+
+Tổng doanh thu 2.297.200. Top 20 khách đóng góp 412.000. Họ chiếm bao nhiêu phần trăm?
+
+<NumericCheck
+  id="s1b6"
+  answer={17.94}
+  tolerance={0.1}
+  unit="%"
+  explain="412000 / 2297200 × 100 ≈ 17,94%. Con số kiểu này thường mở ra câu hỏi tiếp theo: nếu top 20/300 khách chiếm gần 18% doanh thu thì chiến lược giữ chân nhóm này đáng đầu tư bao nhiêu?"
+/>
+
+---
+
+## Phần C — Bài thực hành trên Superstore
+
+Dataset: [Sample Superstore](https://www.kaggle.com/datasets/vivek468/superstore-dataset-final)
+
+| # | Việc | Kết quả cần có |
+|---|---|---|
+| C1 | Xác định grain, liệt kê kiểu dữ liệu từng cột, đếm ô trống mỗi cột | Bảng 3 cột trong `notes/w1-data-basics.md` |
+| C2 | Pivot 2 chiều: doanh thu theo tháng × region, thêm profit | Tab `pivot` |
+| C3 | Thêm cột % growth MoM, bọc IFERROR | Cột trong pivot |
+| C4 | Bảng thống kê mô tả 8 chỉ số cho Sales và Profit | Tab `stats-summary` |
+| C5 | Histogram Sales, xác định hình dạng phân phối | Chart + 1 câu nhận xét |
+| C6 | Tính IQR, đếm outlier, xem 10 dòng outlier, quyết định giữ/loại | Đoạn ghi chú có lý do |
+| C7 | Scatter Discount vs Profit, tính CORREL, viết 3 giả thuyết | Chart + 3 giả thuyết + 1 lý do không kết luận nhân quả |
+| C8 | 5 nhận xét, mỗi câu có số cụ thể | Ô ghi chú |
+
+:::tip Cách tự kiểm tra C1
+Nếu bạn trả lời được câu này thì grain đã hiểu đúng: *"Nếu tôi lấy SUM(Sales) rồi chia cho COUNT số dòng, tôi đang tính cái gì? Nó có phải AOV không?"* — Không. Đó là doanh thu trung bình mỗi **dòng sản phẩm**, không phải mỗi đơn.
+:::
+
+---
+
+## Phần D — Rubric chấm deliverable
+
+Tick từng mục đã làm được. Đạt từ 80% mới sang Stage 2.
+
+<Rubric id="stage1" title="Sheet phân tích Superstore — 100 điểm" items={rubricStage1} />
+
+---
+
+## CHECKPOINT 1
+
+Ngoài rubric ở trên, tự kiểm tra 4 điều sau **không tra cứu**:
+
+1. Tạo pivot 2 chiều + cột % growth trong ≤ 10 phút
+2. Giải thích khi nào dùng mean, khi nào dùng median, kèm ví dụ từ Superstore
+3. Cho 1 câu hỏi business bất kỳ → chọn đúng loại chart và nói được lý do
+4. Chỉ ra grain của dataset và hậu quả nếu đếm sai grain
+
+Chưa làm được → dành thêm 1 tuần luyện phần yếu. **Đừng nhảy sang Stage 2** — SQL sẽ khó gấp đôi nếu tư duy bảng chưa vững.
+
+👉 Tiếp: [Bài tập Stage 2 — SQL](./stage-2)

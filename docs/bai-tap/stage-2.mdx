@@ -1,0 +1,130 @@
+---
+id: bai-tap-stage-2
+title: Bài tập Stage 2 — SQL
+sidebar_label: Stage 2 (auto-grader)
+sidebar_position: 3
+slug: /bai-tap/stage-2
+description: Quiz 12 câu, auto-grader 15 câu SQL chạy local trên DuckDB, rubric CHECKPOINT 2.
+---
+
+import Quiz from '@site/src/components/Quiz';
+import Rubric from '@site/src/components/Quiz/Rubric';
+import { stage2Quiz } from '@site/src/data/quiz/stage2';
+import { rubricStage2 } from '@site/src/data/rubrics';
+
+# Bài tập Stage 2 — SQL
+
+Stage quan trọng nhất. Làm song song với [Stage 2 — SQL](../stages/stage-2-sql), không đợi học xong hết mới làm.
+
+## Phần A — Quiz nhận diện bẫy
+
+12 câu, toàn tình huống thật: fan-out, `NOT IN` với NULL, chia số nguyên, lọc window function. Đây là những lỗi làm sai báo cáo ngoài đời và cũng là câu hỏi hay gặp khi phỏng vấn.
+
+<Quiz id="stage2" questions={stage2Quiz} />
+
+---
+
+## Phần B — Auto-grader: 15 câu SQL
+
+### Cài đặt
+
+```bash
+git clone https://github.com/lhoanghai1912/da-roadmap.git
+cd da-roadmap/exercises
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python setup_db.py
+.venv/bin/python stage2_sql/grade.py --init
+```
+
+Bài làm viết vào `stage2_sql/answers/q01.sql` … `q15.sql`. Chấm bằng:
+
+```bash
+.venv/bin/python stage2_sql/grade.py        # tất cả
+.venv/bin/python stage2_sql/grade.py q07    # một câu
+```
+
+### Danh sách câu hỏi
+
+| # | Tuần | Mức | Nội dung | Bẫy |
+|---|---|---|---|---|
+| q01 | W3 | Easy | Lọc khách theo quốc gia, sắp xếp | — |
+| q02 | W4 | Easy | Đếm đơn theo status | Đặt đúng alias cột |
+| q03 | W4 | Easy | Số khách theo quốc gia, lọc > 45 | `HAVING` vs `WHERE` |
+| q04 | W5 | Medium | Doanh thu theo quốc gia (JOIN 3 bảng) | Đơn `customer_id` NULL bị loại |
+| q05 | W5 | Medium | Khách chưa từng mua | **`NOT IN` + NULL → rỗng** |
+| q06 | W5 | Medium | Tổng phí ship đơn paid | **Fan-out** nếu JOIN order_items |
+| q07 | W6 | Medium | Khách chi trên trung bình | CTE + subquery tự tham chiếu |
+| q08 | W8 | Medium | Doanh thu theo tháng | `DATE_TRUNC` |
+| q09 | W7 | Hard | Doanh thu lũy kế | `SUM() OVER (ORDER BY ...)` |
+| q10 | W7 | Hard | Tăng trưởng MoM | `LAG` + ép kiểu tránh chia nguyên |
+| q11 | W7 | Hard | Top 3 sản phẩm mỗi category | **Top-N per group** |
+| q12 | W8 | Medium | Pivot doanh thu Q1/Q2 ngang | `SUM(CASE WHEN ...)` |
+| q13 | W9 | Hard | Phễu chuyển đổi | **`COUNT(DISTINCT)` không phải `COUNT(*)`** |
+| q14 | W9 | Hard | Conversion theo device | `NULLIF` tránh chia 0 |
+| q15 | W9 | Hard | RFM rút gọn | `COUNT(DISTINCT order_id)` do fan-out |
+
+### Grader chấm thế nào
+
+So kết quả truy vấn của bạn với đáp án tham chiếu — **không so cách viết**. Viết bằng CTE, subquery hay JOIN kiểu khác đều được điểm miễn kết quả đúng.
+
+Yêu cầu bắt buộc: **đúng tên cột** (dùng `AS`), đúng số dòng, đúng giá trị (sai số 0.02 cho số thực), và đúng thứ tự nếu đề yêu cầu sắp xếp.
+
+```text
+[PASS] q09 (W7 · Hard)
+[FAIL] q06 (W5 · Medium)
+       Lech gia tri tai dong 1, cot 'total_shipping': bai lam = 22,158.75, can = 7,274.05
+       Goi y: Khong JOIN order_items o day. Neu JOIN, moi don bi nhan len theo
+              so san pham va phi ship bi cong nhieu lan.
+========================================================================
+Ket qua: 14/15 dung
+██████████████████░░ 93%
+```
+
+:::warning Đừng mở lời giải
+File `stage2_sql/questions.py` chứa cả đề lẫn đáp án tham chiếu. Mở ra trước khi tự làm là mất giá trị bài tập. Sai thì đọc gợi ý mà grader in ra, quay lại tài liệu, sửa, chấm lại.
+:::
+
+### Ba bẫy đáng để sai một lần
+
+Cơ sở dữ liệu luyện tập được cài sẵn ba bẫy. Sai chúng ở đây rẻ hơn nhiều so với sai trong báo cáo thật.
+
+**q05 — `NOT IN` gặp NULL.** Bảng `orders` có ~55 đơn khách vãng lai với `customer_id` NULL. Viết `WHERE customer_id NOT IN (SELECT customer_id FROM orders)` sẽ trả về **0 dòng** thay vì 30. Vì so sánh với NULL cho kết quả UNKNOWN, và `NOT IN` với tập chứa NULL không bao giờ trả TRUE. Dùng `NOT EXISTS` hoặc anti-join.
+
+**q06 — Fan-out.** JOIN `orders` (1 dòng/đơn) với `order_items` (nhiều dòng/đơn) rồi `SUM(shipping_fee)` cho ra ~22.000 thay vì ~7.300 — gấp 3 lần. Phí ship bị cộng lặp theo số sản phẩm trong đơn.
+
+**q13 — `COUNT(*)` thay vì `COUNT(DISTINCT user_id)`.** Phễu đếm sai thành 1.034 thay vì 300 user, thổi phồng gấp 3. Mọi metric có mẫu số là "số người dùng" đều dính bẫy này.
+
+---
+
+## Phần C — Bài tập ngoài grader
+
+| # | Việc | Đo bằng |
+|---|---|---|
+| C1 | 125 bài trên LeetCode Database + StrataScratch | Link profile công khai |
+| C2 | Bộ 12 query báo cáo tháng (xem Stage 2, W8) | File `sql/w8-monthly-report.sql` |
+| C3 | 6 metric definition đủ 5 trường | `notes/metrics.md` |
+| C4 | Chuyển 5 query sang chạy trên BigQuery public data | File `sql/w9-analytics.sql` |
+| C5 | Drill JOIN: vẽ tay kết quả trước khi chạy, làm 5 lần | Ghi chú so sánh dự đoán vs thực tế |
+
+**Mẫu metric definition đủ 5 trường:**
+
+| Trường | Nội dung |
+|---|---|
+| Tên | Purchase conversion rate |
+| Công thức | `COUNT(DISTINCT user_id có purchase) / COUNT(DISTINCT user_id có view)` |
+| Nguồn | `events.user_id`, `events.event_type`, `events.created_at` |
+| Grain | Theo ngày × device |
+| Owner | Growth team |
+
+Thiếu grain thì hai người tính ra hai số khác nhau mà đều "đúng". Thiếu owner thì không ai chịu trách nhiệm khi số sai.
+
+---
+
+## Phần D — Rubric CHECKPOINT 2
+
+<Rubric id="stage2" title="CHECKPOINT 2 — 100 điểm" items={rubricStage2} />
+
+Đạt ≥ 80% mới sang Stage 3. SQL yếu ở đây sẽ làm hỏng cả Capstone ở tuần 20.
+
+👉 Tiếp: [Bài tập Stage 3 — BI & Dashboard](./stage-3)

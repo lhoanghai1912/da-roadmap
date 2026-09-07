@@ -1,0 +1,167 @@
+---
+id: bai-tap-stage-5
+title: Bài tập Stage 5 — Thống kê & A/B Test
+sidebar_label: Stage 5
+sidebar_position: 6
+slug: /bai-tap/stage-5
+description: Quiz 12 câu, 6 bài tính toán thống kê có kiểm tra kết quả, rubric chấm Portfolio #3.
+---
+
+import Quiz from '@site/src/components/Quiz';
+import Rubric from '@site/src/components/Quiz/Rubric';
+import NumericCheck from '@site/src/components/Quiz/NumericCheck';
+import { stage5Quiz } from '@site/src/data/quiz/stage5';
+import { rubricStage5 } from '@site/src/data/rubrics';
+
+# Bài tập Stage 5 — Thống kê & A/B Test
+
+Làm cùng [Stage 5 — Thống kê suy diễn & A/B Test](../stages/stage-5-statistics-abtest).
+
+## Phần A — Quiz
+
+12 câu, tập trung vào chỗ hay hiểu sai nhất: p-value, khoảng tin cậy, peeking, SRM.
+
+<Quiz id="stage5" questions={stage5Quiz} />
+
+---
+
+## Phần B — Bài tính toán
+
+### B1. Standard error
+
+Mẫu 400 quan sát, độ lệch chuẩn 60. Standard error của trung bình mẫu bằng bao nhiêu?
+
+<NumericCheck
+  id="s5b1"
+  answer={3}
+  tolerance={0.05}
+  explain="SE = std / √n = 60 / √400 = 60 / 20 = 3. Muốn giảm SE một nửa phải tăng n gấp 4 lần — đây là lý do cỡ mẫu tăng rất nhanh khi muốn đo chính xác hơn."
+/>
+
+### B2. Khoảng tin cậy 95%
+
+Trung bình mẫu = 250, SE = 3. Cận trên của khoảng tin cậy 95% (dùng hệ số 1.96) là bao nhiêu?
+
+<NumericCheck
+  id="s5b2"
+  answer={255.88}
+  tolerance={0.05}
+  explain="250 + 1.96 × 3 = 250 + 5.88 = 255.88. Khoảng đầy đủ: [244.12, 255.88]. Diễn giải đúng: nếu lặp lại lấy mẫu nhiều lần, khoảng tính theo cách này chứa giá trị thật khoảng 95% số lần."
+/>
+
+### B3. Lift tuyệt đối và tương đối
+
+Nhóm A conversion 10%, nhóm B conversion 12%. Lift **tương đối** là bao nhiêu phần trăm?
+
+<NumericCheck
+  id="s5b3"
+  answer={20}
+  tolerance={0.1}
+  unit="%"
+  explain="Lift tuyệt đối = 12% − 10% = 2 điểm phần trăm (pp). Lift tương đối = 2/10 × 100 = 20%. Báo cáo phải ghi rõ dùng loại nào — nói 'tăng 20%' và 'tăng 2%' đều đúng nhưng nghe rất khác nhau, và đây là chỗ dễ bị hiểu nhầm nhất trong báo cáo A/B test."
+/>
+
+### B4. Cỡ mẫu khi giảm MDE
+
+Với MDE = 4 điểm phần trăm cần 3.000 user mỗi nhóm. Nếu muốn phát hiện MDE = 2 điểm phần trăm thì cần khoảng bao nhiêu user mỗi nhóm?
+
+<NumericCheck
+  id="s5b4"
+  answer={12000}
+  tolerance={500}
+  unit="user/nhóm"
+  explain="Cỡ mẫu tỷ lệ nghịch với bình phương effect size. MDE giảm 2 lần → n tăng khoảng 4 lần = 12.000. Đây là lý do các test tìm hiệu ứng nhỏ cần lưu lượng rất lớn, và vì sao phải chốt MDE cùng business trước khi chạy."
+/>
+
+### B5. Thời gian chạy test
+
+Cần 12.000 user mỗi nhóm, 2 nhóm. Trang có 3.000 user mới mỗi ngày. Cần chạy tối thiểu bao nhiêu ngày?
+
+<NumericCheck
+  id="s5b5"
+  answer={8}
+  tolerance={0.2}
+  unit="ngày"
+  explain="Tổng cần = 12000 × 2 = 24.000 user. 24000 / 3000 = 8 ngày. Nhưng thực tế nên làm tròn lên trọn 1–2 tuần để phủ hết chu kỳ ngày trong tuần — hành vi cuối tuần khác ngày thường."
+/>
+
+### B6. Multiple comparison
+
+Test 20 metric độc lập ở alpha = 0.05, không hiệu chỉnh. Kỳ vọng có bao nhiêu metric "có ý nghĩa" thuần do ngẫu nhiên?
+
+<NumericCheck
+  id="s5b6"
+  answer={1}
+  tolerance={0.05}
+  unit="metric"
+  explain="20 × 0.05 = 1. Đây là lý do phải chốt đúng 1 primary metric trước khi chạy, hoặc hiệu chỉnh Bonferroni/FDR khi buộc phải test nhiều. Test 20 metric rồi báo cáo cái đẹp nhất là p-hacking."
+/>
+
+---
+
+## Phần C — Bài viết
+
+### C1. Giải thích p-value cho Giám đốc Marketing
+
+Viết ≤ 150 từ, **không dùng công thức**, không dùng từ "giả thuyết không". Luyện nói trơn trong 60 giây.
+
+<details>
+<summary>Bản mẫu để đối chiếu (viết bản của bạn trước)</summary>
+
+> Giả sử phiên bản mới thực ra không tốt hơn phiên bản cũ chút nào. Trong tình huống đó, xác suất chúng ta vẫn đo được chênh lệch lớn như đã thấy là bao nhiêu? Con số đó là p-value.
+>
+> p = 0.03 nghĩa là chênh lệch cỡ này khá hiếm khi hai phiên bản thực sự như nhau — nên ta nghiêng về kết luận có khác biệt thật.
+>
+> Nhưng nó **không** cho biết khác biệt lớn cỡ nào. Một thay đổi có thể "có ý nghĩa thống kê" mà chỉ tăng 0,01% doanh thu — không đáng để triển khai. Vì vậy em luôn báo kèm mức tăng cụ thể và khoảng dao động của nó, đó mới là con số dùng để ra quyết định.
+
+</details>
+
+### C2. Ba tình huống — phản biện kết luận
+
+Với mỗi tình huống, chỉ ra vấn đề:
+
+1. *"Chúng ta chạy test 3 ngày, thấy p = 0.04 nên dừng và triển khai."*
+2. *"Nhóm A có 52.000 user, nhóm B có 46.000, chênh lệch nhỏ nên bỏ qua."*
+3. *"p = 0.31 nên hai phiên bản như nhau, chọn cái nào cũng được."*
+
+<details>
+<summary>Đáp án</summary>
+
+1. **Peeking + thiếu chu kỳ tuần.** Dừng ngay khi thấy p < 0.05 làm tỷ lệ báo động giả cao hơn nhiều mức 5% đã đặt. Ngoài ra 3 ngày không phủ hết hành vi cuối tuần. Phải chốt cỡ mẫu và ngày dừng trước khi chạy.
+2. **Sample Ratio Mismatch.** Chênh 6.000/98.000 với phân bổ 50/50 là dấu hiệu hệ thống phân bổ có lỗi (bot, cache, tracking hỏng). Nếu việc chia nhóm đã sai thì mọi kết luận đều không tin được — phải điều tra trước khi đọc bất kỳ metric nào.
+3. **Nhầm "không bác bỏ được H0" với "chứng minh H0 đúng".** Có thể do thiếu power (mẫu quá nhỏ). Kết luận đúng: "chưa đủ bằng chứng để kết luận có khác biệt". Nên báo kèm khoảng tin cậy — nếu CI là [−8%, +9%] thì thực chất ta không biết gì cả.
+
+</details>
+
+### C3. Thiết kế một A/B test đầy đủ
+
+Tình huống: đội sản phẩm muốn đổi nút "Mua ngay" từ xanh sang cam. Viết ra:
+
+| Mục | Nội dung của bạn |
+|---|---|
+| Hypothesis | |
+| Primary metric | |
+| Secondary metrics | |
+| Guardrail metrics | |
+| Đơn vị phân bổ | |
+| MDE và lý do chọn | |
+| Cỡ mẫu cần | |
+| Thời gian chạy | |
+| Điều kiện dừng | |
+| Sanity check sẽ làm | |
+
+---
+
+## Phần D — Portfolio #3
+
+Dataset gợi ý: [Cookie Cats A/B Testing](https://www.kaggle.com/datasets/yufengsui/mobile-games-ab-testing) (gate_30 vs gate_40, metric retention D1/D7).
+
+Notebook phải có đủ 10 mục: Bối cảnh & Hypothesis → Thiết kế → Sanity check → Cỡ mẫu → EDA → Kiểm định → Effect size → Kết luận → Hạn chế → Bước tiếp theo.
+
+<Rubric id="stage5" title="Portfolio #3 — A/B Test Analysis — 100 điểm" items={rubricStage5} />
+
+:::warning Tiêu chí loại trực tiếp
+Kết luận chỉ có p-value mà **không có khoảng tin cậy** = chưa đạt, bất kể các mục khác đầy đủ đến đâu. p-value cho biết "có khác biệt hay không", CI cho biết "khác biệt lớn cỡ nào" — cái thứ hai mới dùng để ra quyết định.
+:::
+
+👉 Tiếp: [Bài tập Stage 6 — Capstone & Phỏng vấn](./stage-6)

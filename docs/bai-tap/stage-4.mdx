@@ -1,0 +1,153 @@
+---
+id: bai-tap-stage-4
+title: Bài tập Stage 4 — Python & Pandas
+sidebar_label: Stage 4 (auto-grader)
+sidebar_position: 5
+slug: /bai-tap/stage-4
+description: Quiz 10 câu, auto-grader 12 bài Pandas, rubric chấm Portfolio #2 EDA notebook.
+---
+
+import Quiz from '@site/src/components/Quiz';
+import Rubric from '@site/src/components/Quiz/Rubric';
+import { stage4Quiz } from '@site/src/data/quiz/stage4';
+import { rubricStage4 } from '@site/src/data/rubrics';
+
+# Bài tập Stage 4 — Python & Pandas
+
+Làm cùng [Stage 4 — Python](../stages/stage-4-python).
+
+## Phần A — Quiz
+
+<Quiz id="stage4" questions={stage4Quiz} />
+
+---
+
+## Phần B — Auto-grader: 12 bài Pandas
+
+### Cài đặt
+
+Nếu đã làm Stage 2 thì môi trường có sẵn, bỏ qua bước này.
+
+```bash
+cd da-roadmap/exercises
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python setup_db.py
+```
+
+Viết code vào `stage4_python/tasks.py`, thay `raise NotImplementedError` bằng lời giải của bạn.
+
+```bash
+.venv/bin/python stage4_python/grade.py         # chấm tất cả
+.venv/bin/python stage4_python/grade.py t5 t8   # chấm vài bài
+```
+
+### Danh sách bài
+
+| # | Tuần | Nội dung | Tương đương SQL |
+|---|---|---|---|
+| t1 | W14 | Tạo cột `line_revenue` | `SELECT ... AS` |
+| t2 | W14 | Lọc nhiều điều kiện | `WHERE a AND b` |
+| t3 | W14 | Doanh thu theo category (merge 3 bảng) | `JOIN` + `GROUP BY` |
+| t4 | W14 | Số đơn duy nhất theo khách | `COUNT(DISTINCT)` |
+| t5 | W14 | Tỷ trọng % mỗi category | `SUM() OVER ()` |
+| t6 | W14 | Doanh thu theo tháng | `DATE_TRUNC` |
+| t7 | W14 | Tăng trưởng MoM | `LAG()` |
+| t8 | W14 | Top 3 sản phẩm mỗi category | `ROW_NUMBER() OVER (PARTITION BY)` |
+| t9 | W15 | Outlier theo IQR | — |
+| t10 | W16 | Phễu chuyển đổi | `COUNT(DISTINCT)` theo bước |
+| t11 | W15 | Pipeline làm sạch có log | — |
+| t12 | W14 | Tổng hợp khách, giữ cả khách chưa mua | `LEFT JOIN` + `COALESCE` |
+
+Bài t3–t8 cố ý lặp lại đúng các bài SQL của Stage 2. Làm được cả hai bên rồi so sánh chính là cách nhanh nhất để hiểu pandas — không phải học thuộc tên hàm mà là nhận ra nó đang làm phép gì.
+
+### Grader báo lỗi cụ thể
+
+```text
+[PASS] t7   (W14 · shift — tuong duong LAG())
+[FAIL] t12  (W14 · LEFT JOIN + fillna)
+       So dong: bai lam 270, can 300
+[ERR ] t9   (W15 · Outlier theo IQR)
+       KeyError: 'unit_prices'
+       File ".../tasks.py", line 131, in t9_iqr_outliers
+```
+
+`[FAIL] t12` với 270 vs 300 dòng là dấu hiệu điển hình: dùng `how="inner"` thay vì `how="left"` nên 30 khách chưa từng mua bị mất.
+
+:::warning Đừng mở `solution_reference.py`
+File đó chứa toàn bộ lời giải. Sai thì đọc docstring của hàm, xem lại bảng map SQL ↔ Pandas, sửa rồi chấm lại.
+:::
+
+---
+
+## Phần C — Bảng map SQL ↔ Pandas
+
+Tự điền cột phải trước, rồi mở đáp án đối chiếu. Đây là bảng bạn sẽ dùng suốt sự nghiệp.
+
+| SQL | Pandas |
+|---|---|
+| `SELECT a, b` | ? |
+| `WHERE x > 1 AND y = 'z'` | ? |
+| `GROUP BY a` | ? |
+| `HAVING COUNT(*) > 5` | ? |
+| `JOIN ... ON` | ? |
+| `LEFT JOIN` | ? |
+| `ORDER BY x DESC` | ? |
+| `LIMIT 10` | ? |
+| `COUNT(DISTINCT x)` | ? |
+| `LAG(x)` | ? |
+| `SUM(x) OVER (PARTITION BY g)` | ? |
+| `ROW_NUMBER() OVER (PARTITION BY g)` | ? |
+| `COALESCE(x, 0)` | ? |
+
+<details>
+<summary>Đáp án</summary>
+
+| SQL | Pandas |
+|---|---|
+| `SELECT a, b` | `df[["a","b"]]` |
+| `WHERE x > 1 AND y = 'z'` | `df[(df.x > 1) & (df.y == "z")]` — **bắt buộc có ngoặc** |
+| `GROUP BY a` | `df.groupby("a")` |
+| `HAVING COUNT(*) > 5` | `.groupby("a").filter(lambda g: len(g) > 5)` |
+| `JOIN ... ON` | `pd.merge(a, b, on="key")` |
+| `LEFT JOIN` | `pd.merge(a, b, on="key", how="left")` |
+| `ORDER BY x DESC` | `.sort_values("x", ascending=False)` |
+| `LIMIT 10` | `.head(10)` |
+| `COUNT(DISTINCT x)` | `.nunique()` — **không phải `.count()`** |
+| `LAG(x)` | `.shift(1)` |
+| `SUM(x) OVER (PARTITION BY g)` | `.groupby("g")["x"].transform("sum")` |
+| `ROW_NUMBER() OVER (PARTITION BY g)` | `.groupby("g").cumcount() + 1` |
+| `COALESCE(x, 0)` | `.fillna(0)` |
+
+</details>
+
+---
+
+## Phần D — Portfolio #2: EDA Olist
+
+Dataset: [Olist Brazilian E-commerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — 9 bảng có quan hệ thật, dữ liệu bẩn có thật.
+
+Chọn 3–5 câu hỏi, ví dụ:
+1. Yếu tố nào ảnh hưởng đến điểm đánh giá của khách?
+2. Thời gian giao hàng có liên quan gì tới điểm review?
+3. Bang nào có giá trị đơn cao nhất, vì sao?
+4. Phương thức thanh toán khác nhau có AOV khác nhau không?
+5. Danh mục nào tăng trưởng nhanh nhất, danh mục nào suy giảm?
+
+**Viết câu hỏi TRƯỚC khi mở dữ liệu.** Nếu mở dữ liệu rồi mới nghĩ, bạn sẽ vẽ chart lung tung 3 tiếng mà không ra kết luận nào.
+
+---
+
+## Phần E — Rubric Portfolio #2
+
+<Rubric id="stage4" title="Portfolio #2 — EDA Notebook — 100 điểm" items={rubricStage4} />
+
+## CHECKPOINT 3
+
+Ngoài rubric, tự kiểm 3 điều:
+
+1. Từ file CSV thô đi tới notebook có insight trong ≤ 4h, không copy code mẫu
+2. Giải thích được `groupby().agg()` tương ứng `GROUP BY` nào, `merge` tương ứng `JOIN` nào
+3. Biết dùng `.transform()` khi nào thay vì `.agg()`
+
+👉 Tiếp: [Bài tập Stage 5 — Thống kê & A/B test](./stage-5)

@@ -79,6 +79,7 @@ const config: Config = {
       logo: { alt: 'DA Roadmap', src: 'img/favicon.svg' },
       items: [
         { type: 'docSidebar', sidebarId: 'mainSidebar', position: 'left', label: 'Lộ trình' },
+        { to: '/bai-tap', label: 'Bài tập & tự chấm', position: 'left' },
         { to: '/phan-tich-repo', label: 'Phân tích repo gốc', position: 'left' },
         {
           href: `https://github.com/${GITHUB_USER}/${REPO_NAME}`,

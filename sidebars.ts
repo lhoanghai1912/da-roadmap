@@ -19,6 +19,20 @@ const sidebars: SidebarsConfig = {
         'stages/stage-6-capstone-jobprep',
       ],
     },
+    {
+      type: 'category',
+      label: 'Bài tập & tự chấm',
+      collapsed: false,
+      link: { type: 'doc', id: 'bai-tap/bai-tap-index' },
+      items: [
+        'bai-tap/bai-tap-stage-1',
+        'bai-tap/bai-tap-stage-2',
+        'bai-tap/bai-tap-stage-3',
+        'bai-tap/bai-tap-stage-4',
+        'bai-tap/bai-tap-stage-5',
+        'bai-tap/bai-tap-stage-6',
+      ],
+    },
   ],
 };
 

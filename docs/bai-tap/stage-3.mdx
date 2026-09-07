@@ -1,0 +1,117 @@
+---
+id: bai-tap-stage-3
+title: Bài tập Stage 3 — BI & Dashboard
+sidebar_label: Stage 3
+sidebar_position: 4
+slug: /bai-tap/stage-3
+description: Quiz 10 câu, 5 bài thiết kế dashboard, rubric chấm Portfolio #1.
+---
+
+import Quiz from '@site/src/components/Quiz';
+import Rubric from '@site/src/components/Quiz/Rubric';
+import { stage3Quiz } from '@site/src/data/quiz/stage3';
+import { rubricStage3 } from '@site/src/data/rubrics';
+
+# Bài tập Stage 3 — BI & Dashboard
+
+Làm cùng [Stage 3 — BI & Dashboard](../stages/stage-3-bi-dashboard).
+
+## Phần A — Quiz
+
+<Quiz id="stage3" questions={stage3Quiz} />
+
+---
+
+## Phần B — Bài thiết kế
+
+Phần này không có auto-grader vì không máy nào chấm được "dashboard này có dùng được không". Tự đánh giá bằng rubric ở cuối trang.
+
+### B1. Chọn chart cho 8 câu hỏi
+
+Với mỗi câu hỏi, viết ra loại chart và **lý do**. Tự đối chiếu với gợi ý sau khi làm xong.
+
+| # | Câu hỏi business | Chart của bạn |
+|---|---|---|
+| 1 | Doanh thu 24 tháng qua biến động thế nào? | |
+| 2 | Danh mục nào đóng góp nhiều nhất? | |
+| 3 | Phân bố giá trị đơn hàng ra sao? | |
+| 4 | Giảm giá có liên quan gì tới lợi nhuận? | |
+| 5 | Cơ cấu doanh thu theo danh mục thay đổi qua các năm? | |
+| 6 | Doanh thu tháng này so tháng trước? | |
+| 7 | Sản phẩm nào bán chạy nhưng đang lỗ? | |
+| 8 | Vùng nào có tỷ lệ hoàn hàng cao? | |
+
+<details>
+<summary>Gợi ý đáp án</summary>
+
+1. **Line** — dữ liệu liên tục theo thời gian. Thêm moving average 3 tháng để làm mượt nhiễu.
+2. **Bar ngang, sắp giảm dần** — so sánh giữa hạng mục, nhãn dài nên để ngang.
+3. **Histogram** hoặc **box plot** — phân phối một biến liên tục.
+4. **Scatter** — quan hệ giữa hai biến số. Nhớ ghi chú tương quan ≠ nhân quả.
+5. **Stacked bar theo năm** hoặc **100% stacked** nếu quan tâm tỷ trọng hơn giá trị tuyệt đối.
+6. **Scorecard kèm % MoM** — một con số quan trọng, luôn phải có mốc so sánh.
+7. **Scatter Sales vs Profit** (mỗi điểm 1 sản phẩm) hoặc **bar** top-10 lỗ nặng nhất kèm mức discount.
+8. **Bar theo vùng** hoặc **geo map** nếu người xem cần nhìn theo địa lý. Map đẹp nhưng khó so sánh chính xác — chỉ dùng khi vị trí địa lý thực sự có ý nghĩa.
+
+</details>
+
+### B2. Sửa 6 lỗi thiết kế
+
+Cho dashboard sau, chỉ ra lỗi và cách sửa:
+
+> Trang có 14 chart. Góc trên trái là pie chart 9 lát "Doanh thu theo sub-category". Bên phải là bar chart trục Y bắt đầu từ 4.500. Ở giữa có card ghi "Doanh thu: 1.2 tỷ". Dưới cùng là line chart 2 trục Y (doanh thu và số đơn) không ghi đơn vị. Các bar chart sắp xếp theo bảng chữ cái. Không có ghi chú thời điểm cập nhật.
+
+<details>
+<summary>Đáp án</summary>
+
+1. **14 chart 1 trang** → tách trang, tối đa 5–7 chart. Nhiều chart thường là dấu hiệu chưa xác định rõ câu hỏi chính.
+2. **Pie 9 lát** → bar ngang sắp giảm dần. Mắt người so sánh độ dài tốt hơn góc/diện tích.
+3. **Bar trục Y bắt đầu từ 4.500** → bắt đầu từ 0. Cắt trục ở bar chart phóng đại khác biệt.
+4. **Card không có mốc so sánh** → thêm % MoM hoặc so target. 1.2 tỷ là tốt hay xấu?
+5. **2 trục Y không ghi đơn vị** → ghi rõ đơn vị từng trục, hoặc tách thành 2 chart.
+6. **Sắp theo bảng chữ cái** → sắp theo giá trị để đọc được thứ hạng ngay.
+7. **Thiếu thời điểm cập nhật** → thêm footer "Dữ liệu cập nhật: ...".
+
+</details>
+
+### B3. Viết lại 5 tiêu đề chart
+
+Đổi từ nhãn trung tính sang câu kết luận có số:
+
+| Tiêu đề cũ | Viết lại |
+|---|---|
+| "Doanh thu theo miền" | |
+| "Biên lợi nhuận theo danh mục" | |
+| "Số đơn theo tháng" | |
+| "Discount vs Profit" | |
+| "Top sản phẩm" | |
+
+Mẫu: `"Doanh thu theo miền"` → `"Miền Tây giảm 3 tháng liên tiếp, −12% so cùng kỳ"`.
+
+### B4. Dựng Metabase và tạo Model
+
+```bash
+docker run -d -p 3000:3000 -v metabase-data:/metabase.db --name metabase metabase/metabase
+```
+
+Yêu cầu: kết nối `practice.duckdb` (hoặc Postgres), tạo 1 Model curated, 6 Question (2 GUI + 4 SQL, trong đó 1 có tham số), 1 Dashboard có filter. Chụp màn hình lưu vào `01-sales-dashboard/screenshots/`.
+
+### B5. Vẽ star schema
+
+Vẽ sơ đồ star schema cho dữ liệu Superstore hoặc `practice.duckdb`. Ghi rõ:
+- Bảng nào là fact, bảng nào là dimension
+- **Grain của fact table**
+- Khóa nối giữa các bảng
+- Vì sao cần date dimension riêng
+
+---
+
+## Phần C — Rubric Portfolio #1
+
+<Rubric id="stage3" title="Portfolio #1 — Sales Dashboard — 100 điểm" items={rubricStage3} />
+
+:::tip Kiểm tra cuối cùng trước khi tính là xong
+Đưa dashboard cho một người **không biết gì về dataset này**. Trong 3 phút họ có nói được: vấn đề là gì, con số nào quan trọng, nên làm gì tiếp — không? Nếu không, dashboard chưa xong bất kể rubric bao nhiêu điểm.
+:::
+
+👉 Tiếp: [Bài tập Stage 4 — Python](./stage-4)

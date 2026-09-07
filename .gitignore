@@ -24,3 +24,9 @@ yarn-error.log*
 /data
 *.duckdb
 *.sqlite
+
+# Exercises
+exercises/.venv/
+exercises/practice.duckdb
+__pycache__/
+*.pyc

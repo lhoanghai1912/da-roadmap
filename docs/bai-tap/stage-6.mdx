@@ -1,0 +1,157 @@
+---
+id: bai-tap-stage-6
+title: Bài tập Stage 6 — Capstone & Phỏng vấn
+sidebar_label: Stage 6
+sidebar_position: 7
+slug: /bai-tap/stage-6
+description: Quiz 10 câu, 3 case study có khung chấm, rubric Capstone và CHECKPOINT 4.
+---
+
+import Quiz from '@site/src/components/Quiz';
+import Rubric from '@site/src/components/Quiz/Rubric';
+import { stage6Quiz } from '@site/src/data/quiz/stage6';
+import { rubricCapstone, rubricJobReady } from '@site/src/data/rubrics';
+
+# Bài tập Stage 6 — Capstone & Phỏng vấn
+
+Làm cùng [Stage 6 — Capstone & Xin việc](../stages/stage-6-capstone-jobprep).
+
+## Phần A — Quiz
+
+<Quiz id="stage6" questions={stage6Quiz} />
+
+---
+
+## Phần B — Case study
+
+Khung 5 bước: **Clarify → Structure → Analyze → Recommend → Measure**. Viết mỗi case 1–1.5 trang vào `notes/case-studies.md`, rồi tự chấm bằng bảng ở cuối phần.
+
+### Case 1 — Conversion rate giảm 15%
+
+> *"Tuần này conversion rate giảm 15% so tuần trước. Điều tra thế nào?"*
+
+Gợi ý cấu trúc — **đừng nhảy thẳng vào bước 3**:
+
+| Bước | Nội dung tối thiểu phải có |
+|---|---|
+| Clarify | Giảm 15% tuyệt đối hay tương đối? Conversion tính ở bước nào của phễu? So với tuần trước hay cùng kỳ? Có thay đổi gì được deploy tuần này không? |
+| Structure | 3 nhánh: (1) lỗi dữ liệu/tracking, (2) thay đổi nội bộ — sản phẩm, giá, campaign, (3) yếu tố ngoài — mùa vụ, đối thủ, sự kiện |
+| Analyze | **Kiểm tra data quality trước.** Rồi cắt theo device / kênh / vùng / phân khúc khách để khoanh vùng. So sánh phễu từng bước để tìm bước rơi. |
+| Recommend | Đề xuất gắn với nguyên nhân tìm được, có mức ưu tiên |
+| Measure | Theo dõi metric nào, trong bao lâu, ngưỡng nào coi là đã khắc phục |
+
+:::tip Điểm cộng lớn nhất
+Nói "em kiểm tra chất lượng dữ liệu trước khi kết luận có vấn đề thật" ngay ở đầu bước Analyze. Người mới thường nhảy vào phân tích rồi báo cáo một con số sai vì pipeline chạy trùng.
+:::
+
+### Case 2 — Thiết kế metric cho tính năng chat mới
+
+> *"App vừa ra tính năng chat với người bán. Bạn đo thành công thế nào?"*
+
+Yêu cầu: đưa ra **metric tree** chứ không phải danh sách metric rời rạc.
+
+| Tầng | Ví dụ |
+|---|---|
+| North star | Metric duy nhất phản ánh giá trị tính năng mang lại |
+| Driver | Adoption (% user dùng), Engagement (số tin nhắn/phiên), Quality (thời gian phản hồi) |
+| Guardrail | Không được xấu đi: tỷ lệ khiếu nại, thời gian tải app, tỷ lệ hủy đơn |
+| Counter-metric | Thứ có thể xấu đi mà ta không mong đợi: gọi tổng đài tăng? người bán quá tải? |
+
+Mỗi metric phải viết đủ 5 trường: tên · công thức · nguồn · grain · owner.
+
+### Case 3 — Nên đầu tư kênh marketing nào
+
+> *"Ban giám đốc muốn biết nên dồn ngân sách vào kênh nào. Bạn phân tích gì?"*
+
+Chỗ dễ sai: chỉ so CAC giữa các kênh rồi kết luận. Cần bàn thêm:
+- **LTV/CAC** chứ không chỉ CAC — kênh rẻ có thể mang về khách chất lượng thấp
+- **Attribution** — last-click gán hết công cho kênh cuối, bóp méo kết quả
+- **Saturation** — kênh đang hiệu quả chưa chắc mở rộng gấp 3 vẫn hiệu quả
+- Đây là dữ liệu quan sát, không phải thí nghiệm → **không kết luận nhân quả**; muốn chắc phải chạy geo holdout test
+
+### Tự chấm case study
+
+| Tiêu chí | Có |
+|---|---|
+| Có hỏi lại làm rõ trước khi giải (ít nhất 3 câu hỏi) | ☐ |
+| Nói ra khung phân tích trước khi đi sâu | ☐ |
+| Có nhắc kiểm tra chất lượng dữ liệu | ☐ |
+| Nêu rõ cần bảng/cột dữ liệu nào | ☐ |
+| Đề xuất gắn với phát hiện cụ thể, không chung chung | ☐ |
+| Có nêu cách đo kết quả của đề xuất | ☐ |
+| Có phân biệt tương quan và nhân quả ở chỗ cần thiết | ☐ |
+
+Dưới 5/7 → viết lại. Case study là vòng loại nhiều ứng viên nhất.
+
+---
+
+## Phần C — 30 câu SQL phỏng vấn
+
+Tự viết câu trả lời **có giải thích**, không chỉ code, vào `notes/interview-sql.md`. Danh sách đầy đủ ở [Stage 6, mục W23.1](../stages/stage-6-capstone-jobprep).
+
+Cách luyện hiệu quả: bấm giờ 15 phút mỗi câu viết query. Quá giờ thì đánh dấu, hôm sau làm lại. Câu nào sai 2 lần liên tiếp → quay lại đọc mục tương ứng ở Stage 2.
+
+**5 câu sửa lỗi** — cho query sai, tìm và giải thích:
+
+```sql
+-- 1. Vì sao query này không trả về khách chưa mua?
+SELECT c.name FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.customer_id
+WHERE o.status = 'paid';
+
+-- 2. Vì sao cvr luôn bằng 0?
+SELECT COUNT(DISTINCT buyer_id) / COUNT(DISTINCT visitor_id) AS cvr FROM sessions;
+
+-- 3. Vì sao tổng phí ship cao gấp 3 lần thực tế?
+SELECT SUM(o.shipping_fee) FROM orders o
+JOIN order_items i ON i.order_id = o.order_id;
+
+-- 4. Vì sao kết quả rỗng?
+SELECT * FROM customers
+WHERE customer_id NOT IN (SELECT customer_id FROM orders);
+
+-- 5. Vì sao báo lỗi?
+SELECT *, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY d DESC) AS rn
+FROM orders WHERE rn = 1;
+```
+
+<details>
+<summary>Đáp án</summary>
+
+1. Điều kiện trên bảng phải đặt ở `WHERE` loại hết dòng NULL → LEFT JOIN thành INNER JOIN. Chuyển vào `ON`.
+2. Chia số nguyên. Dùng `COUNT(...) * 1.0 / NULLIF(COUNT(...), 0)`.
+3. Fan-out: JOIN 1-nhiều nhân bản dòng orders theo số sản phẩm. Không JOIN, hoặc gộp order_items trước.
+4. `orders.customer_id` có NULL → `NOT IN` không bao giờ trả TRUE. Dùng `NOT EXISTS` hoặc anti-join.
+5. Window function tính sau `WHERE` nên không lọc được cùng tầng. Bọc CTE rồi lọc ở tầng ngoài.
+
+</details>
+
+---
+
+## Phần D — Rubric Capstone
+
+<Rubric id="capstone" title="Portfolio #4 — Capstone — 100 điểm" items={rubricCapstone} />
+
+---
+
+## Phần E — CHECKPOINT 4: sẵn sàng ứng tuyển
+
+<Rubric id="job-ready" title="CHECKPOINT 4 — 100 điểm" items={rubricJobReady} />
+
+---
+
+## Phần F — Mock interview
+
+| Vòng | Cách làm | Tự chấm |
+|---|---|---|
+| 1 | Tự phỏng vấn có **ghi âm**: 10 câu SQL + 1 case, không dừng giữa chừng | Nghe lại, ghi 5 điểm cần sửa: nói lan man, "ừm à", trả lời trước khi kịp nghĩ |
+| 2 | Nhờ người khác phỏng vấn (bạn bè, DataTalks.Club, group "Data Analytics Vietnam") | Hỏi họ: chỗ nào khó hiểu nhất? |
+| 3 | Trình bày Capstone 5 phút, **không đọc slide** | Có nói được kết luận trong 30 giây đầu không? |
+
+Sau mỗi buổi phỏng vấn thật, ghi lại câu bị hỏi và câu trả lời chưa tốt — dùng làm giáo trình ôn cho buổi sau. Tỷ lệ phản hồi cho ứng viên entry-level không cao, và im lặng là chuyện bình thường, không phải đánh giá về năng lực bạn.
+
+Người trúng tuyển thường không phải người giỏi nhất từ đầu, mà là người sửa nhanh nhất sau mỗi lần trượt.
+
+---
+
+👉 Quay lại: [Cách chấm điểm](/bai-tap) · [Tổng quan lộ trình](/)
