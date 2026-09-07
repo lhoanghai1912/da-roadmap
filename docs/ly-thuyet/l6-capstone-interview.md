@@ -13,7 +13,7 @@ Bổ trợ cho [Stage 6 — Capstone & Job prep](../stages/stage-6-capstone-jobp
 
 ---
 
-## 6.1 — Định nghĩa 3 dạng phân tích của capstone
+## 6.1 — Định nghĩa 3 dạng phân tích của capstone {#ba-dang-phan-tich}
 
 ### Funnel (phễu)
 **Định nghĩa.** Chuỗi bước bắt buộc dẫn tới mục tiêu, đo số người còn lại sau mỗi bước.
@@ -46,7 +46,7 @@ Giá trị thật của RFM nằm ở chỗ nó nối thẳng sang hành động
 
 ---
 
-## 6.2 — Cấu trúc README mà nhà tuyển dụng đọc trong 3 phút
+## 6.2 — Cấu trúc README mà nhà tuyển dụng đọc trong 3 phút {#readme-chuan}
 
 Roadmap gốc nói đúng một điều: CV được đọc 30 giây, portfolio được xem 5 phút. Cấu trúc bắt buộc:
 
@@ -73,7 +73,7 @@ Roadmap gốc nói đúng một điều: CV được đọc 30 giây, portfolio 
 
 ---
 
-## 6.3 — Kể chuyện với dữ liệu: khung 5 phút
+## 6.3 — Kể chuyện với dữ liệu: khung 5 phút {#ke-chuyen}
 
 | Phút | Nội dung | Bẫy |
 |---|---|---|
@@ -89,7 +89,7 @@ Roadmap gốc nói đúng một điều: CV được đọc 30 giây, portfolio 
 
 ---
 
-## 6.4 — Khung trả lời case study (5 bước)
+## 6.4 — Khung trả lời case study (5 bước) {#case-study}
 
 Vòng case study là chỗ rớt nhiều nhất, vì ứng viên nhảy thẳng vào SQL.
 
@@ -118,7 +118,7 @@ Doanh thu ↓15%
 
 ---
 
-## 6.5 — 20 câu phỏng vấn kỹ thuật và ý cần có trong câu trả lời
+## 6.5 — 20 câu phỏng vấn kỹ thuật và ý cần có trong câu trả lời {#cau-hoi-phong-van}
 
 **SQL**
 1. `WHERE` vs `HAVING` → lọc dòng trước gom nhóm / lọc nhóm sau gom.
@@ -148,7 +148,7 @@ Doanh thu ↓15%
 
 ---
 
-## 6.6 — CV cho DA fresher
+## 6.6 — CV cho DA fresher {#cv-fresher}
 
 **Một trang.** Thứ tự: Thông tin liên hệ → 3 dòng tóm tắt → **Projects** → Kỹ năng → Học vấn → (Kinh nghiệm khác nếu có).
 
@@ -170,7 +170,7 @@ De xuat ra soat chinh sach chiet khau tren nguong 30% - nguong ma loi nhuan trun
 
 ---
 
-## 6.7 — CHECKPOINT 4: sẵn sàng ứng tuyển
+## 6.7 — CHECKPOINT 4: sẵn sàng ứng tuyển {#checkpoint-4}
 
 - [ ] 4 project public trên GitHub, mỗi cái có README đúng cấu trúc + ảnh
 - [ ] ≥ 150 bài SQL, có link profile

@@ -15,7 +15,7 @@ Mọi số trong file này đã chạy thật trên `superstore.csv` (đọc b�
 
 ---
 
-## 4.0 — Chạy được ngay
+## 4.0 — Chạy được ngay {#chay-ngay}
 
 ```bash
 cd ~/Documents/Study/DA/lab
@@ -32,7 +32,7 @@ df.shape        # (9994, 21)
 
 ---
 
-## 4.1 — DataFrame: bảng SQL trong bộ nhớ
+## 4.1 — DataFrame: bảng SQL trong bộ nhớ {#dataframe}
 
 **Định nghĩa.** `DataFrame` = bảng 2 chiều có tên cột và chỉ mục dòng. `Series` = một cột.
 
@@ -61,7 +61,7 @@ Và câu hỏi tiếp theo mới là phần analyst: đây là lỗi nhập li�
 
 ---
 
-## 4.2 — Bảng chuyển đổi SQL ↔ Pandas (học thuộc bảng này)
+## 4.2 — Bảng chuyển đổi SQL ↔ Pandas (học thuộc bảng này) {#sql-pandas}
 
 | Mục đích | SQL | Pandas |
 |---|---|---|
@@ -117,7 +117,7 @@ Chỉ 3 nhóm lỗ trong 17 sub-category. Tables lỗ gấp 5 lần Bookcases �
 
 ---
 
-## 4.3 — loc / iloc: nguồn nhầm lẫn kinh điển
+## 4.3 — loc / iloc: nguồn nhầm lẫn kinh điển {#loc-iloc}
 
 **Định nghĩa.** `.loc[dòng, cột]` chọn theo **nhãn**. `.iloc[dòng, cột]` chọn theo **vị trí số** (0-based, không bao gồm cận phải).
 
@@ -139,7 +139,7 @@ sub["flag"] = 1
 
 ---
 
-## 4.4 — Làm sạch dữ liệu (phần chiếm nhiều thời gian nhất khi đi làm)
+## 4.4 — Làm sạch dữ liệu (phần chiếm nhiều thời gian nhất khi đi làm) {#lam-sach}
 
 **Định nghĩa.** Làm sạch = đưa dữ liệu về trạng thái tin được, và **ghi lại mọi thay đổi**. Quy tắc vàng: mỗi bước xóa/sửa phải in ra "trước → sau".
 
@@ -186,7 +186,7 @@ Các dòng thiếu ngày giao gần như đều có `order_status` là `shipped`
 
 ---
 
-## 4.5 — Visualization: vẽ để hiểu, rồi vẽ để kể
+## 4.5 — Visualization: vẽ để hiểu, rồi vẽ để kể {#visualization}
 
 **Hai loại chart khác nhau hoàn toàn:**
 - **Chart để khám phá** (cho mình): nhanh, xấu cũng được, vẽ 20 cái.
@@ -222,7 +222,7 @@ sns.heatmap(df[["Sales","Quantity","Discount","Profit"]].corr(), annot=True, cma
 
 ---
 
-## 4.6 — Quy trình EDA chuẩn (dùng cho Portfolio #2)
+## 4.6 — Quy trình EDA chuẩn (dùng cho Portfolio #2) {#quy-trinh-eda}
 
 Sáu bước, đúng thứ tự, viết thành 6 phần trong notebook:
 

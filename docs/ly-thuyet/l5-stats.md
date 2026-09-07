@@ -15,7 +15,7 @@ Mọi con số ví dụ dưới đây đã được tính thật bằng `scipy.s
 
 ---
 
-## 5.1 — Tổng thể, mẫu, và vì sao có sai số
+## 5.1 — Tổng thể, mẫu, và vì sao có sai số {#mau-sai-so}
 
 **Định nghĩa.** **Tổng thể (population)** = toàn bộ đối tượng quan tâm (tất cả khách hàng). **Mẫu (sample)** = phần quan sát được (1.000 khách được khảo sát). Thống kê suy diễn = dùng mẫu nói về tổng thể, kèm mức độ không chắc chắn.
 
@@ -47,7 +47,7 @@ c) Non-response: người quá bực thường bỏ đi im lặng, không điề
 
 ---
 
-## 5.2 — CLT: vì sao dùng được phân phối chuẩn cho dữ liệu lệch
+## 5.2 — CLT: vì sao dùng được phân phối chuẩn cho dữ liệu lệch {#clt}
 
 **Định nghĩa (CLT).** Dù tổng thể lệch thế nào, **phân phối của trung bình mẫu** sẽ tiệm cận phân phối chuẩn khi n đủ lớn.
 
@@ -66,7 +66,7 @@ Quan sát: `sd` giảm theo đúng tỷ lệ `1/√n`, và hình dạng ngày c�
 
 ---
 
-## 5.3 — Khoảng tin cậy: cách báo cáo đúng
+## 5.3 — Khoảng tin cậy: cách báo cáo đúng {#khoang-tin-cay}
 
 **Định nghĩa.** CI 95% = khoảng ước lượng được tạo bằng một quy trình mà, nếu lặp lại việc lấy mẫu nhiều lần, khoảng đó sẽ chứa giá trị thật khoảng 95% số lần.
 
@@ -84,7 +84,7 @@ Con số thứ hai mới là sự thật đầy đủ. (Số này lấy từ ví
 
 ---
 
-## 5.4 — p-value: định nghĩa đúng và cách giải thích cho sếp
+## 5.4 — p-value: định nghĩa đúng và cách giải thích cho sếp {#p-value}
 
 **Định nghĩa.** p-value = xác suất quan sát được kết quả **ít nhất cực đoan như dữ liệu hiện có**, giả sử H0 (không có khác biệt) là đúng.
 
@@ -105,7 +105,7 @@ Nhận xét: bài viết này không dùng chữ "giả thuyết không", không
 
 ---
 
-## 5.5 — Sai lầm loại I/II, power, MDE
+## 5.5 — Sai lầm loại I/II, power, MDE {#power-mde}
 
 | Khái niệm | Nghĩa | Giá trị chuẩn |
 |---|---|---|
@@ -140,7 +140,7 @@ n_per_group(0.05, 0.055)     # 31234
 
 ---
 
-## 5.6 — Đọc kết quả A/B test: một ví dụ đầy đủ
+## 5.6 — Đọc kết quả A/B test: một ví dụ đầy đủ {#doc-ket-qua-ab}
 
 **Dữ liệu:** A: 10.000 người, 500 chuyển đổi (5,00%). B: 10.000 người, 560 chuyển đổi (5,60%).
 
@@ -174,7 +174,7 @@ print(z, 2*(1-stats.norm.cdf(abs(z))), (p2-p1)-1.96*se, (p2-p1)+1.96*se)
 
 ---
 
-## 5.7 — Bốn cái bẫy phá hỏng A/B test
+## 5.7 — Bốn cái bẫy phá hỏng A/B test {#bon-bay}
 
 **1. Peeking (nhìn lén và dừng khi thấy đẹp).** Kiểm tra kết quả mỗi ngày và dừng ngay khi p < 0,05 làm tỷ lệ báo động giả tăng từ 5% lên **20–30%**. Cách tránh: chốt ngày dừng trước khi chạy; nếu bắt buộc phải theo dõi liên tục thì dùng sequential testing (alpha spending).
 
@@ -198,7 +198,7 @@ Bài học: **luôn tách theo các chiều chính (thiết bị, kênh, ngườ
 
 ---
 
-## 5.8 — Checklist thiết kế A/B test (dùng cho Portfolio #3)
+## 5.8 — Checklist thiết kế A/B test (dùng cho Portfolio #3) {#checklist-ab}
 
 **Trước khi chạy** — thiếu bất kỳ mục nào thì chưa được chạy:
 - [ ] Giả thuyết viết dạng: "Nếu [thay đổi] thì [metric] sẽ [tăng/giảm] khoảng [MDE] vì [lý do]"

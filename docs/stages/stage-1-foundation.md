@@ -46,6 +46,28 @@ File Superstore trên Kaggle mã hóa **Windows-1252**, không phải UTF-8 (ch�
 
 # TUẦN 1 — Tư duy dữ liệu + Spreadsheet
 
+## Nội dung cần học — W1
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Grain (độ mịn)** | 1 dòng trong bảng đại diện cho cái gì. Sai grain → mọi con số sau đều sai mà không báo lỗi | [L1 §1.1](/ly-thuyet/l1-foundation#grain) |
+| **Kiểu dữ liệu** | Số / text / ngày / boolean — quyết định phép tính nào hợp lệ | [L1 §1.2](/ly-thuyet/l1-foundation#kieu-du-lieu-null) |
+| **NULL** | "Không biết" — khác `0`, khác chuỗi rỗng. Hàm tổng hợp bỏ qua NULL | [L1 §1.2](/ly-thuyet/l1-foundation#kieu-du-lieu-null) |
+| **Khóa chính / khóa ngoại** | Cột định danh duy nhất một dòng / cột trỏ sang bảng khác | [Từ điển](/glossary) |
+| **Pivot table** | Gom nhóm theo 1–2 chiều rồi tổng hợp — chính là `GROUP BY` phiên bản kéo thả | [L1 §1.7](/ly-thuyet/l1-foundation#pivot-mom) |
+| **MoM growth** | `(kỳ này − kỳ trước) / kỳ trước`. Bẫy: kỳ trước = 0 → chia 0 | [L1 §1.7](/ly-thuyet/l1-foundation#pivot-mom) |
+| **Quy trình đọc dataset lạ** | 9 bước bắt buộc, bước cuối là "dữ liệu này **không** trả lời được gì" | [L1 §1.8](/ly-thuyet/l1-foundation#doc-dataset-la) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Đọc [L1 §1.1–1.2](/ly-thuyet/l1-foundation#grain) (20'). Rồi mở file, trả lời 5 câu vào `notes/w1-data-basics.md`. Câu chốt: 9.994 dòng nhưng **bao nhiêu đơn hàng?**
+2. **T3** — Hàm spreadsheet. Học theo cụm chứ đừng học từng hàm rời: cụm tổng hợp (`SUM/COUNT/AVERAGE`) → cụm có điều kiện (`SUMIFS/COUNTIFS`) → cụm tra cứu (`XLOOKUP`) → cụm ngày.
+3. **T4** — Pivot. Làm đúng thứ tự: 1 chiều → 2 chiều → thêm measure thứ 2 → thêm cột tính (margin) → thêm MoM. Mỗi bước chạy thử rồi mới thêm bước sau.
+4. **T5** — Làm sạch. Ghi lại **số dòng trước và sau** mỗi thao tác, không xóa im lặng.
+5. **T6–T7** — Ghép thành sheet 3 tab. Viết 5 nhận xét, **mỗi câu bắt buộc có số**.
+
+**Dấu hiệu đã hiểu:** nhìn một bảng lạ, trong 2 phút nói được grain của nó và chỉ ra cột nào không được phép cộng.
+
 ## W1.1 — Khái niệm nền (T2, 2h)
 
 | ID | Việc | Cách làm | Xong |
@@ -116,6 +138,28 @@ Thêm ô ghi chú: **5 câu nhận xét**, mỗi câu phải có số kèm theo.
 ---
 
 # TUẦN 2 — Thống kê mô tả + Chọn chart
+
+## Nội dung cần học — W2
+
+| Khái niệm | Là gì | Học ở đâu |
+|---|---|---|
+| **Mean vs Median** | Trung bình bị outlier kéo, trung vị thì không. Dữ liệu doanh thu gần như luôn lệch phải | [L1 §1.3](/ly-thuyet/l1-foundation#mean-median) |
+| **Percentile / Quartile** | P90 = giá trị mà 90% dữ liệu nằm dưới. Q1/Q3 dùng để tính IQR | [Từ điển](/glossary) |
+| **IQR & outlier** | `Q3 − Q1`; ngoài `[Q1−1,5×IQR ; Q3+1,5×IQR]` là ngoại lai — **quy ước, không phải chân lý** | [L1 §1.4](/ly-thuyet/l1-foundation#iqr-outlier) |
+| **Std / CV** | Độ phân tán; CV = std/mean dùng so sánh nhóm khác đơn vị | [Từ điển](/glossary) |
+| **Correlation** | Hệ số r ∈ [−1,1], chỉ bắt quan hệ **tuyến tính** | [L1 §1.5](/ly-thuyet/l1-foundation#tuong-quan) |
+| **Confounder** | Biến thứ ba tạo ra tương quan giả — lý do "tương quan ≠ nhân quả" | [L1 §1.5](/ly-thuyet/l1-foundation#tuong-quan) |
+| **Chọn chart** | Chart chọn theo **loại câu hỏi**, không theo thẩm mỹ. 3 lỗi cấm | [L1 §1.6](/ly-thuyet/l1-foundation#chon-chart) |
+
+**Hướng đi trong tuần**
+
+1. **T2** — Tính 8 chỉ số mô tả cho `Sales`. Việc quan trọng không phải bấm hàm mà là **giải thích chênh lệch mean–median** (229,86 vs 54,49 → gấp 4,2 lần).
+2. **T3** — Histogram trước, IQR sau. Vẽ rồi mới tính, không làm ngược. Đếm outlier ra 1.167 dòng (11,7%) → tự trả lời: đó là lỗi dữ liệu hay đặc tính tự nhiên?
+3. **T4** — Scatter `Discount` vs `Profit`, tính r. r = −0,219 trông yếu — nhưng cắt theo mức chiết khấu thì lộ ngưỡng đảo dấu ở 30%. Bài học: **luôn cắt nhóm trước khi tin hệ số**.
+4. **T5** — Bài chọn chart: 6 câu hỏi, mỗi câu ghi lý do 1 dòng.
+5. **T6–T7** — Tab `stats-summary`. Bắt buộc có mục **Hạn chế**: 2 điều dữ liệu này không trả lời được.
+
+**Dấu hiệu đã hiểu:** giải thích được vì sao **không** loại 1.167 điểm mà quy tắc IQR đã gắn cờ.
 
 ## W2.1 — Đo lường trung tâm và phân tán (T2, 2h)
 
@@ -188,7 +232,7 @@ Thêm ô ghi chú: **5 câu nhận xét**, mỗi câu phải có số kèm theo.
 
 Push link sheet (share chế độ "ai có link đều xem được") vào README repo.
 
-## W2.6 — CHECKPOINT 1 (CN, 2h)
+## W2.6 — CHECKPOINT 1 (CN, 2h) {#checkpoint-1}
 
 **Pass khi làm được cả 4 điều sau, không tra cứu:**
 
