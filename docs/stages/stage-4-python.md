@@ -19,6 +19,10 @@ format: md
 
 **Nếu đã biết lập trình:** rút W13 còn 2 buổi, dồn thời gian sang W15 (làm sạch dữ liệu) — đó mới là phần chiếm nhiều thời gian nhất trong công việc thật.
 
+:::tip Lý thuyết đi kèm
+Bảng chuyển đổi SQL ↔ pandas, làm sạch có log, quy trình EDA 6 bước — định nghĩa + ví dụ + bài tập có đáp án: [L4 — Python & Pandas](../ly-thuyet/l4-python.md) · tra từ: [Từ điển thuật ngữ](../glossary.md)
+:::
+
 ---
 
 ## Dataset Stage này

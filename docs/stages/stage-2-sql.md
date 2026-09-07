@@ -17,6 +17,10 @@ format: md
 | **Output** | ≥ 125 bài đã giải + bộ 12 query báo cáo + 6 metric definition |
 | **Checkpoint** | CHECKPOINT 2 |
 
+:::tip Lý thuyết đi kèm
+Định nghĩa + ví dụ đã chạy thật trên Chinook (fan-out 2.328,60 → 20.848,62 · LEFT JOIN 412/35/89) + bài tập có đáp án: [L2 — SQL](../ly-thuyet/l2-sql.md) · tra từ: [Từ điển thuật ngữ](../glossary.md)
+:::
+
 Đây là stage quan trọng nhất. JD Junior DA banking yêu cầu rõ: *"Thành thạo SQL (JOIN, subquery, window functions)"*. 7 tuần này quyết định có qua được vòng technical hay không.
 
 ---
@@ -33,14 +37,16 @@ duckdb chinook.duckdb
 ```
 ```sql
 INSTALL sqlite; LOAD sqlite;
-CALL sqlite_attach('Chinook_Sqlite.sqlite');
+ATTACH 'Chinook_Sqlite.sqlite' AS ch (TYPE sqlite);   -- cu phap hien hanh (DuckDB >= 0.9)
+USE ch;
 SHOW TABLES;
 SELECT COUNT(*) FROM Invoice;   -- kiểm tra kết nối
 ```
 
 **Nạp thêm Superstore từ Stage 1:**
 ```sql
-CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore.csv');
+CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
+-- Dung ban da chuyen ma hoa o Stage 1. Doc thang superstore.csv se loi: file la Windows-1252.
 ```
 
 **Kết nối DBeaver:** New Connection → DuckDB → trỏ tới file `chinook.duckdb`. Dùng DBeaver để nhìn ERD (Database → View Diagram) — hiểu quan hệ bảng trước khi viết JOIN.
@@ -71,7 +77,7 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore.csv');
 **10 query tự viết:**
 1. Danh sách khách hàng ở Brazil, sắp xếp theo tên
 2. Track có đơn giá trên 0.99
-3. Hóa đơn năm 2013, sắp giảm dần theo tổng tiền
+3. Hóa đơn năm 2023, sắp giảm dần theo tổng tiền (bản Chinook hiện tại chứa dữ liệu 2021–2025, không phải 2009–2013 như tài liệu cũ)
 4. Khách hàng có email đuôi `gmail.com`
 5. Track không thuộc composer nào (NULL)
 6. 10 hóa đơn giá trị cao nhất
@@ -252,7 +258,7 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore.csv');
 | W8.10 | `NULLIF` (tránh chia cho 0) | ☐ |
 | W8.11 | Ép kiểu khi chia số nguyên: `x * 1.0 / y` | ☐ |
 
-**Bẫy chia số nguyên:** `SELECT 3/4` ở một số DB trả về `0` chứ không phải `0.75`. Tính conversion rate mà quên ép kiểu → ra 0 hết. Luôn viết `COUNT(a) * 1.0 / NULLIF(COUNT(b), 0)`.
+**Bẫy chia số nguyên (đã kiểm chứng):** `SELECT 3/4` trả về **0** trên SQLite, PostgreSQL, SQL Server — nhưng **0.75** trên DuckDB, BigQuery, MySQL. Code chạy đúng ở sân tập DuckDB có thể ra conversion rate = 0 khi đưa lên Postgres. Tính conversion rate mà quên ép kiểu → ra 0 hết. Luôn viết `COUNT(a) * 1.0 / NULLIF(COUNT(b), 0)`.
 
 **Deliverable W8 — Bộ 12 query báo cáo tháng** → `sql/w8-monthly-report.sql`
 
