@@ -273,70 +273,220 @@ Google Sheets hành xử giống hệt: `AVERAGE` của 3 ô `10 / trống / 20`
 
 ## 1.3 — Mean vs Median: câu phỏng vấn xuất hiện nhiều nhất {#mean-median}
 
-**Định nghĩa.** Mean = tổng / số lượng. Median = giá trị đứng giữa khi đã sắp xếp. Mean bị giá trị cực đoan kéo, median thì không.
+**Định nghĩa.** Mean = tổng ÷ số lượng. Median = giá trị đứng giữa khi đã sắp xếp. Mean bị giá trị cực đoan kéo, median thì không.
 
-**Ví dụ thật (đã chạy trên `Sales`).**
+### Bàn tập lương 5 người
+
+Một phòng ban 5 người, lương (triệu/tháng):
+
+```
+10   11   12   13   300
+```
+
+Người thứ 5 là giám đốc. Đoán trước hai con số rồi tính:
+
+```python
+mean   = (10+11+12+13+300) / 5 = 69,2
+median = 12          (gia tri dung giua khi sap xep)
+```
+
+**Không ai trong phòng có lương gần 69,2.** Bốn người dưới 14, một người 300. Mean rơi vào khoảng trống không có ai.
+
+Giờ hình dung tin tuyển dụng ghi *"lương trung bình phòng 69 triệu"*. Không sai về số học. Nhưng ứng viên vào làm sẽ nhận 10–13.
+
+### Vì sao chuyện này quan trọng với dữ liệu doanh thu
+
+Doanh thu, thu nhập, thời gian chờ — gần như **luôn lệch phải**: rất nhiều giá trị nhỏ, vài giá trị rất lớn. Đúng hình dạng của bàn tập lương trên.
+
+Superstore, cột `Sales`:
 
 | Chỉ số | Giá trị |
 |---|---|
-| mean | 229,86 |
-| median | 54,49 |
+| mean | **229,86** |
+| median | **54,49** |
 | SD | 623,25 |
 | min | 0,44 |
 | Q1 | 17,28 |
 | Q3 | 209,94 |
 | max | 22.638,48 |
 
-Mean gấp **4,2 lần** median. Nghĩa là: một nhóm nhỏ đơn hàng rất lớn đang kéo mean lên. Một nửa số dòng có giá trị dưới 55$. Nếu báo cáo với sếp "giá trị trung bình mỗi dòng bán hàng là 230$", sếp sẽ hình dung sai hoàn toàn về khách hàng điển hình.
+Mean gấp **4,2 lần** median. Nửa số dòng có giá trị dưới 55$, nhưng mean nói 230$.
 
-Cách nói đúng: *"Phân phối lệch phải mạnh — median 54$, mean 230$. Phần lớn giao dịch nhỏ, doanh thu tập trung vào nhóm ít giao dịch giá trị cao. Nên theo dõi bằng median cộng thêm P90, và tách riêng nhóm đơn lớn."*
+**Cách kiểm nhanh độ lệch:** so mean với median.
 
-**Bài tập 1.3.**
-1. Tính mean và median của `Profit`. Dấu của chúng nói lên điều gì?
-2. Trường hợp nào mean tốt hơn median?
-3. Lương 5 người: 10, 11, 12, 13, 300 (triệu). Mean? Median? Nên báo cáo cái nào và vì sao?
+| Quan hệ | Hình dạng | Nên báo cáo bằng |
+|---|---|---|
+| mean ≈ median | đối xứng | mean được |
+| mean > median | **lệch phải** (đuôi dài bên phải) | median + P90 |
+| mean < median | lệch trái | median |
+
+### Cách nói đúng trong báo cáo
+
+❌ *"Giá trị trung bình mỗi dòng bán hàng là 230$."*
+
+✅ *"Phân phối lệch phải mạnh — median 54$, mean 230$. Phần lớn giao dịch nhỏ, doanh thu tập trung ở nhóm ít giao dịch giá trị cao. Nên theo dõi bằng median kèm P90, và tách riêng nhóm đơn lớn để phân tích."*
+
+### Khi nào mean lại tốt hơn
+
+Mean không phải lúc nào cũng xấu:
+
+| Tình huống | Dùng | Vì sao |
+|---|---|---|
+| Cần cộng dồn / lập ngân sách | **mean** | `mean × số đơn = tổng doanh thu`. Median không có tính chất này |
+| Mô tả "khách điển hình" | **median** | không bị vài đơn lớn kéo |
+| Dữ liệu đối xứng, ít outlier | mean | đơn giản, quen thuộc |
+| So sánh giữa các nhóm lệch | **median** hoặc cả hai | tránh kết luận ngược |
+
+### Bài tập 1.3
+
+Trên bàn tập lương:
+
+1. Nếu giám đốc tăng lương từ 300 lên 600, mean đổi bao nhiêu? Median đổi bao nhiêu?
+2. Thêm 1 nhân viên lương 11 vào phòng. Median mới là bao nhiêu?
+
+Trên Superstore:
+
+3. Tính mean và median của `Profit`. Dấu của chúng nói lên điều gì?
+4. Sếp hỏi *"đơn hàng điển hình của mình đáng bao nhiêu tiền?"* — trả lời bằng con số nào, kèm câu giải thích 2 dòng?
 
 <details>
 <summary>Đáp án 1.3</summary>
 
-1. Tự chạy bằng lệnh ở cuối file. Điểm cần thấy: `Profit` có giá trị âm (đơn lỗ), min âm sâu. Median dương trong khi vẫn tồn tại đuôi âm dài → phần lớn giao dịch có lãi nhỏ, một số ít lỗ rất nặng kéo mean xuống.
-2. Khi cần **cộng dồn**: doanh thu tổng = mean × số đơn (median không có tính chất này). Khi dữ liệu phân phối gần đối xứng, không có outlier. Khi cần so sánh với ngân sách/tổng.
-3. Mean = 69,2 · Median = 12. Báo median vì mean bị 1 giá trị 300 kéo lệch, không ai trong nhóm có lương gần 69. Cách chuẩn: báo cả hai + khoảng (min–max) và nêu rõ có outlier.
+1. Mean tăng từ 69,2 lên **129,2** (+60). Median **không đổi**, vẫn 12. Đó chính là ý nghĩa của "median không bị outlier kéo" — thay đổi ở đuôi không ảnh hưởng giá trị giữa.
+2. Sáu người: `10, 11, 11, 12, 13, 300`. Median = trung bình 2 giá trị giữa = (11+12)/2 = **11,5**.
+3. `Profit` có cả giá trị âm (đơn lỗ). Median dương trong khi vẫn tồn tại đuôi âm dài → phần lớn giao dịch lãi nhỏ, một số ít lỗ rất nặng kéo mean xuống. Nếu chỉ báo mean sẽ che mất chuyện "đa số đơn vẫn có lãi".
+4. **458,6$** — nhưng đó là AOV (doanh thu ÷ số đơn duy nhất), không phải mean của cột `Sales`. Câu trả lời đầy đủ: *"Giá trị trung bình một đơn hàng là 458$. Tuy nhiên phân phối rất lệch: nửa số dòng bán hàng dưới 55$, trong khi đơn lớn nhất tới 22.638$. Nên xem thêm median và nhóm đơn lớn riêng."* Chú ý câu này dùng đúng grain — nếu trả lời 229,9$ là đã nhầm sang grain dòng.
 
 </details>
 
----
-
 ## 1.4 — Outlier và quy tắc IQR {#iqr-outlier}
 
-**Định nghĩa.** IQR = Q3 − Q1. Ngưỡng ngoại lai: dưới `Q1 − 1,5×IQR`, trên `Q3 + 1,5×IQR`. Đây là quy ước, không phải chân lý.
+**Định nghĩa.** IQR = Q3 − Q1, đo độ phân tán của **phần giữa** dữ liệu. Ngưỡng ngoại lai: ngoài khoảng `[Q1 − 1,5×IQR ; Q3 + 1,5×IQR]`. Đây là **quy ước**, không phải chân lý.
 
-**Ví dụ thật.** IQR = 209,94 − 17,28 = **192,66** → ngưỡng trên = 209,94 + 1,5×192,66 = **498,93**. Số dòng vượt ngưỡng: **1.167 dòng = 11,7%** dữ liệu.
+### Bàn tập 8 số
 
-Diễn giải: 11,7% là quá nhiều để gọi là "bất thường". Kết luận đúng không phải "có 1.167 lỗi dữ liệu" mà là *"phân phối lệch phải mạnh nên quy tắc IQR gắn cờ quá nhiều điểm; đây là đặc tính tự nhiên của doanh thu, không phải lỗi"*. Hành động: giữ nguyên dữ liệu, đổi cách báo cáo (median, P90), và nếu cần lọc thì lọc theo ngưỡng nghiệp vụ (ví dụ đơn > 5.000$ tách nhóm B2B) chứ không theo IQR.
+Thời gian xử lý đơn hàng (phút):
 
-**Nguyên tắc loại outlier.** Chỉ loại khi **chứng minh được là lỗi**: ngày 2099, giá âm, số lượng 99.999, khách tên "test". Không loại vì "chart nhìn xấu".
+```
+12   15   14   13   16   15   14   90
+```
 
-**Bài tập 1.4.**
-1. Tính ngưỡng IQR cho `Profit`, đếm số outlier hai phía.
-2. Mở 10 dòng `Sales` lớn nhất. Chúng là lỗi hay đơn thật? Căn cứ vào đâu để kết luận?
-3. Viết 3 câu quyết định giữ/loại kèm lý do, theo đúng giọng đưa cho sếp đọc.
+Bảy đơn quanh 12–16 phút, một đơn **90 phút**. Tính tay:
+
+```
+Q1  = 13,75        Q3 = 15,25        IQR = 1,50
+Nguong duoi = 13,75 - 1,5x1,50 = 11,50
+Nguong tren = 15,25 + 1,5x1,50 = 17,50
+-> 90 vuot nguong  ->  bi gan co outlier
+```
+
+Ảnh hưởng của một điểm đó lên các chỉ số:
+
+| Chỉ số | Có outlier | Bỏ outlier | Chênh |
+|---|---|---|---|
+| mean | **23,6** | 14,1 | 67% |
+| median | 14,5 | 14,5 | **0%** |
+
+Một điểm duy nhất kéo mean lên 67%. Median không nhúc nhích. Đây là lý do §1.3 tồn tại.
+
+### Nhưng đừng vội xóa
+
+Câu hỏi đúng không phải *"loại hay giữ?"* mà là **"90 phút đó là cái gì?"**:
+
+| Nếu là | Thì |
+|---|---|
+| Lỗi nhập liệu (gõ nhầm 9 thành 90) | **Sửa hoặc loại**, ghi lại |
+| Đơn hàng đặc biệt (hàng cồng kềnh, giao tỉnh xa) | **Giữ** — đây là thực tế kinh doanh |
+| Sự cố hệ thống hôm đó | **Giữ**, và đó chính là phát hiện đáng báo cáo |
+
+**Nguyên tắc: chỉ loại khi chứng minh được là lỗi.** Ngày 2099, giá âm, số lượng 99.999, khách tên "test" — loại được. "Nhìn xấu trên biểu đồ" — không phải lý do.
+
+### Áp lên Superstore
+
+```
+Q1 = 17,28      Q3 = 209,94      IQR = 192,66
+Nguong tren = 209,94 + 1,5 x 192,66 = 498,93
+So dong vuot nguong: 1.167  =  11,7% du lieu
+```
+
+**11,7% là quá nhiều để gọi là "bất thường".** Nếu hơn 1/10 dữ liệu bị gắn cờ ngoại lai thì vấn đề không nằm ở dữ liệu, mà nằm ở **quy tắc**.
+
+Vì sao? Quy tắc 1,5×IQR được thiết kế cho phân phối gần chuẩn. Doanh thu lệch phải mạnh nên quy tắc này gắn cờ quá tay.
+
+Kết luận đúng: *"Phân phối lệch phải là đặc tính tự nhiên của doanh thu, không phải lỗi. Giữ toàn bộ dữ liệu, đổi cách báo cáo sang median + P90. Nếu cần tách nhóm giá trị lớn thì dùng **ngưỡng nghiệp vụ** (ví dụ đơn > 5.000$ = nhóm B2B) chứ không dùng ngưỡng IQR."*
+
+### Ba cách xử lý outlier
+
+| Cách | Khi nào | Rủi ro |
+|---|---|---|
+| **Giữ nguyên** | Dữ liệu thật, phản ánh thực tế | Chỉ số trung bình bị kéo |
+| **Loại bỏ** | Chứng minh được là lỗi | Mất thông tin nếu đoán sai |
+| **Tách nhóm** | Nhóm lớn có hành vi khác hẳn | Phải giải thích tiêu chí tách |
+
+Cách thứ ba thường tốt nhất trong thực tế: không xóa, không trộn, mà **phân tích riêng** — "đơn bán lẻ" và "đơn doanh nghiệp" là hai câu chuyện khác nhau.
+
+### Bài tập 1.4
+
+Trên bàn tập 8 số:
+
+1. Thêm một đơn 100 phút nữa. Ngưỡng IQR có đổi không? Vì sao?
+2. Nếu 6/8 đơn đều trên 60 phút thì quy tắc IQR còn gắn cờ 90 không?
+
+Trên Superstore:
+
+3. Tính ngưỡng IQR cho `Profit`, đếm outlier **hai phía**. Phía nào nhiều hơn, nói lên điều gì?
+4. Mở 10 dòng `Sales` lớn nhất. Chúng là lỗi hay đơn thật? Căn cứ vào đâu?
+5. Viết 3 câu quyết định giữ/loại, giọng đưa cho sếp đọc.
 
 <details>
 <summary>Đáp án 1.4</summary>
 
-1–2. Chạy lệnh ở cuối file. Kiểm tra: đơn lớn có `Quantity` hợp lý không, `Product Name` có phải hàng đắt tiền thật không (máy photocopy, tủ), khách có phải segment Corporate/Home Office không. Nếu số lượng và loại hàng khớp nhau → đơn thật.
-3. Mẫu: *"Giữ toàn bộ 1.167 điểm vượt ngưỡng IQR. Kiểm tra 10 giá trị lớn nhất cho thấy đều là máy móc văn phòng giá cao mua với số lượng hợp lý, không có dấu hiệu lỗi nhập liệu. Do phân phối lệch phải, tôi báo cáo bằng median kèm P90 thay vì mean, và tách riêng nhóm đơn > 5.000$ để theo dõi vì nhóm này chiếm phần lớn biến động doanh thu."*
+1. Ngưỡng **gần như không đổi** (Q1, Q3 chỉ dịch nhẹ) vì IQR dựa trên phân vị, không dựa trên giá trị cực đoan. Đây là ưu điểm của IQR so với "mean ± 3×SD" — cách sau bị chính outlier làm hỏng ngưỡng.
+2. **Không.** Nếu phần lớn đơn đều 60–90 phút thì Q1, Q3 dịch lên theo, 90 nằm trong khoảng bình thường. Outlier là khái niệm **tương đối so với phần còn lại**, không phải ngưỡng tuyệt đối.
+3. Chạy trên dữ liệu. Điểm cần thấy: `Profit` có outlier **cả hai phía** — đơn lãi rất lớn và đơn lỗ rất nặng. Phía âm đáng chú ý hơn vì đó là tiền đang mất, và đó là đầu mối dẫn tới phát hiện về `Tables` (lỗ 17.725) và chiết khấu ≥30%.
+4. Kiểm tra: `Quantity` có hợp lý không · `Product Name` có phải hàng đắt tiền thật không (máy photocopy, tủ) · khách thuộc segment Corporate/Home Office không. Số lượng và loại hàng khớp nhau → đơn thật.
+5. *"Giữ toàn bộ 1.167 điểm vượt ngưỡng IQR. Kiểm tra 10 giá trị lớn nhất cho thấy đều là thiết bị văn phòng giá cao mua với số lượng hợp lý, không có dấu hiệu lỗi nhập liệu. Do phân phối lệch phải, tôi báo cáo bằng median kèm P90 thay vì mean, và tách riêng nhóm đơn trên 5.000$ để theo dõi vì nhóm này chiếm phần lớn biến động doanh thu."*
 
 </details>
 
----
-
 ## 1.5 — Tương quan và bẫy nhân quả {#tuong-quan}
 
-**Định nghĩa.** Hệ số tương quan r ∈ [−1, 1] đo mức độ hai biến **số** đi cùng nhau theo quan hệ tuyến tính. |r| < 0,3 yếu · 0,3–0,7 vừa · > 0,7 mạnh (quy ước thô).
+**Định nghĩa.** Hệ số tương quan r ∈ [−1, 1] đo mức độ hai biến **số** đi cùng nhau theo quan hệ **tuyến tính**. Chữ "tuyến tính" là chỗ hầu hết người mới bỏ qua, và nó gây ra sai lầm lớn nhất.
 
-**Ví dụ thật.** corr(`Discount`, `Profit`) = **−0,219** → nhìn qua thì "yếu, chắc không quan trọng". Nhưng cắt theo mức chiết khấu thì bức tranh khác hẳn:
+### Bàn tập — r thấp nhưng quan hệ rất mạnh
+
+Hiệu suất làm việc theo số giờ làm liên tục trong ngày:
+
+| Giờ thứ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|---|
+| Hiệu suất | 30 | 55 | 75 | 88 | 90 | 86 | 70 | 45 |
+
+Nhìn dãy số: tăng mạnh tới giờ thứ 5 rồi giảm mạnh — quan hệ **rõ như ban ngày**.
+
+Tính hệ số tương quan:
+
+```python
+np.corrcoef(gio, hieu_suat)[0,1]    # 0.284
+```
+
+**r = 0,284.** Theo quy ước thì đó là "tương quan yếu, gần như không liên quan". Sai hoàn toàn.
+
+Tách làm hai nửa:
+
+```
+Nua dau (gio 1-4):  r = +0,991
+Nua sau (gio 5-8):  r = -0,955
+```
+
+Cả hai nửa đều **gần như hoàn hảo**, chỉ là ngược chiều nhau nên triệt tiêu khi tính chung.
+
+**Bài học 1: r thấp KHÔNG có nghĩa là không có quan hệ.** Nó chỉ có nghĩa là *không có quan hệ tuyến tính*. Luôn vẽ scatter trước khi tin hệ số.
+
+### Áp lên Superstore — cùng một bẫy
+
+`corr(Discount, Profit)` = **−0,219**. Nhìn qua: "yếu, chắc không quan trọng".
+
+Cắt theo mức chiết khấu:
 
 | Discount | Số dòng | Lợi nhuận TB |
 |---|---|---|
@@ -349,61 +499,160 @@ Diễn giải: 11,7% là quá nhiều để gọi là "bất thường". Kết l
 | 40% | 206 | **−111,9** |
 | 45% | 11 | −226,6 |
 
-Bài học kép:
-1. **r thấp không có nghĩa là không có quan hệ.** Quan hệ ở đây có ngưỡng (dưới 20% vẫn lãi, từ 30% trở lên lỗ) — dạng phi tuyến mà r tuyến tính không bắt được. Luôn vẽ chart / cắt nhóm trước khi tin vào r.
-2. **Vẫn chưa được kết luận "chiết khấu gây lỗ".** Biến ẩn khả dĩ: loại mặt hàng. Bàn ghế (Furniture) vốn biên lợi nhuận chỉ 2,5% và cũng là nhóm hay bị giảm giá sâu để đẩy hàng tồn. Chiết khấu và lỗ có thể cùng là *hậu quả* của "hàng khó bán", chứ không phải cái này gây ra cái kia.
+Quan hệ **có ngưỡng**: dưới 20% vẫn lãi, từ 30% trở lên lỗ. Đó là dạng phi tuyến mà r không bắt được — y hệt bàn tập hiệu suất.
 
-Cách nói đúng trong báo cáo: *"Có liên hệ rõ giữa mức chiết khấu và lợi nhuận: từ ngưỡng 30% trở lên, lợi nhuận trung bình mỗi dòng chuyển sang âm. Chưa thể khẳng định quan hệ nhân quả vì loại mặt hàng có thể là biến gây nhiễu. Đề xuất kiểm chứng bằng thử nghiệm có kiểm soát trên một nhóm sản phẩm."*
+### Bài học 2: có quan hệ vẫn chưa phải nhân quả
 
-**Bài tập 1.5.**
-1. Tính corr(`Sales`, `Profit`) và corr(`Quantity`, `Profit`). Giải thích dấu và độ lớn.
-2. Tìm 1 cặp biến trong Superstore có tương quan nhưng chắc chắn không nhân quả.
-3. Viết lại kết luận về Discount theo cách chỉ dùng số, không dùng từ "gây ra", "khiến cho", "dẫn đến".
+Ngay cả khi đã thấy rõ ngưỡng 30%, **vẫn chưa được kết luận "chiết khấu gây lỗ"**.
+
+Biến ẩn khả dĩ: **loại mặt hàng**. Furniture có biên lợi nhuận chỉ 2,5% (so với Technology 17,4%) và cũng là nhóm hay bị giảm giá sâu để đẩy hàng tồn.
+
+```
+Hang kho ban  ──►  bien loi nhuan von da thap  ──►  LO
+      │
+      └──────────►  hay bi chiet khau sau     ──►  CHIET KHAU CAO
+```
+
+Chiết khấu và lỗ có thể **cùng là hậu quả** của "hàng khó bán", chứ không phải cái này gây ra cái kia. Biến gây nhiễu đó gọi là **confounder**.
+
+### Ba câu hỏi trước khi nói "A gây ra B"
+
+1. **Có biến thứ ba nào tác động lên cả hai không?** (confounder)
+2. **Chiều ngược lại có hợp lý không?** — biết đâu lỗ mới dẫn tới chiết khấu (hàng ế → giảm giá), chứ không phải ngược lại
+3. **Có cách nào kiểm chứng bằng thí nghiệm không?** — chỉ ngẫu nhiên hóa mới cho phép nói nhân quả (xem [L5](/ly-thuyet/l5-stats#p-value))
+
+### Cách viết kết luận đúng
+
+❌ *"Chiết khấu cao gây lỗ. Đề xuất bỏ chiết khấu."*
+
+✅ *"Có liên hệ rõ giữa mức chiết khấu và lợi nhuận: từ ngưỡng 30% trở lên, lợi nhuận trung bình mỗi dòng chuyển sang âm (−45,7$ ở mức 30%, −111,9$ ở mức 40%), nhất quán qua 4 mức chiết khấu trên 471 dòng. Chưa thể khẳng định quan hệ nhân quả vì loại mặt hàng có thể là biến gây nhiễu — nhóm biên lợi nhuận thấp cũng chính là nhóm hay được giảm giá sâu. Đề xuất kiểm chứng bằng thử nghiệm có kiểm soát trên một nhóm sản phẩm."*
+
+### Bài tập 1.5
+
+1. Trên bàn tập hiệu suất: nếu chỉ lấy dữ liệu giờ 1–4 rồi kết luận "làm càng lâu càng hiệu quả", sai ở đâu?
+2. Tính `corr(Sales, Profit)` và `corr(Quantity, Profit)` trên Superstore. Giải thích dấu và độ lớn.
+3. Tìm 1 cặp biến trong Superstore có tương quan nhưng **chắc chắn** không nhân quả.
+4. Viết lại kết luận về Discount mà **không dùng** các từ "gây ra", "khiến cho", "dẫn đến".
 
 <details>
 <summary>Đáp án 1.5</summary>
 
-1. corr(Sales, Profit) dương nhưng không sát 1 vì có đơn doanh thu cao mà lỗ (chiết khấu sâu). corr(Quantity, Profit) rất yếu — bán nhiều không đồng nghĩa lãi nhiều, vì đơn giá và chiết khấu mới là yếu tố quyết định.
-2. Ví dụ: `Ship Date` và `Order Date` tương quan gần hoàn hảo — nhưng là quan hệ định nghĩa (ship luôn sau order), không phải nhân quả kinh doanh. Hoặc: doanh thu theo tháng và số đơn theo tháng — cả hai cùng bị chi phối bởi mùa vụ.
-3. Mẫu: *"Nhóm đơn chiết khấu 0–20% có lợi nhuận trung bình +24,7 đến +96,1 mỗi dòng. Nhóm chiết khấu từ 30% trở lên có lợi nhuận trung bình −45,7 đến −226,6. Chênh lệch tồn tại nhất quán qua 4 mức chiết khấu, trên 471 dòng thuộc nhóm chiết khấu sâu."*
+1. Sai vì **ngoại suy ra ngoài khoảng dữ liệu**. Trong khoảng 1–4 giờ thì kết luận đúng, nhưng áp cho giờ thứ 8 thì ngược hoàn toàn. Đây là lỗi rất hay gặp: lấy một đoạn của quan hệ phi tuyến rồi khái quát thành quy luật chung.
+2. `corr(Sales, Profit)` dương nhưng không sát 1 — vì có đơn doanh thu cao mà vẫn lỗ (chiết khấu sâu). `corr(Quantity, Profit)` rất yếu — bán nhiều không đồng nghĩa lãi nhiều; đơn giá và chiết khấu mới quyết định.
+3. `Ship Date` và `Order Date` tương quan gần như hoàn hảo — nhưng là quan hệ **định nghĩa** (ship luôn sau order), không phải nhân quả kinh doanh. Hoặc: doanh thu theo tháng và số đơn theo tháng — cả hai cùng bị chi phối bởi mùa vụ.
+4. Xem đoạn "Cách viết kết luận đúng" ở trên. Điểm mấu chốt: mô tả **cái quan sát được** (số liệu theo nhóm, cỡ mẫu, mức nhất quán), nêu **biến gây nhiễu khả dĩ**, rồi đề xuất **cách kiểm chứng** — thay vì tuyên bố nhân quả.
 
 </details>
 
----
-
 ## 1.6 — Chọn đúng loại chart {#chon-chart}
 
-**Định nghĩa.** Chart không chọn theo "đẹp" mà theo **loại câu hỏi**.
+**Định nghĩa.** Chart không chọn theo thẩm mỹ mà theo **loại câu hỏi**. Sai loại chart = người đọc phải tự dịch trong đầu, và họ sẽ dịch sai.
+
+### Cùng một dữ liệu, ba cách vẽ
+
+Doanh thu 4 vùng: West 250, East 213, Central 147, South 123.
+
+| Cách vẽ | Người đọc thấy gì | Đánh giá |
+|---|---|---|
+| **Bar ngang, sắp giảm dần** | Thứ hạng rõ ràng, so sánh độ dài dễ | ✅ đúng |
+| **Pie chart** | Phải so diện tích các múi — mắt người rất kém việc này | ❌ tránh |
+| **Line chart** | Ngụ ý có xu hướng theo thứ tự — nhưng vùng không có thứ tự tự nhiên | ❌ sai khái niệm |
+
+Line chart chỉ dùng khi trục X có **thứ tự tự nhiên** (thời gian). Vùng miền không có thứ tự — nối chúng bằng đường là bịa ra một xu hướng không tồn tại.
+
+### Bảng tra: câu hỏi → chart
 
 | Câu hỏi | Chart | Ví dụ Superstore | Lỗi hay gặp |
 |---|---|---|---|
-| Thay đổi theo thời gian? | Line | doanh thu 48 tháng | dùng bar cho 48 điểm → rối |
-| So sánh giữa hạng mục? | Bar (ngang nếu nhãn dài) | doanh thu 17 sub-category | trục Y không từ 0 → phóng đại |
-| Phân phối một biến? | Histogram / Box | `Sales` | dùng bar → sai khái niệm |
-| Quan hệ hai biến số? | Scatter | `Discount` vs `Profit` | vẽ line nối các điểm |
-| Cấu phần trong tổng? | Stacked bar / 100% stacked | category qua 4 năm | pie > 5 lát |
-| Một con số then chốt? | Card + % so kỳ trước | doanh thu YTD | card không có mốc so sánh |
-| Hai chiều cùng lúc? | Heatmap | region × tháng | quá nhiều màu |
+| Thay đổi theo thời gian? | **Line** | doanh thu 48 tháng | dùng bar cho 48 điểm → rối |
+| So sánh giữa hạng mục? | **Bar** (ngang nếu nhãn dài) | 17 sub-category | trục Y không từ 0 |
+| Phân phối một biến? | **Histogram / Box** | `Sales` | dùng bar → sai khái niệm |
+| Quan hệ hai biến số? | **Scatter** | `Discount` vs `Profit` | nối các điểm bằng đường |
+| Cấu phần trong tổng? | **Stacked bar** | category qua 4 năm | pie quá 5 lát |
+| Một con số then chốt? | **Card + % so kỳ trước** | doanh thu YTD | card không có mốc so sánh |
+| Hai chiều cùng lúc? | **Heatmap** | region × tháng | quá nhiều màu |
 
-**Ba lỗi cấm.** (1) Bar chart trục Y không bắt đầu từ 0. (2) Pie chart quá 5 lát. (3) Hai trục Y khác thang mà không chú thích — có thể vẽ ra bất kỳ "mối liên hệ" nào mình muốn.
+### Ba lỗi cấm
 
-**Bài tập 1.6.** Chọn chart cho 6 câu hỏi sau, ghi lý do 1 dòng:
-a) Tháng nào doanh thu cao nhất năm 2017? b) Region nào lãi nhất? c) Đơn hàng thường có giá trị bao nhiêu? d) Giảm giá nhiều có lãi hơn không? e) Tỷ trọng 3 category thay đổi qua các năm? f) Tháng này so tháng trước tăng bao nhiêu %?
+**1. Bar chart trục Y không bắt đầu từ 0.**
+
+Doanh thu 2 vùng: 250 và 213 (chênh 17%). Vẽ trục Y từ 200 → cột 250 trông **cao gấp 4 lần** cột 213. Cùng dữ liệu, cùng "đúng sự thật", nhưng người xem rút ra kết luận sai hoàn toàn.
+
+Line chart thì **được phép** cắt trục — vì line đọc theo độ dốc, không đọc theo chiều cao cột.
+
+**2. Pie chart quá 5 lát.** Mắt người so được độ dài, so rất kém diện tích và góc. 17 sub-category vẽ pie = 17 múi không ai đọc nổi. Dùng bar sắp giảm dần.
+
+**3. Hai trục Y khác thang không ghi rõ.** Với hai trục tự do, có thể làm bất kỳ hai đường nào trông như "đi cùng nhau". Đây là cách tạo tương quan giả bằng đồ họa.
+
+### Tiêu đề chart là câu kết luận
+
+❌ *"Doanh thu theo Category"* — đó là nhãn, người đọc phải tự tìm ý nghĩa.
+
+✅ *"Furniture chiếm 32% doanh thu nhưng chỉ 6% lợi nhuận"* — người đọc nhận thông điệp ngay.
+
+Quy tắc: **đọc tiêu đề là biết chart nói gì, không cần nhìn chart.** Chart chỉ để chứng minh.
+
+### Bài tập 1.6
+
+Chọn chart cho 6 câu hỏi, ghi lý do 1 dòng:
+
+a) Tháng nào doanh thu cao nhất năm 2017?
+b) Region nào lãi nhất?
+c) Đơn hàng thường có giá trị bao nhiêu?
+d) Giảm giá nhiều có lãi hơn không?
+e) Tỷ trọng 3 category thay đổi qua các năm?
+f) Tháng này so tháng trước tăng bao nhiêu %?
+
+Rồi:
+
+g) Viết lại tiêu đề cho chart (b) và (d) theo kiểu "tiêu đề là kết luận".
 
 <details>
 <summary>Đáp án 1.6</summary>
 
-a) Line (thời gian, 12 điểm) — hoặc bar nếu muốn nhấn so sánh từng tháng. b) Bar ngang sắp giảm dần (4 hạng mục). c) Histogram + box plot (phân phối, và ở đây phải thấy được độ lệch phải). d) Scatter Discount vs Profit, thêm màu theo Category để lộ biến gây nhiễu. e) 100% stacked bar theo năm (quan tâm tỷ trọng) hoặc stacked bar thường (quan tâm cả quy mô). f) Card lớn + delta % kèm mũi tên, không cần chart.
+a) **Line** (12 điểm theo thời gian). Bar cũng chấp nhận được nếu muốn nhấn so sánh từng tháng, nhưng line thể hiện xu hướng tốt hơn.
+b) **Bar ngang sắp giảm dần** — 4 hạng mục, không có thứ tự tự nhiên.
+c) **Histogram + box plot.** Phải thấy được độ lệch phải, và đây là chỗ mean/median chênh nhau 4,2 lần.
+d) **Scatter** `Discount` vs `Profit`, **tô màu theo Category** — màu sẽ lộ ra biến gây nhiễu (§1.5).
+e) **100% stacked bar** theo năm nếu quan tâm tỷ trọng; **stacked bar thường** nếu quan tâm cả quy mô tuyệt đối. Nói rõ mình chọn cái nào và vì sao.
+f) **Card lớn + delta %** kèm mũi tên. Không cần chart. Chú ý: nếu tháng trước bằng 0 thì hiện "—", không hiện ∞ (xem §1.7).
+g) (b) *"West dẫn đầu lợi nhuận với 108K$, gấp 2,4 lần South"* — (d) *"Từ mức chiết khấu 30%, lợi nhuận trung bình chuyển sang âm"*.
 
 </details>
-
----
 
 ## 1.7 — Pivot table và tăng trưởng MoM {#pivot-mom}
 
 **Định nghĩa.** Pivot table = gom nhóm dữ liệu theo 1–2 chiều rồi tính tổng hợp. Chính là `GROUP BY` phiên bản kéo thả. MoM growth = `(kỳ này − kỳ trước) / kỳ trước`.
 
-**Ví dụ thật (Superstore, năm 2017).**
+### Bàn tập 3 tháng — bẫy nền nhỏ
+
+Doanh thu (triệu): **T1 = 100 · T2 = 10 · T3 = 30**
+
+Tính MoM:
+
+```
+T2:  (10 - 100) / 100  =  -90%
+T3:  (30 -  10) /  10  = +200%
+```
+
+Báo cáo ghi *"tháng 3 tăng trưởng 200%"*. Nghe như bùng nổ.
+
+Sự thật: tháng 3 vẫn chỉ bằng **30% của tháng 1**. Doanh thu đang ở mức thấp, chỉ là hồi phục nhẹ từ đáy.
+
+**Quy tắc: % tăng trưởng trên nền nhỏ luôn phải kèm số tuyệt đối.**
+
+❌ *"Tháng 3 tăng 200%"*
+✅ *"Tháng 3 đạt 30 triệu, tăng 200% so tháng 2 (10 triệu) nhưng vẫn thấp hơn 70% so tháng 1 (100 triệu)"*
+
+### Ba bẫy MoM
+
+| Bẫy | Ví dụ | Cách tránh |
+|---|---|---|
+| **Nền nhỏ** | 10 → 30 = +200% | luôn kèm số tuyệt đối |
+| **Chia cho 0** | tháng trước = 0 | `IFERROR(...)` / `NULLIF(prev, 0)` → hiện "—", không hiện 0% hay ∞ |
+| **Mùa vụ** | tháng 2 luôn thấp vì Tết | dùng **YoY** thay vì MoM cho ngành có mùa vụ |
+
+### Áp lên Superstore, năm 2017
 
 | Tháng | Doanh thu | Số đơn | MoM |
 |---|---|---|---|
@@ -412,41 +661,105 @@ a) Line (thời gian, 12 điểm) — hoặc bar nếu muốn nhấn so sánh t�
 | 2017-03 | 58.872 | 118 | **+190,0%** |
 | 2017-04 | 36.522 | 116 | −38,0% |
 
-Đọc bảng này như một analyst: tháng 3 tăng 190% nghe sốc, nhưng số đơn chỉ tăng từ 53 → 118 (2,2×) trong khi doanh thu tăng 2,9× → giá trị đơn trung bình cũng tăng. Và tháng 2 thấp bất thường (53 đơn, thấp nhất) → nền so sánh nhỏ khiến % tăng tháng 3 bị thổi phồng. Đây là lý do **% growth trên nền nhỏ luôn phải kèm số tuyệt đối**.
+Đọc như một analyst, không chỉ đọc số:
 
-**Bẫy MoM.** Kỳ trước = 0 → chia cho 0. Bọc `IFERROR(...)` trong Sheets, `NULLIF(prev, 0)` trong SQL.
+- Tháng 3 tăng 190% — nhưng nền tháng 2 thấp bất thường (53 đơn, thấp nhất) nên con số bị thổi phồng
+- Số đơn tăng 2,2× (53 → 118) trong khi doanh thu tăng 2,9× → **giá trị đơn trung bình cũng tăng**, không chỉ tăng số lượng
+- Tháng 4 giảm 38% nhưng số đơn gần như không đổi (118 → 116) → **giảm do giá trị đơn**, không phải do mất khách
 
-**Bài tập 1.7.**
-1. Dựng pivot: dòng = tháng, cột = Region, giá trị = Sales, cho năm 2017.
-2. Thêm cột MoM cho tổng, xử lý trường hợp chia 0.
-3. Thêm measure thứ hai (Profit) và cột tính `profit_margin`. Vì sao không được lấy trung bình của cột margin từng dòng để ra margin tổng?
+Ba nhận xét trên đến từ việc **nhìn hai cột cùng lúc** (doanh thu và số đơn), không phải nhìn riêng cột MoM. Đó là khác biệt giữa đọc báo cáo và phân tích báo cáo.
+
+### Bẫy tỷ số trong pivot
+
+Thêm cột `profit_margin` vào pivot. Có hai cách tính, chỉ một cách đúng:
+
+| Cách | Công thức | Đúng/Sai |
+|---|---|---|
+| Tỷ số của các tổng | `SUM(Profit) / SUM(Sales)` | ✅ |
+| Trung bình của các tỷ số | `AVERAGE(margin từng dòng)` | ❌ |
+
+Vì sao cách 2 sai: nó gán trọng số **bằng nhau** cho đơn 5$ và đơn 20.000$. Một đơn nhỏ lãi 100% sẽ kéo margin trung bình lên như thể nó quan trọng ngang đơn lớn.
+
+Đây là cùng một chuyện với measure non-additive ở [L3 §3.4](/ly-thuyet/l3-bi#filter-context), và là câu phỏng vấn hay gặp.
+
+### Bài tập 1.7
+
+1. Trên bàn tập 3 tháng: viết một câu báo cáo về tháng 3 mà **không gây hiểu nhầm**.
+2. Tháng 4 doanh thu 0, tháng 5 doanh thu 20. MoM tháng 5 bằng bao nhiêu? Hiển thị thế nào trên báo cáo?
+3. Dựng pivot Superstore: dòng = tháng, cột = Region, giá trị = Sales, năm 2017.
+4. Thêm cột MoM cho tổng, xử lý chia 0.
+5. Thêm measure `Profit` và cột `profit_margin`. Kiểm chứng hai cách tính margin cho ra số khác nhau — chênh bao nhiêu?
 
 <details>
 <summary>Đáp án 1.7</summary>
 
-3. Vì margin là **tỷ số**. Trung bình của các tỷ số ≠ tỷ số của các tổng. Đúng: `SUM(Profit) / SUM(Sales)`. Sai: `AVERAGE(profit_margin_từng_dòng)` — cách sai gán trọng số bằng nhau cho đơn 5$ và đơn 20.000$. Đây là lỗi phổ biến trong cả Excel lẫn công cụ BI, và là một câu phỏng vấn hay gặp.
+1. *"Tháng 3 đạt 30 triệu, hồi phục từ đáy tháng 2 (10 triệu) nhưng vẫn thấp hơn 70% so với tháng 1 (100 triệu). Xu hướng 3 tháng vẫn là giảm."*
+2. Không tính được — chia cho 0. Hiển thị **"—"** hoặc "n/a", kèm chú thích "tháng trước không có doanh thu". Tuyệt đối không hiện 0%, cũng không hiện ∞ hay một con số rất lớn. Nhiều dashboard hiển thị `+∞%` và làm người đọc hoảng.
+3. Pivot 2 chiều tiêu chuẩn — dòng tháng, cột region, giá trị `SUM(Sales)`.
+4. `IFERROR((tháng này − tháng trước)/tháng trước, "—")` trong Sheets; `NULLIF(prev, 0)` trong SQL.
+5. Hai cách sẽ lệch nhau vài điểm phần trăm. Cách đúng là tỷ số của tổng. Trên toàn Superstore: `SUM(Profit)/SUM(Sales)` = 286.397/2.297.201 = **12,5%**. Trung bình các margin từng dòng sẽ ra con số khác vì đơn nhỏ có margin cực đoan (cả rất cao lẫn rất âm) được tính ngang hàng với đơn lớn.
 
 </details>
 
----
-
 ## 1.8 — Đọc một dataset lạ trong 15 phút {#doc-dataset-la}
 
-Quy trình áp dụng cho mọi dataset, làm theo đúng thứ tự:
+Quy trình áp dụng cho **mọi** dataset. Làm đúng thứ tự, đừng nhảy cóc.
 
-1. **Kích thước** — bao nhiêu dòng, bao nhiêu cột?
-2. **Grain** — 1 dòng là gì? Viết thành câu.
-3. **Khóa** — cột nào duy nhất? Cột nào lặp?
-4. **Thời gian** — dữ liệu từ ngày nào đến ngày nào? Có lỗ hổng tháng nào không?
-5. **Thiếu** — mỗi cột thiếu bao nhiêu %?
-6. **Phân loại** — mỗi cột text có bao nhiêu giá trị khác nhau? Có giá trị lạ ('N/A', 'unknown', khoảng trắng thừa)?
-7. **Số** — min/median/max mỗi cột số. Có số âm không? Có bằng 0 bất thường không?
-8. **Trùng** — có dòng trùng hoàn toàn không?
-9. **Câu hỏi** — dataset này trả lời được câu hỏi kinh doanh nào, và **không** trả lời được câu nào?
+| # | Bước | Câu hỏi | Lệnh |
+|---|---|---|---|
+| 1 | Kích thước | Bao nhiêu dòng, bao nhiêu cột? | `SELECT COUNT(*) FROM s;` |
+| 2 | **Grain** | 1 dòng là cái gì? Viết thành câu | §1.1 |
+| 3 | Khóa | Cột nào duy nhất? Cột nào lặp? | `COUNT(*)` vs `COUNT(DISTINCT ...)` |
+| 4 | Thời gian | Từ ngày nào đến ngày nào? Có lỗ hổng tháng nào? | `MIN/MAX(ngay)` |
+| 5 | Thiếu | Mỗi cột thiếu bao nhiêu %? | `COUNT(*) - COUNT(cot)` |
+| 6 | Phân loại | Mỗi cột text có bao nhiêu giá trị? Có giá trị lạ? | `COUNT(DISTINCT)`, xem `value_counts` |
+| 7 | Số | min/median/max mỗi cột số. Có số âm? Có 0 bất thường? | `DESCRIBE`, `QUANTILE` |
+| 8 | Trùng | Có dòng trùng hoàn toàn? Trùng theo khóa nghiệp vụ? | §1.1 |
+| 9 | **Giới hạn** | Dataset này **không** trả lời được câu nào? | tự nghĩ |
 
-Bước 9 là bước phân biệt analyst với người biết dùng công cụ. *Ví dụ Superstore: không có giá vốn thật (chỉ có Profit tính sẵn), không có dữ liệu marketing, không có hành vi trước khi mua → không trả lời được "kênh nào hiệu quả nhất" hay "vì sao khách bỏ giỏ hàng".*
+### Bước 9 là bước phân biệt analyst với người dùng công cụ
 
----
+Tám bước đầu là kỹ thuật, ai cũng làm được. Bước 9 mới là phần khó và là phần được trả lương.
+
+**Cách làm:** nhìn danh sách cột rồi hỏi ngược — *thiếu cái gì?*
+
+Superstore có 21 cột. Những thứ **không có**:
+
+| Thiếu | Nên không trả lời được câu hỏi |
+|---|---|
+| Giá vốn thật (chỉ có `Profit` tính sẵn) | "Nếu đàm phán giảm giá nhập 5% thì lợi nhuận đổi thế nào?" |
+| Dữ liệu marketing (chi phí, kênh) | "Kênh nào hiệu quả nhất? ROI bao nhiêu?" |
+| Hành vi trước khi mua | "Vì sao khách bỏ giỏ hàng?" |
+| Thông tin đối thủ, giá thị trường | "Giá của mình có cạnh tranh không?" |
+| Lý do trả hàng | "Vì sao nhóm hàng này hay bị hoàn?" |
+| Chi phí vận hành, lương | "Cửa hàng này thực sự lãi hay lỗ?" |
+
+Nêu được bảng này trong buổi phỏng vấn hoặc trong README đáng giá hơn nhiều so với thêm một biểu đồ.
+
+### Vì sao bước 9 quan trọng đến vậy
+
+Sếp hỏi *"vì sao doanh thu giảm?"*. Dữ liệu chỉ có đơn hàng. Có hai kiểu trả lời:
+
+❌ Người mới: đào dữ liệu, tìm ra "giảm mạnh nhất ở Furniture vùng South", trình bày như thể đó là **nguyên nhân**.
+
+✅ Analyst: *"Dữ liệu cho thấy phần giảm tập trung ở Furniture vùng South (−23%). Nhưng dữ liệu hiện có **không** cho biết vì sao — không có dữ liệu marketing, giá đối thủ, hay phản hồi khách. Để trả lời câu 'vì sao', cần thêm A và B. Trong lúc chờ, giả thuyết khả dĩ nhất là X, kiểm chứng bằng cách Y."*
+
+Câu thứ hai nói ít hơn về dữ liệu nhưng cho sếp nhiều thông tin hơn để quyết định.
+
+### Bài tập 1.8
+
+1. Chạy đủ 9 bước trên Superstore, ghi vào `notes/w1-data-basics.md`.
+2. Làm lại 9 bước với một bảng Chinook bất kỳ (gợi ý: `Invoice` hoặc `Track`).
+3. Với Chinook, viết 3 câu hỏi kinh doanh mà dataset **không** trả lời được, kèm lý do thiếu dữ liệu gì.
+
+<details>
+<summary>Gợi ý câu 3</summary>
+
+Chinook là cửa hàng nhạc số. Những thứ không có: chi phí bản quyền cho mỗi track (nên không tính được lợi nhuận thật) · hành vi nghe thử trước khi mua · lý do khách ngừng mua · dữ liệu khách hàng tiềm năng chưa mua lần nào · thời điểm nhân viên hỗ trợ tiếp xúc khách.
+
+Một câu hỏi đắt giá mà Chinook **không** trả lời được: *"Bán 1 track thì thực sự lãi bao nhiêu?"* — vì `UnitPrice` là giá bán, không có giá vốn. Đây cũng là giới hạn của Superstore, nhưng ở Superstore người ta hay quên vì đã có sẵn cột `Profit` trông như thật.
+
+</details>
 
 ## Lệnh tự kiểm chứng mọi con số trong file này
 
