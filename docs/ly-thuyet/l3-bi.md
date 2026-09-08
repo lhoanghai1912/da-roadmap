@@ -128,21 +128,65 @@ Nếu `dim_product` nhiều dòng hơn số `Product ID` duy nhất → cùng m�
 
 **Định nghĩa.** Mỗi biểu đồ tính toán trong phạm vi bộ lọc đang áp lên nó (filter dashboard + filter riêng của chart + phạm vi ngày).
 
-Ba nguyên nhân khiến số không khớp nhau trên cùng một dashboard:
-1. **Khác bộ lọc** — chart A lọc năm 2017, card B lấy toàn bộ thời gian.
-2. **Đo lường không cộng được** — `COUNT(DISTINCT customer)` theo tháng cộng lại **không** bằng cả năm (khách quay lại bị đếm 1 lần ở tổng, nhiều lần khi cộng tháng).
-3. **Làm tròn** — mỗi chart tự làm tròn rồi mới hiển thị.
+### Bàn tập 5 dòng
 
-**Bài tập 3.4.** Dashboard hiện: "Khách hàng: 793" trên card, nhưng cộng cột "số khách" của 12 tháng ra 2.184. Giải thích cho sếp trong 3 câu, không dùng thuật ngữ kỹ thuật.
+Cửa hàng bán 3 tháng đầu năm:
+
+| thang | khach | tien |
+|---|---|---|
+| 01 | An | 100 |
+| 01 | Bình | 50 |
+| 02 | An | 80 |
+| 02 | Chi | 30 |
+| 03 | An | 60 |
+
+Dashboard có 2 thành phần: một **card** ở trên (cả kỳ) và một **bảng** ở dưới (chia theo tháng). Đoán trước xem hai bên có khớp nhau không:
+
+```sql
+-- Bang theo thang
+SELECT thang, COUNT(DISTINCT khach) AS so_khach, SUM(tien) AS doanh_thu FROM ban GROUP BY 1;
+-- Card ca ky
+SELECT COUNT(DISTINCT khach) AS khach, SUM(tien) AS doanh_thu FROM ban;
+```
+
+| | Tháng 01 | Tháng 02 | Tháng 03 | **Cộng 3 tháng** | **Card cả kỳ** | Khớp? |
+|---|---|---|---|---|---|---|
+| Doanh thu | 150 | 110 | 60 | **320** | **320** | ✅ |
+| Số khách | 2 | 2 | 1 | **5** | **3** | ❌ |
+
+Cùng một bảng, cùng một dashboard: doanh thu khớp, số khách lệch. Không phải lỗi.
+
+**Vì sao:** An mua cả 3 tháng nên được đếm ở cả 3 dòng của bảng, nhưng ở card chỉ tính **1 người**. Cửa hàng có đúng 3 khách: An, Bình, Chi.
+
+### Measure cộng được và measure không cộng được {#non-additive}
+
+| Loại | Ví dụ | Cộng các kỳ lại được? |
+|---|---|---|
+| **Additive** | doanh thu, số đơn, số lượng | ✅ Tổng 12 tháng = cả năm |
+| **Non-additive** | số khách duy nhất, số user hoạt động | ❌ Tổng 12 tháng > cả năm |
+| **Tỷ số** | biên lợi nhuận, tỷ lệ chuyển đổi | ❌ Phải tính lại từ tử/mẫu, không lấy trung bình |
+
+Đây là cùng một chuyện với [grain ở Lesson 1](/ly-thuyet/l1-foundation#grain): khách là thực thể ở grain cao hơn dòng bán hàng, nên đếm thẳng là đếm trùng.
+
+**Ba nguyên nhân khiến số trên dashboard "không khớp":**
+1. Khác bộ lọc — chart A lọc 2017, card B lấy toàn bộ thời gian
+2. Measure non-additive — trường hợp vừa xem
+3. Làm tròn — mỗi chart tự làm tròn rồi mới hiển thị
+
+### Bài tập 3.4
+
+1. Vẫn bảng 5 dòng: "doanh thu trung bình mỗi khách mỗi tháng" — tính thế nào? Ra bao nhiêu?
+2. Biên lợi nhuận tháng 01 là 10%, tháng 02 là 20%. Biên lợi nhuận cả kỳ có phải 15% không?
+3. Dashboard hiện "Khách hàng: 793" trên card, nhưng cộng cột "số khách" của 12 tháng ra 2.184. Giải thích cho sếp trong 3 câu, không dùng thuật ngữ kỹ thuật.
 
 <details>
 <summary>Đáp án 3.4</summary>
 
-*"Card đếm số người khác nhau đã mua trong cả kỳ — mỗi người chỉ tính một lần dù mua nhiều tháng. Cột theo tháng đếm số người mua trong từng tháng, nên ai mua 3 tháng sẽ được tính ở cả 3 tháng đó. Vì vậy cộng 12 tháng luôn lớn hơn con số tổng, và đó là hành vi đúng chứ không phải lỗi."*
+1. Cần nói rõ định nghĩa trước khi tính. Hiểu theo "trung bình của (doanh thu tháng ÷ số khách tháng đó)": (150/2 + 110/2 + 60/1) / 3 = (75 + 55 + 60)/3 = **63,3**. Hiểu theo "tổng doanh thu ÷ tổng lượt khách-tháng": 320/5 = **64**. Hai con số khác nhau, đều "đúng" — nên khi sếp hỏi, phải hỏi lại ý nào trước khi trả lời.
+2. **Không.** Biên lợi nhuận là tỷ số nên phải tính lại: `tổng lợi nhuận / tổng doanh thu`. Nếu tháng 01 doanh thu 1.000 (lãi 100) và tháng 02 doanh thu 100 (lãi 20) thì biên cả kỳ = 120/1.100 = **10,9%**, không phải 15%. Trung bình cộng của hai tỷ số bỏ qua chênh lệch quy mô.
+3. *"Card đếm số người khác nhau đã mua trong cả kỳ — mỗi người chỉ tính một lần dù mua nhiều tháng. Cột theo tháng đếm số người mua trong từng tháng, nên ai mua 3 tháng sẽ được tính ở cả 3 tháng. Vì vậy cộng 12 tháng luôn lớn hơn con số tổng, và đó là hành vi đúng chứ không phải lỗi."*
 
 </details>
-
----
 
 ## 3.5 — Thiết kế: bố cục, màu, mật độ thông tin {#thiet-ke}
 

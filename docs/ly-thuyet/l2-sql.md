@@ -42,6 +42,34 @@ CREATE TABLE superstore AS SELECT * FROM read_csv_auto('superstore_utf8.csv');
 
 ---
 
+### Bàn tập 2 bảng — dùng suốt bài này {#ban-tap-2-bang}
+
+Chinook 11 bảng là quá nhiều để học khái niệm mới. Dựng thêm 2 bảng nhỏ, nhìn hết bằng mắt:
+
+```sql
+CREATE TABLE khach(id INT, ten VARCHAR, diem INT);
+INSERT INTO khach VALUES (1,'An',100),(2,'Binh',50),(3,'Chi',30);
+
+CREATE TABLE don(don_id VARCHAR, khach_id INT, tien INT);
+INSERT INTO don VALUES ('HD-01',1,90),('HD-02',1,50),('HD-03',2,30);
+```
+
+| khach | | | | don | | |
+|---|---|---|---|---|---|---|
+| **id** | **ten** | **diem** | | **don_id** | **khach_id** | **tien** |
+| 1 | An | 100 | | HD-01 | 1 | 90 |
+| 2 | Bình | 50 | | HD-02 | 1 | 50 |
+| 3 | Chi | 30 | | HD-03 | 2 | 30 |
+
+Ba điều cần thấy ngay, chỉ bằng mắt:
+- **An có 2 đơn**, Bình có 1, **Chi không có đơn nào**
+- Cột `diem` thuộc về **khách**, không thuộc về đơn
+- 3 khách, 3 đơn — trùng hợp về số lượng, đừng để nó đánh lừa
+
+Mọi khái niệm khó trong bài (JOIN, fan-out, window) sẽ thử trên 2 bảng này trước, rồi mới áp lên Chinook.
+
+---
+
 ## 2.1 — SQL là gì và chạy theo thứ tự nào {#thu-tu-thuc-thi}
 
 **Định nghĩa.** SQL là ngôn ngữ *khai báo*: mình mô tả kết quả muốn có, database tự quyết cách lấy. Khác hoàn toàn Python/JS nơi mình chỉ đạo từng bước.
@@ -186,116 +214,194 @@ FROM Invoice GROUP BY 1 ORDER BY hd_lon DESC;
 
 ## 2.4 — JOIN: mô hình tư duy + 2 cái bẫy chết người {#join}
 
-**Định nghĩa.** JOIN ghép dòng của hai bảng theo điều kiện khớp. Hình dung: với **mỗi dòng bảng trái**, database đi tìm **mọi dòng bảng phải** thỏa điều kiện `ON`, rồi ghép ra 1 dòng cho mỗi cặp khớp.
+**Định nghĩa.** JOIN ghép dòng của hai bảng theo điều kiện khớp. Hình dung đúng: với **mỗi dòng bảng trái**, database đi tìm **mọi dòng bảng phải** thỏa điều kiện `ON`, rồi sinh ra một dòng cho **mỗi cặp khớp**.
 
-Bảng nhỏ để hình dung:
+Câu "mỗi cặp khớp" là chìa khóa. Nó giải thích cả hai cái bẫy bên dưới.
 
+### Thử trên bàn tập 2 bảng
+
+Trước khi chạy, **tự đoán số dòng** của mỗi câu rồi hãy chạy.
+
+```sql
+-- (a) INNER JOIN
+SELECT k.ten, d.don_id, d.tien FROM khach k INNER JOIN don d ON d.khach_id = k.id;
 ```
-A (khach)          B (don hang)
-id  ten            id  khach_id  tien
-1   An             101  1        50
-2   Binh           102  1        70
-3   Chi            103  2        30
+```
+An   HD-01  90
+An   HD-02  50
+Binh HD-03  30          -> 3 dong. Chi BIEN MAT (khong co don nao)
 ```
 
-| Kiểu JOIN | Kết quả | Số dòng |
+```sql
+-- (b) LEFT JOIN
+SELECT k.ten, d.don_id, d.tien FROM khach k LEFT JOIN don d ON d.khach_id = k.id;
+```
+```
+An   HD-01  90
+An   HD-02  50
+Binh HD-03  30
+Chi  NULL   NULL        -> 4 dong. Chi duoc giu lai, phan ben phai la NULL
+```
+
+Hai điều rút ra ngay:
+- **An chiếm 2 dòng** vì có 2 đơn — bảng trái bị nhân bản theo số dòng khớp bên phải
+- **Chi mất ở INNER, còn ở LEFT** — đây là toàn bộ khác biệt giữa hai loại
+
+| Kiểu JOIN | Kết quả trên bàn tập | Số dòng |
 |---|---|---|
 | `INNER JOIN` | An×2, Bình×1 | 3 |
 | `LEFT JOIN` | An×2, Bình×1, Chi + NULL | 4 |
-| `RIGHT JOIN` | như INNER (B không có dòng thừa) | 3 |
-| `FULL OUTER` | 4 dòng như LEFT | 4 |
+| `RIGHT JOIN` | như INNER (bảng `don` không có dòng thừa) | 3 |
+| `FULL OUTER` | như LEFT | 4 |
 | `CROSS JOIN` | mọi tổ hợp 3×3 | 9 |
 
-Chú ý dòng "An" xuất hiện **2 lần** — đây là mầm mống của fan-out.
+### Bẫy 1 — "LEFT JOIN hóa INNER JOIN" {#bay-left-join}
 
-### Bẫy 1 — "LEFT JOIN hóa INNER JOIN" (câu phỏng vấn kinh điển)
+Câu hỏi: *"Liệt kê mọi khách, kèm đơn trên 40 nghìn nếu có."*
 
-Ba query dưới đây đã chạy thật trên Chinook, kết quả khác nhau hoàn toàn:
+Hai cách viết, khác nhau đúng một chỗ. Đoán trước xem cách nào ra mấy dòng:
 
 ```sql
--- (a) khong dieu kien
-SELECT COUNT(*) FROM Customer c LEFT JOIN Invoice i ON i.CustomerId = c.CustomerId;                        -- 412
+-- Cach 1: dieu kien o WHERE
+SELECT COUNT(*) FROM khach k LEFT JOIN don d ON d.khach_id = k.id WHERE d.tien > 40;
 
--- (b) dieu kien bang phai dat o WHERE
-SELECT COUNT(*) FROM Customer c LEFT JOIN Invoice i ON i.CustomerId = c.CustomerId
-WHERE i.BillingCountry = 'Brazil';                                                                          -- 35
-
--- (c) dieu kien dat o ON
-SELECT COUNT(*) FROM Customer c LEFT JOIN Invoice i ON i.CustomerId = c.CustomerId
-AND i.BillingCountry = 'Brazil';                                                                            -- 89
+-- Cach 2: dieu kien o ON
+SELECT COUNT(*) FROM khach k LEFT JOIN don d ON d.khach_id = k.id AND d.tien > 40;
 ```
 
-Giải thích: ở (b), những khách không có hóa đơn Brazil sẽ có `i.BillingCountry` = NULL, mà `NULL = 'Brazil'` là UNKNOWN → bị WHERE loại → LEFT JOIN mất tác dụng, thành INNER JOIN. Ở (c), điều kiện nằm trong `ON` nên khách vẫn được giữ, phần hóa đơn để NULL: 35 dòng Brazil + 54 khách còn lại = 89.
-
-Quy tắc nhớ: **điều kiện lọc bảng phải → đặt vào `ON`. Điều kiện lọc bảng trái → đặt vào `WHERE`.** Ngoại lệ hữu ích: `WHERE b.id IS NULL` chính là anti-join (tìm cái không có).
-
-### Bẫy 2 — Fan-out (nhân bản dòng làm phồng số liệu)
-
-Đã chạy thật:
-```sql
-SELECT SUM(Total) FROM Invoice;                                        -- 2.328,60  (DUNG)
-SELECT SUM(i.Total) FROM Invoice i JOIN InvoiceLine il ON il.InvoiceId = i.InvoiceId;  -- 20.848,62 (SAI, phong 9 lan)
 ```
-Nguyên nhân: mỗi hóa đơn có nhiều dòng chi tiết, JOIN làm `Total` của hóa đơn bị lặp lại theo số dòng chi tiết rồi bị cộng nhiều lần.
+Cach 1 (WHERE): 2 dong
+Cach 2 (ON):    4 dong
+```
 
-Ba cách xử lý:
+Vì sao? Ở cách 1, Chi có `d.tien` = NULL. Mà `NULL > 40` cho ra UNKNOWN, không phải TRUE → `WHERE` loại Chi đi. Bình cũng bị loại vì đơn 30 < 40. **LEFT JOIN mất tác dụng, biến thành INNER JOIN.**
+
+Ở cách 2, điều kiện nằm trong `ON` nên nó chỉ quyết định "dòng nào bên phải được ghép", còn mọi khách bên trái vẫn được giữ.
+
+Cùng chuyện đó trên Chinook, quy mô lớn hơn:
+
 ```sql
--- Cach 1: tong hop bang "nhieu" TRUOC roi moi join
+SELECT COUNT(*) FROM Customer c LEFT JOIN Invoice i ON i.CustomerId = c.CustomerId;                    -- 412
+SELECT COUNT(*) FROM Customer c LEFT JOIN Invoice i ON i.CustomerId = c.CustomerId
+WHERE i.BillingCountry = 'Brazil';                                                                      -- 35
+SELECT COUNT(*) FROM Customer c LEFT JOIN Invoice i ON i.CustomerId = c.CustomerId
+AND i.BillingCountry = 'Brazil';                                                                        -- 89
+```
+
+89 = 35 dòng hóa đơn Brazil + 54 khách còn lại được giữ với cột phải NULL.
+
+**Quy tắc nhớ:** điều kiện lọc **bảng phải** → đặt vào `ON`. Điều kiện lọc **bảng trái** → đặt vào `WHERE`.
+
+Ngoại lệ hữu ích: `WHERE b.id IS NULL` chính là **anti-join** — tìm cái *không* có. Trên bàn tập, đó là cách tìm ra Chi.
+
+### Bẫy 2 — Fan-out {#fan-out}
+
+Câu hỏi: *"Tổng điểm thưởng của các khách đã từng mua hàng là bao nhiêu?"*
+
+Nhìn bảng `khach` bằng mắt: An 100 + Bình 50 = **150** (Chi chưa mua nên không tính).
+
+Viết query kiểu tự nhiên:
+
+```sql
+SELECT SUM(k.diem) FROM khach k JOIN don d ON d.khach_id = k.id;   -- 250 (!!)
+```
+
+Ra **250**. Sai. Nhìn kết quả JOIN thì rõ ngay:
+
+```
+An   100  HD-01     <- diem 100 dem lan 1
+An   100  HD-02     <- diem 100 dem lan 2
+Binh  50  HD-03
+```
+
+An có 2 đơn nên dòng của An bị nhân đôi, kéo theo `diem` bị cộng 2 lần: 100 + 100 + 50 = 250.
+
+Đây chính là chuyện `ship` bị lặp ở [Lesson 1](/ly-thuyet/l1-foundation#grain), chỉ khác là lần này **JOIN tạo ra sự lặp** thay vì có sẵn trong bảng.
+
+Trên Chinook, cùng lỗi đó ở quy mô thật:
+
+```sql
+SELECT SUM(Total) FROM Invoice;                                                       -- 2.328,60  DUNG
+SELECT SUM(i.Total) FROM Invoice i JOIN InvoiceLine il ON il.InvoiceId = i.InvoiceId; -- 20.848,62 SAI, phong 9 lan
+```
+
+**Ba cách sửa:**
+
+```sql
+-- Cach 1: khu trung truoc khi cong
+SELECT SUM(diem) FROM (SELECT DISTINCT k.id, k.diem FROM khach k JOIN don d ON d.khach_id = k.id);
+
+-- Cach 2: tong hop bang "nhieu" TRUOC roi moi join
 WITH line AS (SELECT InvoiceId, SUM(UnitPrice*Quantity) AS tien FROM InvoiceLine GROUP BY 1)
 SELECT ROUND(SUM(tien),2) FROM Invoice i JOIN line l ON l.InvoiceId = i.InvoiceId;
 
--- Cach 2: cong o dung grain (chi cong cot cua bang chi tiet)
-SELECT ROUND(SUM(il.UnitPrice * il.Quantity),2) FROM InvoiceLine il;
-
--- Cach 3: kiem tra truoc khi join -- so dong truoc va sau phai bang nhau neu ky vong 1-1
-SELECT COUNT(*) FROM Invoice;                                          -- 412
+-- Cach 3: cong o dung grain, khong join
+SELECT ROUND(SUM(UnitPrice * Quantity),2) FROM InvoiceLine;
 ```
-Thói quen bắt buộc: **đếm số dòng trước và sau mỗi JOIN**. Số tăng ngoài dự kiến = fan-out.
 
-**Bài tập 2.4.**
-1. Tên khách + tổng tiền từng hóa đơn.
-2. Tên track + album + nghệ sĩ (3 bảng).
-3. Doanh thu theo nghệ sĩ (5 bảng) — cẩn thận fan-out, cộng ở đúng grain.
-4. Khách chưa từng mua (anti-join). Kết quả thật là 0 — giải thích ý nghĩa của con số này.
-5. Nhân viên + tên quản lý trực tiếp (self join).
-6. Playlist và số track, giữ cả playlist rỗng.
+### Mẹo phát hiện fan-out {#meo-fan-out}
+
+**Đếm số dòng trước và sau mỗi JOIN.** Số tăng ngoài dự kiến = fan-out.
+
+```sql
+SELECT COUNT(*) FROM khach;                                      -- 3
+SELECT COUNT(*) FROM khach k JOIN don d ON d.khach_id = k.id;    -- 3, nhung khac tap dong
+```
+
+Hoặc kiểm khóa sau khi join:
+
+```sql
+SELECT khach_id, COUNT(*) FROM don GROUP BY 1 HAVING COUNT(*) > 1;   -- co dong tra ve = quan he 1-nhieu = nguy co fan-out
+```
+
+Quy tắc thực chiến: **thấy con số cao bất thường thì nghi fan-out trước, nghi dữ liệu sau.**
+
+### Bài tập 2.4
+
+Trên **bàn tập 2 bảng**, không chạy query, tự đoán rồi kiểm:
+
+1. `SELECT COUNT(*) FROM khach k CROSS JOIN don d;` ra mấy dòng?
+2. Muốn liệt kê khách **chưa từng mua**, viết thế nào? Kết quả là ai?
+3. `SELECT SUM(d.tien) FROM khach k JOIN don d ON d.khach_id = k.id` — có bị fan-out không? Vì sao có/không?
+4. Muốn biết "mỗi khách chi tổng bao nhiêu, khách chưa mua hiện 0" thì dùng JOIN nào, và xử lý NULL ra sao?
+
+Trên Chinook:
+
+5. Tên khách + tổng tiền từng hóa đơn.
+6. Doanh thu theo nghệ sĩ (5 bảng) — cẩn thận cộng đúng grain.
+7. Playlist và số track, giữ cả playlist rỗng.
 
 <details>
 <summary>Đáp án 2.4</summary>
 
-```sql
--- 1
-SELECT c.FirstName || ' ' || c.LastName AS khach, i.InvoiceId, i.Total
-FROM Customer c JOIN Invoice i ON i.CustomerId = c.CustomerId;
--- 2
-SELECT t.Name AS track, al.Title AS album, ar.Name AS nghe_si
-FROM Track t JOIN Album al ON al.AlbumId = t.AlbumId JOIN Artist ar ON ar.ArtistId = al.ArtistId;
--- 3  cong UnitPrice*Quantity cua InvoiceLine (dung grain), KHONG cong Invoice.Total
-SELECT ar.Name AS nghe_si, ROUND(SUM(il.UnitPrice * il.Quantity),2) AS doanh_thu
-FROM InvoiceLine il
-JOIN Track t   ON t.TrackId   = il.TrackId
-JOIN Album al  ON al.AlbumId  = t.AlbumId
-JOIN Artist ar ON ar.ArtistId = al.ArtistId
-GROUP BY 1 ORDER BY doanh_thu DESC LIMIT 10;
--- 4
-SELECT c.CustomerId FROM Customer c
-LEFT JOIN Invoice i ON i.CustomerId = c.CustomerId
-WHERE i.InvoiceId IS NULL;      -- 0 dong: moi khach trong Chinook deu da mua it nhat 1 lan
--- 5
-SELECT e.FirstName AS nhan_vien, m.FirstName AS quan_ly
-FROM Employee e LEFT JOIN Employee m ON m.EmployeeId = e.ReportsTo;
--- 6
-SELECT p.Name, COUNT(pt.TrackId) AS so_track
-FROM Playlist p LEFT JOIN PlaylistTrack pt ON pt.PlaylistId = p.PlaylistId
-GROUP BY 1 ORDER BY so_track DESC;
---   Dung COUNT(pt.TrackId) chu KHONG dung COUNT(*):
---   COUNT(*) dem ca dong NULL nen playlist rong se ra 1 thay vi 0.
-```
-Câu 4: kết quả 0 nghĩa là dataset đã "sạch" theo hướng này — không có khách mồ côi. Trong dữ liệu thật, con số này thường khác 0 và chính là danh sách cần gửi cho marketing.
+1. **9 dòng** (3×3). `CROSS JOIN` không có điều kiện nên ghép mọi tổ hợp. Hữu ích khi cần tạo bảng lịch đủ tháng × đủ region.
+2. ```sql
+   SELECT k.ten FROM khach k LEFT JOIN don d ON d.khach_id = k.id WHERE d.don_id IS NULL;
+   ```
+   Ra **Chi**. Đây là anti-join. Chú ý: điều kiện `IS NULL` đặt ở `WHERE` là **đúng ý đồ** ở đây — khác hoàn toàn với bẫy 1.
+3. **Không bị.** Vì `tien` thuộc grain **đơn**, mà JOIN đang sinh ra đúng một dòng cho mỗi đơn. Tổng = 90+50+30 = 170, đúng. Fan-out chỉ xảy ra với cột thuộc grain **cao hơn** (như `diem` của khách).
+4. `LEFT JOIN` từ `khach` sang `don`, rồi `COALESCE(SUM(d.tien), 0)`. Nếu dùng `INNER JOIN` thì Chi biến mất khỏi báo cáo — đúng kiểu "khách hàng bị bỏ quên" trong dữ liệu thật.
+5. ```sql
+   SELECT c.FirstName || ' ' || c.LastName AS khach, i.InvoiceId, i.Total
+   FROM Customer c JOIN Invoice i ON i.CustomerId = c.CustomerId;
+   ```
+6. Cộng `il.UnitPrice * il.Quantity` của `InvoiceLine` (đúng grain), **không** cộng `Invoice.Total`:
+   ```sql
+   SELECT ar.Name, ROUND(SUM(il.UnitPrice * il.Quantity),2) AS doanh_thu
+   FROM InvoiceLine il
+   JOIN Track t   ON t.TrackId   = il.TrackId
+   JOIN Album al  ON al.AlbumId  = t.AlbumId
+   JOIN Artist ar ON ar.ArtistId = al.ArtistId
+   GROUP BY 1 ORDER BY doanh_thu DESC LIMIT 10;
+   ```
+7. ```sql
+   SELECT p.Name, COUNT(pt.TrackId) AS so_track
+   FROM Playlist p LEFT JOIN PlaylistTrack pt ON pt.PlaylistId = p.PlaylistId
+   GROUP BY 1;
+   ```
+   Dùng `COUNT(pt.TrackId)` chứ **không** `COUNT(*)` — `COUNT(*)` đếm cả dòng NULL nên playlist rỗng sẽ ra 1 thay vì 0.
 
 </details>
-
----
 
 ## 2.5 — Subquery, CTE và bẫy NOT IN {#subquery-cte}
 
@@ -367,11 +473,33 @@ Bản `NOT IN`: nếu danh sách con chứa NULL (ví dụ khi join hụt làm s
 
 ## 2.6 — Window functions (kỹ năng phân biệt fresher và junior) {#window}
 
-**Định nghĩa.** Window function tính toán dựa trên một nhóm dòng liên quan **mà không gộp dòng lại**. GROUP BY: 100 dòng → 5 dòng. Window: 100 dòng → vẫn 100 dòng, thêm cột kết quả.
+**Định nghĩa.** Window function tính toán dựa trên một nhóm dòng liên quan **mà không gộp dòng lại**.
+
+### Thấy khác biệt trên bàn tập
+
+Cùng một câu hỏi, hai cách làm. Đoán trước: mỗi câu trả về **mấy dòng**?
+
+```sql
+-- Cach A: GROUP BY
+SELECT k.ten, SUM(d.tien) FROM khach k JOIN don d ON d.khach_id = k.id GROUP BY 1;
+
+-- Cach B: window
+SELECT k.ten, d.tien, SUM(d.tien) OVER () AS tong
+FROM khach k JOIN don d ON d.khach_id = k.id;
+```
+
+```
+Cach A ->  2 dong        An 140 · Binh 30          (gop lai, mat chi tiet tung don)
+Cach B ->  3 dong        An 90 |170 · An 50 |170 · Binh 30 |170   (giu nguyen dong, gan them cot tong)
+```
+
+Đó là toàn bộ khác biệt: **`GROUP BY` gộp dòng, window giữ nguyên dòng và gắn thêm cột.**
+
+Vì sao cần giữ dòng? Vì nhiều câu hỏi cần **cả chi tiết lẫn tổng cùng lúc**: "đơn này chiếm bao nhiêu % tổng doanh thu?" — cần giá trị từng đơn (chi tiết) và tổng (tổng hợp) trên cùng một dòng. `GROUP BY` không làm được, phải join hai lần.
 
 Cú pháp: `HAM() OVER (PARTITION BY nhom ORDER BY thu_tu [ROWS BETWEEN ...])`
-- `PARTITION BY` = chia nhóm (giống GROUP BY nhưng không gộp)
-- `ORDER BY` = thứ tự trong nhóm (bắt buộc cho LAG/LEAD/running total)
+- `PARTITION BY` = chia nhóm (giống `GROUP BY` nhưng không gộp)
+- `ORDER BY` = thứ tự trong nhóm (bắt buộc cho `LAG`/`LEAD`/running total)
 - frame = lấy bao nhiêu dòng quanh dòng hiện tại
 
 **Ví dụ 1 — Running total + MoM (đã chạy thật, 5 tháng đầu Chinook):**
