@@ -13,69 +13,263 @@ Bổ trợ cho [Stage 1 — Nền tảng](../stages/stage-1-foundation.md). Stag
 
 Mỗi mục có 4 phần: **Định nghĩa** → **Ví dụ thật** (số lấy từ `data/superstore.csv`, đã chạy kiểm chứng) → **Bài tập** → **Đáp án** (bấm mở sau khi tự làm).
 
+:::tip Cách học hiệu quả nhất với phần này
+**Đoán trước, chạy sau.** Đọc câu hỏi → viết con số mình đoán ra giấy → mới chạy query → so hai bên.
+
+Chỗ lệch giữa *đoán* và *thực tế* chính là chỗ mình đang hiểu sai. Chạy query trước rồi đọc đáp án thì não không phản kháng, học xong quên ngay.
+
+Mỗi khái niệm ở đây đều bắt đầu bằng **bảng nhỏ 3 dòng nhìn hết bằng mắt**, rồi mới áp lên dữ liệu 10.000 dòng. Đừng đảo thứ tự.
+:::
+
 Số nền của dataset — kiểm chứng bằng lệnh ở cuối file: 9.994 dòng · 5.009 đơn · 793 khách · 1.862 sản phẩm · 2014-01-03 → 2017-12-30 · tổng Sales 2.297.201.
 
 ---
 
 ## 1.1 — Grain (độ mịn): khái niệm quan trọng nhất {#grain}
 
-**Định nghĩa.** Grain là câu trả lời cho câu hỏi *"một dòng trong bảng này đại diện cho cái gì?"*. Viết ra bằng một câu đầy đủ trước khi tính bất cứ thứ gì.
+**Định nghĩa.** Grain là câu trả lời cho câu hỏi *"một dòng trong bảng này đại diện cho cái gì?"*. Viết ra bằng **một câu đầy đủ** trước khi tính bất cứ thứ gì.
 
-**Ví dụ thật.** Grain của Superstore = "1 dòng = 1 sản phẩm trong 1 đơn hàng". Hệ quả:
+Nghe đơn giản. Nhưng trả lời sai thì mọi con số sau đó sai — và không có thông báo lỗi nào.
 
-| Muốn biết | Cách tính đúng | Kết quả | Cách tính sai | Kết quả sai |
+### Bàn tập 3 dòng {#ban-tap}
+
+Học grain bằng bảng 10.000 dòng là học ngược. Bắt đầu bằng bảng nhỏ tới mức nhìn hết bằng mắt.
+
+**Chuyện đời thực:** chị An mua 1 lần gồm 2 hộp sữa + 1 gói bánh. Anh Bình mua 1 lần gồm 1 hộp sữa. Vậy là **2 tờ hóa đơn**.
+
+Nhập vào bảng thì thành 3 dòng:
+
+| order_id | khach | mon | sl | tien |
 |---|---|---|---|---|
-| Số dòng đơn hàng | đếm dòng | 9.994 | — | — |
-| Số đơn hàng | đếm `Order ID` **duy nhất** | 5.009 | đếm dòng | 9.994 (phồng 2×) |
-| Số khách | đếm `Customer ID` duy nhất | 793 | đếm `Customer Name` | sai nếu trùng tên |
+| HD-01 | An | Sữa | 2 | 60 |
+| HD-01 | An | Bánh | 1 | 30 |
+| HD-02 | Bình | Sữa | 1 | 30 |
 
-Sai grain không báo lỗi. Query chạy ngon, ra số đẹp, và sai. Đó là lý do nó nguy hiểm.
+**3 dòng, nhưng chỉ 2 đơn hàng.** Grain ở đây = *"1 dòng = 1 món hàng trong 1 hóa đơn"* — không phải "1 dòng = 1 hóa đơn".
 
-**Bài tập 1.1.**
-1. Viết ra grain của bảng `Invoice` (Chinook) và bảng `InvoiceLine`.
-2. Nếu muốn tính "giá trị đơn trung bình" trên Superstore, mẫu số là 9.994 hay 5.009? Tính ra con số.
-3. Câu "trung bình mỗi khách mua bao nhiêu đơn?" cần grain nào ở tử số, mẫu số?
+Tự dựng bàn tập này để nghịch:
+
+```sql
+CREATE TABLE hd(order_id VARCHAR, khach VARCHAR, mon VARCHAR, sl INT, tien INT, ship INT);
+INSERT INTO hd VALUES
+  ('HD-01','An','Sua',2,60,15),
+  ('HD-01','An','Banh',1,30,15),
+  ('HD-02','Binh','Sua',1,30,20);
+```
+
+### Hậu quả bằng số
+
+Sếp hỏi 3 câu, cùng một bảng đó:
+
+| Câu hỏi | Làm đúng | Kết quả | Làm sai | Kết quả sai |
+|---|---|---|---|---|
+| Bán được mấy đơn? | đếm `order_id` **duy nhất** | **2** | đếm dòng | 3 |
+| Doanh thu bao nhiêu? | cộng cột `tien` | **120** | — | — |
+| Đơn trung bình bao nhiêu tiền? | 120 ÷ **2** | **60** | 120 ÷ 3 | **40** |
+
+Câu 3 lệch 33%. Query chạy ngon, chart vẫn đẹp, sếp ra quyết định dựa trên số sai.
+
+Chú ý câu 2 vẫn đúng: cột `tien` được ghi **đúng ở grain dòng-món** nên cộng thoải mái.
+
+### Cột không thuộc grain — cái bẫy đi kèm
+
+Thêm cột phí ship. Phí này tính **theo đơn**, không theo món:
+
+| order_id | mon | tien | ship |
+|---|---|---|---|
+| HD-01 | Sữa | 60 | 15 |
+| HD-01 | Bánh | 30 | **15** ← chép lại |
+| HD-02 | Sữa | 30 | 20 |
+
+`SUM(ship)` = 50. **Sai.** Thực thu chỉ 15 + 20 = **35**. Phí ship của HD-01 bị lặp 2 lần vì bảng ở grain dòng-món.
+
+Tương tự với hạng thành viên (thuộc về **khách**):
+
+| order_id | khach | hạng | mon |
+|---|---|---|---|
+| HD-01 | An | Vàng | Sữa |
+| HD-01 | An | **Vàng** | Bánh |
+| HD-02 | Bình | Bạc | Sữa |
+
+Đếm dòng có chữ "Vàng" ra **2**. Nhưng khách hạng Vàng chỉ có **1** người. Cột `hạng` bị chép lại theo số món An mua.
+
+**Quy tắc: chỉ cộng/đếm thẳng được cột nằm đúng ở grain của bảng.**
+
+| Cột thuộc grain | Cách xử lý |
+|---|---|
+| Đúng grain của bảng (`tien`, `sl`) | Cộng thẳng, an toàn |
+| Grain cao hơn — đơn (`ship`) | Khử trùng theo `order_id` trước |
+| Grain cao hơn — khách (`hạng`) | Khử trùng theo `khach` trước |
+
+Kiểm chứng cả 3 trường hợp bằng một query:
+
+```sql
+SELECT SUM(tien)                                   AS doanh_thu_dung,   -- 120
+       SUM(ship)                                   AS ship_SAI,         -- 50
+       (SELECT SUM(ship) FROM (SELECT DISTINCT order_id, ship FROM hd)) AS ship_dung,  -- 35
+       ROUND(SUM(tien)*1.0/COUNT(DISTINCT order_id),1) AS aov_dung,     -- 60.0
+       ROUND(SUM(tien)*1.0/COUNT(*),1)                 AS aov_SAI       -- 40.0
+FROM hd;
+```
+
+### Mẹo nhận biết trong 5 giây {#meo-5-giay}
+
+Không cần query. Lấy 2 dòng **cùng một đơn**, so từng cột:
+
+| Cột | Dòng 1 | Dòng 2 | Giống nhau? | Kết luận |
+|---|---|---|---|---|
+| `order_id` | HD-01 | HD-01 | ✅ | thuộc grain **đơn** |
+| `khach` | An | An | ✅ | thuộc grain **khách** |
+| `hạng` | Vàng | Vàng | ✅ | thuộc grain **khách** |
+| `mon` | Sữa | Bánh | ❌ | thuộc grain **dòng** |
+| `sl` | 2 | 1 | ❌ | thuộc grain **dòng** |
+| `tien` | 60 | 30 | ❌ | thuộc grain **dòng** |
+
+**Cột bị chép lại giống hệt → thuộc grain cao hơn → không cộng/đếm thẳng được.**
+**Cột khác nhau từng dòng → đúng grain → cộng thoải mái.**
+
+### Cách xác định grain bằng máy
+
+```
+COUNT(*) == COUNT(DISTINCT cột)  →  cột đó là khóa, grain nằm ở mức đó
+COUNT(*) >  COUNT(DISTINCT cột)  →  grain THẤP HƠN, cần thêm cột nữa mới đủ khóa
+```
+
+Thử tăng dần: 1 cột → chưa bằng thì thử cặp 2 cột → vẫn chưa thì 3.
+
+### Áp vào Superstore
+
+```sql
+SELECT COUNT(*)                                        AS so_dong,          -- 9.994
+       COUNT(DISTINCT "Order ID")                      AS don,              -- 5.009
+       COUNT(DISTINCT "Product ID")                    AS san_pham,         -- 1.862
+       COUNT(DISTINCT ("Order ID", "Product ID"))      AS cap_don_sanpham   -- 9.986
+FROM superstore;
+```
+
+Đọc bốn con số này theo đúng thứ tự suy luận:
+
+1. `Order ID` chỉ có 5.009 giá trị khác nhau trên 9.994 dòng → **không phải khóa**, grain thấp hơn mức đơn hàng.
+2. `Product ID` có 1.862 → càng không phải khóa. Nói *"1 dòng = 1 sản phẩm"* là **sai**: một sản phẩm được bán trong nhiều đơn khác nhau nên xuất hiện ở nhiều dòng.
+3. Cặp `(Order ID, Product ID)` cho 9.986 — **gần bằng** 9.994. Đây mới là khóa.
+
+→ Grain: **1 dòng = 1 sản phẩm trong 1 đơn hàng.**
+
+Chú ý cách viết. Câu *"1 dòng = 1 sản phẩm"* thiếu ngữ cảnh nên sai. Grain phải nêu đủ: sản phẩm đó **nằm trong đơn nào**.
+
+Còn 8 dòng lệch (9.994 − 9.986) thì sao? Đó là 8 dòng trùng cặp — cùng đơn, cùng sản phẩm, xuất hiện 2 lần. Không làm sai grain, mà là **dữ liệu bẩn**. Việc của analyst là ghi vào mục Hạn chế và hỏi người vận hành: *"khách mua cùng sản phẩm 2 lần trong 1 đơn, hay nhập liệu bị lặp?"* — không tự ý xóa, cũng không im lặng bỏ qua.
+
+### Bài tập 1.1
+
+Dùng **bàn tập 3 dòng** ở trên, trả lời bằng lời, không chạy query:
+
+1. "Trung bình mỗi **khách** chi bao nhiêu?" — tử số là gì, mẫu số là gì, ra bao nhiêu?
+2. "Có bao nhiêu khách hạng Vàng?" — đếm thế nào cho đúng?
+3. "Bán ra tổng cộng bao nhiêu **món hàng**?" (cột `sl`) — cộng thẳng được không, vì sao?
+
+Rồi chuyển sang dữ liệu thật:
+
+4. Viết grain của bảng `Invoice` và `InvoiceLine` (Chinook).
+5. Tính AOV của Superstore — mẫu số là 9.994 hay 5.009?
+6. "Trung bình mỗi khách mua bao nhiêu đơn?" — tử số, mẫu số lấy ở grain nào?
 
 <details>
 <summary>Đáp án 1.1</summary>
 
-1. `Invoice`: 1 dòng = 1 hóa đơn. `InvoiceLine`: 1 dòng = 1 track trong 1 hóa đơn. Quan hệ 1-nhiều.
-2. Mẫu số là **5.009** (số đơn duy nhất). AOV = 2.297.201 / 5.009 = **458,6**. Nếu chia cho 9.994 sẽ ra 229,9 — đó là giá trị trung bình mỗi *dòng*, không phải mỗi *đơn*. Hai con số này đều "đúng" về mặt số học nhưng chỉ một cái trả lời đúng câu hỏi.
-3. Tử số = số `Order ID` duy nhất (5.009), mẫu số = số `Customer ID` duy nhất (793) → 6,3 đơn/khách trong 4 năm.
+1. **60.** Tử số = tổng tiền 120. Mẫu số = **2 khách** (An, Bình), không phải 3 dòng — An chiếm 2 dòng nhưng vẫn là 1 khách. Chia cho 3 ra 40, con số đó không trả lời câu hỏi nào cả.
+2. **1 khách.** Có 2 dòng mang giá trị "Vàng" nhưng đều là An. Phải `COUNT(DISTINCT khach)` sau khi lọc hạng, vì `hạng` thuộc grain khách chứ không thuộc grain dòng.
+3. **Cộng thẳng được, ra 4 món.** Vì `sl` được ghi đúng ở grain dòng-món: mỗi dòng một giá trị riêng, không phải giá trị bị chép lại.
+4. `Invoice`: 1 dòng = 1 hóa đơn (412 dòng, `InvoiceId` là khóa). `InvoiceLine`: 1 dòng = 1 track trong 1 hóa đơn. Quan hệ 1-nhiều.
+5. **5.009.** AOV = 2.297.201 / 5.009 = **458,6**. Chia cho 9.994 ra 229,9 — đó là trung bình mỗi *dòng*, không phải mỗi *đơn*. Cả hai đều đúng số học, chỉ một cái đúng câu hỏi.
+6. Tử số = `COUNT(DISTINCT "Order ID")` = 5.009. Mẫu số = `COUNT(DISTINCT "Customer ID")` = 793 → 6,3 đơn/khách trong 4 năm.
 
 </details>
 
----
-
 ## 1.2 — Kiểu dữ liệu và NULL {#kieu-du-lieu-null}
 
-**Định nghĩa.** Kiểu dữ liệu quy định giá trị nào hợp lệ và phép tính nào được phép. NULL = "không có giá trị / không biết", khác `0`, khác chuỗi rỗng.
+**Định nghĩa.** Kiểu dữ liệu quy định giá trị nào hợp lệ và phép tính nào được phép. Công cụ **tự đoán** kiểu khi đọc file — và đoán sai thường xuyên.
 
-**Ví dụ thật.** Cột `Postal Code` của Superstore nếu để kiểu số sẽ biến mã `02134` (Boston) thành `2134`. DuckDB đọc file này ra kiểu `VARCHAR` — đúng. Còn `Order Date` phải là `DATE`, không phải chuỗi, nếu không thì sắp xếp theo thời gian sẽ ra `1/10/2015` đứng trước `2/1/2014`.
+### Cùng một file, hai công cụ đoán khác nhau
 
-Ba giá trị khác nhau hoàn toàn:
+Đọc `superstore_utf8.csv` bằng hai công cụ, so cột `Postal Code`:
+
+| Công cụ | Kiểu đoán ra | Kết quả |
+|---|---|---|
+| DuckDB `read_csv_auto` | `VARCHAR` | giữ nguyên `06824` ✅ |
+| pandas `read_csv` | `int64` | thành `6824` ❌ |
+
+Kiểm chứng:
+
+```python
+df = pd.read_csv("superstore_utf8.csv")
+df["Postal Code"].astype(str).str.len().min()   # 4  -> ma chi con 4 ky tu
+df.loc[df["Postal Code"].astype(str).str.len() < 5, "Postal Code"].head(3).tolist()
+# [6824, 7090, 7960]
+```
+
+Mã bưu chính Mỹ luôn 5 chữ số. `6824` thật ra là **`06824`** (Fairfield, Connecticut). **Số 0 đầu đã bị nuốt mất.**
+
+Sửa: `pd.read_csv(..., dtype={"Postal Code": str})`.
+
+### Vì sao mất một số 0 lại nghiêm trọng
+
+| Tình huống | Hậu quả |
+|---|---|
+| JOIN với bảng tra cứu mã bưu chính → bang | `6824` không khớp `06824` → dòng đó **rơi khỏi kết quả**, doanh thu vùng đó biến mất khỏi báo cáo |
+| Lọc `WHERE postal_code = '06824'` | Trả 0 dòng → tưởng vùng đó không có khách |
+| Xuất file cho bộ phận giao hàng | Hệ thống bưu chính từ chối định dạng |
+
+Trường hợp đầu là nguy hiểm nhất: **không báo lỗi, chỉ âm thầm mất dòng** — cùng loại nguy hiểm với sai grain.
+
+### Số nào cộng được, số nào không
+
+Không phải cứ kiểu số là cộng được. Ba loại khác nhau:
+
+| Loại | Ví dụ trong Superstore | Cộng được? | Vì sao |
+|---|---|---|---|
+| **Số đo** | `Sales`, `Profit`, `Quantity` | ✅ | `SUM(Profit)` = tổng lợi nhuận = 286.397, có ý nghĩa rõ |
+| **Số định danh** | `Row ID`, `Postal Code` | ❌ | Cộng `Row ID` ra 49.950.015 — không trả lời câu hỏi nào |
+| **Tỷ lệ** | `Discount` | ❌ | 20% + 30% = 50% là vô nghĩa |
+
+Cách tự kiểm: *"cộng cả cột này lên ra một con số — con số đó trả lời câu hỏi kinh doanh nào?"* Không trả lời được câu nào → không cộng được.
+
+Riêng `Discount` còn một tầng nữa: **trung bình cũng phải cẩn thận**. `AVG(Discount)` gán trọng số bằng nhau cho đơn 5$ và đơn 20.000$. Muốn đúng phải tính trung bình có trọng số theo doanh thu.
+
+### NULL
+
+**Định nghĩa.** NULL = "không có giá trị / không biết". Khác `0`, khác chuỗi rỗng `''`.
 
 | Giá trị | Ý nghĩa | Ví dụ |
 |---|---|---|
-| `0` | có đo, kết quả bằng không | khách không được giảm giá → discount = 0 |
-| `''` | có ô, nội dung rỗng | ghi chú để trống |
-| `NULL` | không biết / không áp dụng | 977/3.503 track Chinook không ghi tên nhạc sĩ |
+| `0` | Có đo, kết quả bằng không | Khách không được giảm giá → `Discount = 0` |
+| `''` | Có ô, nội dung rỗng | Ghi chú để trống |
+| `NULL` | Không biết / không áp dụng | 977/3.503 track Chinook không ghi tên nhạc sĩ |
 
-**Bài tập 1.2.**
-1. Trong Superstore, `Discount = 0` và `Discount = NULL` khác nhau thế nào về mặt nghiệp vụ?
-2. `AVERAGE` trong Sheets xử lý ô trống ra sao — coi là 0 hay bỏ qua? Tự kiểm chứng bằng 3 ô: 10, trống, 20.
-3. Cột nào trong Superstore nên đổi kiểu ngay khi nạp? Vì sao?
+**Hàm tổng hợp bỏ qua NULL.** Đây là chỗ hay sai:
+
+```sql
+-- Cot profit co 100 o NULL tren 9.994 dong
+SELECT AVG(profit) FROM s;   -- chia cho 9.894, KHONG phai 9.994
+```
+
+Nếu 100 ô NULL đó thực chất là "lợi nhuận bằng 0" thì trung bình bị **thổi lên**. Muốn coi NULL là 0 phải nói rõ: `AVG(COALESCE(profit, 0))`.
+
+Google Sheets hành xử giống hệt: `AVERAGE` của 3 ô `10 / trống / 20` ra **15**, không phải 10.
+
+### Bài tập 1.2
+
+1. Trong Superstore, `Discount = 0` và `Discount = NULL` khác nhau thế nào về mặt **nghiệp vụ**?
+2. Chạy `DESCRIBE` bằng DuckDB, rồi đọc lại cùng file bằng pandas. Cột nào hai bên đoán khác nhau, ngoài `Postal Code`?
+3. Ngoài `Row ID`, `Postal Code`, `Discount` — còn cột nào trong Superstore mà cộng lên thì vô nghĩa không? Giải thích.
 
 <details>
 <summary>Đáp án 1.2</summary>
 
-1. `0` = đơn này thực sự không có chiết khấu. `NULL` = không biết đơn này có chiết khấu hay không. Khi tính "chiết khấu trung bình", NULL bị bỏ qua khỏi mẫu số còn 0 thì được tính → hai kết quả khác nhau.
-2. `AVERAGE` **bỏ qua** ô trống → (10+20)/2 = 15, không phải 10. Đây là hành vi giống `AVG` của SQL. Muốn coi trống là 0 phải dùng `SUM/COUNTA` hoặc điền 0 rõ ràng.
-3. `Postal Code` → text (giữ số 0 đầu). `Order Date`, `Ship Date` → date (để sắp xếp và tính chênh lệch ngày). `Row ID` → text hoặc bỏ (là số thứ tự, cộng nó lại là vô nghĩa).
+1. `0` = đơn này **thực sự không có** chiết khấu. `NULL` = **không biết** đơn này có chiết khấu hay không. Khi tính "chiết khấu trung bình": NULL bị loại khỏi mẫu số, còn 0 thì được tính vào → hai kết quả khác nhau. Trước khi xử lý phải hỏi: dữ liệu thiếu vì lý do gì?
+2. `Order Date` và `Ship Date`: DuckDB nhận ra là `DATE`, pandas để `str` nếu không truyền `parse_dates=[...]`. Hậu quả: sắp xếp theo ngày sẽ ra thứ tự chữ cái — `1/10/2015` đứng trước `2/1/2014`.
+3. Không còn cột số nào khác. Nhưng `Customer ID` và `Product ID` cũng là **mã định danh** — ở đây may mắn được lưu dạng text nên không ai cộng nhầm. Trong nhiều dataset khác, ID lưu dạng số và đó là bẫy quen thuộc.
 
 </details>
-
----
 
 ## 1.3 — Mean vs Median: câu phỏng vấn xuất hiện nhiều nhất {#mean-median}
 
