@@ -72,9 +72,11 @@ Mọi khái niệm khó trong bài (JOIN, fan-out, window) sẽ thử trên 2 b�
 
 ## 2.1 — SQL là gì và chạy theo thứ tự nào {#thu-tu-thuc-thi}
 
-**Định nghĩa.** SQL là ngôn ngữ *khai báo*: mình mô tả kết quả muốn có, database tự quyết cách lấy. Khác hoàn toàn Python/JS nơi mình chỉ đạo từng bước.
+**Định nghĩa.** SQL là ngôn ngữ *khai báo*: mình mô tả **kết quả muốn có**, database tự quyết cách lấy. Khác hoàn toàn Python/JavaScript nơi mình chỉ đạo từng bước.
 
-**Thứ tự thực thi logic** — thứ tự viết KHÁC thứ tự chạy. Nhớ bảng này giải thích được phần lớn lỗi của người mới:
+### Thứ tự viết KHÁC thứ tự chạy
+
+Đây là bảng quan trọng nhất của cả Stage 2. Nhớ nó giải thích được phần lớn lỗi của người mới.
 
 | Bước chạy | Mệnh đề | Làm gì |
 |---|---|---|
@@ -82,135 +84,290 @@ Mọi khái niệm khó trong bài (JOIN, fan-out, window) sẽ thử trên 2 b�
 | 2 | `WHERE` | lọc **dòng** |
 | 3 | `GROUP BY` | gom nhóm |
 | 4 | `HAVING` | lọc **nhóm** |
-| 5 | `SELECT` | chọn/tính cột, gán alias |
+| 5 | `SELECT` | chọn/tính cột, **gán alias** |
 | 6 | window functions | tính trên cửa sổ |
 | 7 | `DISTINCT` | khử trùng |
-| 8 | `ORDER BY` | sắp xếp (dùng được alias vì SELECT đã chạy) |
+| 8 | `ORDER BY` | sắp xếp |
 | 9 | `LIMIT` | cắt số dòng |
 
-Hệ quả thực tế:
-- `WHERE doanh_thu > 100` với `doanh_thu` là alias trong SELECT → **lỗi**, vì WHERE (bước 2) chạy trước SELECT (bước 5).
-- `ORDER BY doanh_thu` với cùng alias đó → **chạy được**, vì ORDER BY ở bước 8.
-- `WHERE ROW_NUMBER() OVER (...) = 1` → **lỗi**, window ở bước 6, sau WHERE.
+### Thử trên bàn tập
 
-**Bài tập 2.1.** Không chạy máy, dự đoán cái nào lỗi:
+Đoán trước: câu nào **chạy được**, câu nào **lỗi**?
+
 ```sql
-a) SELECT Total*2 AS gap_doi FROM Invoice WHERE gap_doi > 10;
-b) SELECT Total*2 AS gap_doi FROM Invoice ORDER BY gap_doi DESC;
-c) SELECT BillingCountry, COUNT(*) n FROM Invoice GROUP BY BillingCountry HAVING n > 5;
-d) SELECT BillingCountry, COUNT(*) FROM Invoice WHERE COUNT(*) > 5 GROUP BY BillingCountry;
+-- (a)
+SELECT tien * 2 AS gap_doi FROM don WHERE gap_doi > 100;
+-- (b)
+SELECT tien * 2 AS gap_doi FROM don ORDER BY gap_doi DESC;
 ```
+
+```
+(a) LOI: Referenced column "gap_doi" not found
+(b) Chay duoc: 180, 100, 60
+```
+
+Vì sao khác nhau? `WHERE` chạy ở **bước 2**, lúc đó `SELECT` (bước 5) chưa chạy nên alias `gap_doi` **chưa tồn tại**. Còn `ORDER BY` ở bước 8, sau `SELECT`, nên alias đã có.
+
+Sửa câu (a): lặp lại biểu thức — `WHERE tien * 2 > 100`.
+
+Cùng logic đó giải thích thêm hai lỗi kinh điển:
+
+| Viết sai | Vì sao lỗi | Sửa |
+|---|---|---|
+| `WHERE COUNT(*) > 5` | Aggregate tính ở bước 3, `WHERE` ở bước 2 — chưa có gì để đếm | Dùng `HAVING COUNT(*) > 5` |
+| `WHERE ROW_NUMBER() OVER (...) = 1` | Window ở bước 6, sau `WHERE` | Bọc CTE rồi lọc ở tầng ngoài, hoặc `QUALIFY` |
+
+**Mẹo tự chữa lỗi:** gặp báo lỗi "column not found" hoặc "aggregate not allowed here", hỏi ngay *"mệnh đề này chạy ở bước mấy, thứ mình đang gọi ra đời ở bước mấy?"*. Bước gọi phải **sau** bước sinh ra.
+
+### Bài tập 2.1
+
+Không chạy máy, dự đoán từng câu chạy được hay lỗi, kèm lý do:
+
+```sql
+a) SELECT tien * 2 AS gap_doi FROM don WHERE gap_doi > 100;
+b) SELECT tien * 2 AS gap_doi FROM don ORDER BY gap_doi DESC;
+c) SELECT khach_id, COUNT(*) n FROM don GROUP BY khach_id HAVING n > 1;
+d) SELECT khach_id, COUNT(*) FROM don WHERE COUNT(*) > 1 GROUP BY khach_id;
+e) SELECT khach_id, tien FROM don GROUP BY khach_id;
+f) SELECT DISTINCT khach_id FROM don ORDER BY tien;
+```
+
 <details>
 <summary>Đáp án 2.1</summary>
 
-a) **Lỗi** — alias chưa tồn tại lúc WHERE chạy. Sửa: lặp lại biểu thức `WHERE Total*2 > 10`.
-b) Chạy được.
-c) Chạy được trên DuckDB/Postgres/MySQL (cho phép alias trong HAVING). Cách viết an toàn mọi DB: `HAVING COUNT(*) > 5`.
-d) **Lỗi** — không được dùng aggregate trong WHERE. Đó chính là lý do HAVING tồn tại.
+a) **Lỗi** — alias chưa tồn tại lúc `WHERE` chạy (bước 2 < bước 5).
+b) **Chạy được** — `ORDER BY` ở bước 8, sau `SELECT`.
+c) **Chạy được** trên DuckDB/PostgreSQL/MySQL (cho phép alias trong `HAVING`). Cách viết an toàn mọi DB: `HAVING COUNT(*) > 1`.
+d) **Lỗi** — aggregate trong `WHERE`. Đây chính là lý do `HAVING` tồn tại.
+e) **Lỗi** — `tien` không nằm trong `GROUP BY` và cũng không được bọc trong hàm aggregate. Database không biết chọn giá trị `tien` nào trong nhóm. Sửa: `SUM(tien)` hoặc thêm `tien` vào `GROUP BY`.
+f) **Lỗi** — sau `DISTINCT` (bước 7) chỉ còn cột `khach_id`, không còn `tien` để sắp xếp.
 
 </details>
 
----
-
 ## 2.2 — SELECT, WHERE và bẫy NULL {#bay-null}
 
-**Định nghĩa.** `SELECT` chọn cột, `WHERE` giữ lại dòng thỏa điều kiện. Điều kiện trả về TRUE / FALSE / **UNKNOWN** (khi dính NULL) — chỉ dòng TRUE được giữ.
+**Định nghĩa.** `WHERE` giữ lại dòng thỏa điều kiện. Nhưng điều kiện trong SQL không chỉ có TRUE/FALSE — còn có **UNKNOWN**, sinh ra khi dính NULL. **Chỉ dòng TRUE được giữ.**
 
-**Ví dụ thật.** Chinook có 3.503 track, trong đó 977 track `Composer` là NULL.
+### Bàn tập — thêm cột có NULL
 
 ```sql
-SELECT COUNT(*) FROM Track WHERE Composer != 'AC/DC';    -- KHONG phai 3503 - so track cua AC/DC
-SELECT COUNT(*) FROM Track WHERE Composer != 'AC/DC' OR Composer IS NULL;  -- dung y dinh
+CREATE TABLE don(don_id VARCHAR, khach_id INT, tien INT, ghi_chu VARCHAR);
+INSERT INTO don VALUES ('HD-01',1,90,'gap'),('HD-02',1,50,NULL),('HD-03',2,30,'gap');
 ```
-Câu đầu **âm thầm bỏ 977 dòng NULL**, vì `NULL != 'AC/DC'` cho ra UNKNOWN chứ không phải TRUE. Không có cảnh báo, không có lỗi — chỉ có báo cáo sai.
 
-Kiểm chứng nhanh 3 cách đếm:
-
-| Query | Kết quả | Ý nghĩa |
+| don_id | tien | ghi_chu |
 |---|---|---|
-| `COUNT(*)` | 3.503 | tổng số dòng |
-| `COUNT(Composer)` | 2.526 | số dòng có giá trị (bỏ NULL) |
-| `COUNT(DISTINCT Composer)` | 853 | số nhạc sĩ khác nhau |
+| HD-01 | 90 | gấp |
+| HD-02 | 50 | **NULL** |
+| HD-03 | 30 | gấp |
 
-**Bài tập 2.2.**
-1. Đếm khách hàng có email đuôi `gmail.com`.
-2. Lấy hóa đơn năm **2023** (chú ý: bản Chinook này dữ liệu 2021–2025, không phải 2013 như nhiều tài liệu cũ ghi), sắp giảm dần theo `Total`.
-3. Lấy dòng 11–20 của bảng `Invoice` theo thứ tự ngày.
-4. Đếm track có tên chứa "love", không phân biệt hoa thường.
+Câu hỏi: *"Liệt kê đơn KHÔNG phải đơn gấp."* Nhìn bảng bằng mắt: đáp án phải là **HD-02**.
+
+Đoán trước rồi chạy:
+
+```sql
+SELECT COUNT(*) FROM don WHERE ghi_chu != 'gap';                        -- ?
+SELECT COUNT(*) FROM don WHERE ghi_chu != 'gap' OR ghi_chu IS NULL;     -- ?
+```
+
+```
+Cach 1:  0 dong   (!!)
+Cach 2:  1 dong   (dung: HD-02)
+```
+
+Cách 1 ra **rỗng hoàn toàn**. Không lỗi, không cảnh báo — chỉ là kết quả sai.
+
+**Vì sao:** `NULL != 'gap'` không trả về TRUE, cũng không trả về FALSE. Nó trả về **UNKNOWN** — vì không biết ghi chú là gì thì làm sao biết nó có khác 'gap' hay không. Mà `WHERE` chỉ giữ TRUE.
+
+Quy tắc: **mọi phép so sánh với NULL đều ra UNKNOWN.** Kể cả `NULL = NULL`.
+
+```sql
+SELECT NULL = NULL AS a, NULL != NULL AS b, NULL > 1 AS c;   -- ca ba deu NULL, khong phai true/false
+```
+
+Cách duy nhất đúng để kiểm tra: `IS NULL` / `IS NOT NULL`.
+
+### Ba biến thể COUNT
+
+```sql
+SELECT COUNT(*) AS count_sao, COUNT(ghi_chu) AS count_cot, COUNT(DISTINCT ghi_chu) AS count_distinct FROM don;
+```
+
+```
+count_sao = 3      count_cot = 2      count_distinct = 1
+```
+
+| Cách viết | Đếm gì | Kết quả |
+|---|---|---|
+| `COUNT(*)` | mọi dòng | 3 |
+| `COUNT(ghi_chu)` | dòng **có giá trị** (bỏ NULL) | 2 |
+| `COUNT(DISTINCT ghi_chu)` | số giá trị **khác nhau** | 1 (chỉ có 'gấp') |
+
+Trên Chinook, cùng ba cách với cột `Composer`: **3.503 / 2.526 / 853**.
+
+Ba con số, ba câu hỏi khác nhau. Chọn nhầm là trả lời nhầm câu hỏi của sếp.
+
+### Toán tử lọc
+
+| Toán tử | Dùng khi | Ví dụ |
+|---|---|---|
+| `=` `!=` `>` `<` `>=` `<=` | so sánh trực tiếp | `tien > 40` |
+| `BETWEEN a AND b` | trong khoảng, **bao gồm 2 đầu** | `tien BETWEEN 30 AND 50` |
+| `IN (...)` | thuộc danh sách | `khach_id IN (1,2)` |
+| `LIKE` | khớp mẫu chuỗi | `'%love%'` chứa · `'a_c'` đúng 1 ký tự giữa |
+| `IS NULL` | kiểm tra thiếu | bắt buộc, không dùng `= NULL` |
+
+**Bẫy `BETWEEN` với cột thời gian:** `InvoiceDate BETWEEN '2023-01-01' AND '2023-12-31'` **mất toàn bộ giao dịch ngày 31/12 sau 00:00**, vì `'2023-12-31'` được hiểu là `2023-12-31 00:00:00`. Viết an toàn: `>= '2023-01-01' AND < '2024-01-01'`.
+
+### Bài tập 2.2
+
+Trên bàn tập 3 dòng, đoán trước rồi kiểm:
+
+1. `SELECT COUNT(*) FROM don WHERE ghi_chu = 'gap';` → mấy dòng?
+2. `SELECT COUNT(*) FROM don WHERE tien NOT BETWEEN 40 AND 60;` → mấy dòng?
+3. Muốn đếm "số đơn không ghi chú gì" thì viết thế nào?
+
+Trên Chinook:
+
+4. Đếm khách có email đuôi `gmail.com`.
+5. Hóa đơn năm 2023, sắp giảm dần theo `Total` — viết cách an toàn với kiểu TIMESTAMP.
+6. Lấy dòng 11–20 của `Invoice` theo thứ tự ngày.
 
 <details>
 <summary>Đáp án 2.2</summary>
 
-```sql
--- 1
-SELECT COUNT(*) FROM Customer WHERE Email LIKE '%@gmail.com';
--- 2
-SELECT * FROM Invoice WHERE InvoiceDate >= '2023-01-01' AND InvoiceDate < '2024-01-01' ORDER BY Total DESC;
---    Viet '>= dau ky AND < dau ky sau' an toan hon BETWEEN khi cot la TIMESTAMP,
---    vi BETWEEN '2023-01-01' AND '2023-12-31' bo mat ca ngay 31/12 sau 00:00.
--- 3
-SELECT * FROM Invoice ORDER BY InvoiceDate LIMIT 10 OFFSET 10;
--- 4
-SELECT COUNT(*) FROM Track WHERE LOWER(Name) LIKE '%love%';
-```
+1. **2 dòng** (HD-01, HD-03). Dòng NULL bị loại — lần này là đúng ý đồ.
+2. **2 dòng** (90 và 30). Cẩn thận: nếu `tien` có NULL thì dòng NULL cũng bị loại khỏi cả `BETWEEN` lẫn `NOT BETWEEN` — nghĩa là tổng hai kết quả **không** bằng tổng số dòng.
+3. `SELECT COUNT(*) FROM don WHERE ghi_chu IS NULL;` → 1.
+4. `SELECT COUNT(*) FROM Customer WHERE Email LIKE '%@gmail.com';`
+5. ```sql
+   SELECT * FROM Invoice
+   WHERE InvoiceDate >= '2023-01-01' AND InvoiceDate < '2024-01-01'
+   ORDER BY Total DESC;
+   ```
+6. `SELECT * FROM Invoice ORDER BY InvoiceDate LIMIT 10 OFFSET 10;`
 
 </details>
 
----
-
 ## 2.3 — GROUP BY, HAVING và các hàm tổng hợp {#group-by-having}
 
-**Định nghĩa.** `GROUP BY` gom các dòng cùng giá trị thành 1 nhóm; hàm aggregate (`COUNT/SUM/AVG/MIN/MAX`) tính ra 1 số cho mỗi nhóm. `HAVING` lọc trên kết quả nhóm.
+**Định nghĩa.** `GROUP BY` gom các dòng có cùng giá trị thành **một nhóm**, rồi hàm aggregate tính ra **một số cho mỗi nhóm**. Số dòng kết quả = số nhóm, không phải số dòng gốc.
 
-**Ví dụ thật.**
+### Bàn tập — thấy việc gộp dòng
+
 ```sql
-SELECT Country, COUNT(*) AS n FROM Customer GROUP BY Country ORDER BY n DESC LIMIT 5;
+SELECT khach_id, COUNT(*) AS so_don, SUM(tien) AS tong_tien FROM don GROUP BY khach_id;
 ```
-```
-USA 13 · Canada 8 · Brazil 5 · France 5 · Germany 4
-```
-Thêm `HAVING COUNT(*) > 4` → còn 4 quốc gia (Germany bị loại). So sánh trực quan:
-- `WHERE Country != 'USA'` → loại **dòng** trước khi gom.
-- `HAVING COUNT(*) > 4` → loại **nhóm** sau khi gom.
 
-**Aggregate có điều kiện** — mẫu câu dùng cực nhiều trong việc thật:
+```
+3 dong goc  ->  2 dong ket qua
+
+khach_id=1   so_don=2   tong_tien=140     (HD-01 + HD-02 gop lai)
+khach_id=2   so_don=1   tong_tien=30
+```
+
+Ba dòng vào, hai dòng ra. **Chi tiết từng đơn biến mất** — muốn giữ chi tiết thì phải dùng window function (§2.6).
+
+### WHERE lọc dòng, HAVING lọc nhóm
+
+Cùng một câu hỏi, hai chỗ lọc khác nhau, kết quả khác hẳn:
+
 ```sql
-SELECT
-  COUNT(*)                                              AS tong_dong,
-  SUM(CASE WHEN Total > 10 THEN 1 ELSE 0 END)           AS don_lon,
-  ROUND(100.0 * SUM(CASE WHEN Total > 10 THEN 1 ELSE 0 END) / COUNT(*), 1) AS ty_le_don_lon
-FROM Invoice;
+-- Loc TRUOC khi gom: chi tinh don tren 40
+SELECT khach_id, SUM(tien) FROM don WHERE tien > 40 GROUP BY khach_id;
+-- khach 1 -> 140 (90+50), khach 2 -> bien mat (don 30 bi loai truoc)
+
+-- Loc SAU khi gom: chi giu khach chi tren 100
+SELECT khach_id, SUM(tien) FROM don GROUP BY khach_id HAVING SUM(tien) > 100;
+-- khach 1 -> 140, khach 2 -> bi loai vi tong 30 khong dat
 ```
 
-**Bài tập 2.3.**
-1. Doanh thu theo năm.
-2. Doanh thu trung bình mỗi hóa đơn theo quốc gia, chỉ lấy quốc gia có ≥ 5 hóa đơn.
-3. Tỷ lệ % track không có `Composer`.
-4. Đếm hóa đơn theo quốc gia, tách 2 cột: "≥ 10$" và "< 10$".
+| | `WHERE` | `HAVING` |
+|---|---|---|
+| Chạy ở bước | 2 (trước gom) | 4 (sau gom) |
+| Lọc cái gì | từng **dòng** | từng **nhóm** |
+| Dùng được aggregate? | ❌ | ✅ |
+
+**Câu phỏng vấn:** *"Khi nào dùng WHERE, khi nào dùng HAVING?"* → điều kiện áp lên **giá trị của một dòng** thì dùng `WHERE`; áp lên **kết quả tổng hợp của nhóm** thì dùng `HAVING`. Dùng `WHERE` được thì luôn ưu tiên, vì lọc sớm nghĩa là gom ít dòng hơn, chạy nhanh hơn.
+
+### Aggregate bỏ qua NULL
+
+Đây là chỗ âm thầm làm sai số liệu:
+
+```sql
+SELECT COUNT(*) AS so_dong, COUNT(ghi_chu) AS co_ghi_chu, AVG(tien) AS tien_tb FROM don;
+```
+
+`AVG` cũng bỏ qua NULL. Nếu cột `tien` có 100 ô NULL trên 9.994 dòng, `AVG(tien)` chia cho **9.894**, không phải 9.994. Nếu những ô NULL đó thực chất là "bằng 0" thì trung bình bị **thổi lên**.
+
+Muốn coi NULL là 0, phải nói rõ: `AVG(COALESCE(tien, 0))`.
+
+### Aggregate có điều kiện — mẫu câu dùng nhiều nhất khi đi làm
+
+Đếm/cộng có phân loại mà **không cần chạy nhiều query**:
+
+```sql
+SELECT COUNT(*)                                        AS tong,
+       SUM(CASE WHEN tien > 40 THEN 1 ELSE 0 END)      AS don_lon,
+       ROUND(100.0 * SUM(CASE WHEN tien > 40 THEN 1 ELSE 0 END) / COUNT(*), 1) AS ty_le_don_lon
+FROM don;
+```
+
+```
+tong = 3    don_lon = 2    ty_le_don_lon = 66.7
+```
+
+DuckDB/PostgreSQL có cách viết gọn hơn, cùng ý nghĩa:
+
+```sql
+SELECT COUNT(*) FILTER (WHERE tien > 40) AS don_lon FROM don;
+```
+
+Kỹ thuật này là nền của **pivot bằng CASE WHEN** (§2.7) và của **funnel** (§2.8). Học kỹ.
+
+### Bài tập 2.3
+
+Trên bàn tập:
+
+1. `SELECT khach_id, SUM(tien) FROM don GROUP BY khach_id HAVING COUNT(*) > 1;` → ra gì?
+2. Tính "tỷ lệ % đơn có ghi chú" — viết query, chú ý NULL.
+3. Vì sao `SELECT khach_id, don_id, SUM(tien) FROM don GROUP BY khach_id` bị lỗi?
+
+Trên Chinook:
+
+4. Doanh thu theo năm.
+5. Doanh thu trung bình mỗi hóa đơn theo quốc gia, chỉ lấy quốc gia có ≥ 5 hóa đơn.
+6. Tỷ lệ % track không có `Composer`.
+7. Đếm hóa đơn theo quốc gia, tách 2 cột "≥ 10$" và "< 10$".
 
 <details>
 <summary>Đáp án 2.3</summary>
 
-```sql
--- 1
-SELECT EXTRACT(YEAR FROM InvoiceDate) AS nam, ROUND(SUM(Total),2) AS doanh_thu
-FROM Invoice GROUP BY 1 ORDER BY 1;
--- 2
-SELECT BillingCountry, COUNT(*) AS so_hd, ROUND(AVG(Total),2) AS tb_hd
-FROM Invoice GROUP BY 1 HAVING COUNT(*) >= 5 ORDER BY tb_hd DESC;
--- 3  (ket qua: 977/3503 = 27,9%)
-SELECT ROUND(100.0 * SUM(CASE WHEN Composer IS NULL THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_null
-FROM Track;
--- 4
-SELECT BillingCountry,
-       SUM(CASE WHEN Total >= 10 THEN 1 ELSE 0 END) AS hd_lon,
-       SUM(CASE WHEN Total <  10 THEN 1 ELSE 0 END) AS hd_nho
-FROM Invoice GROUP BY 1 ORDER BY hd_lon DESC;
-```
+1. Chỉ ra `khach_id=1, 140`. Khách 2 chỉ có 1 đơn nên không qua `HAVING`.
+2. ```sql
+   SELECT ROUND(100.0 * COUNT(ghi_chu) / COUNT(*), 1) AS pct FROM don;   -- 66.7
+   ```
+   Dùng `COUNT(ghi_chu)` (bỏ NULL) trên `COUNT(*)` (mọi dòng). Đây là mẫu đếm tỷ lệ dữ liệu đầy đủ, dùng rất nhiều khi kiểm tra chất lượng dữ liệu.
+3. `don_id` không nằm trong `GROUP BY` và không được bọc aggregate. Nhóm `khach_id=1` có 2 giá trị `don_id` khác nhau — database không biết chọn cái nào. Muốn xem cả hai thì đừng gộp, dùng window function.
+4. ```sql
+   SELECT EXTRACT(YEAR FROM InvoiceDate) AS nam, ROUND(SUM(Total),2) FROM Invoice GROUP BY 1 ORDER BY 1;
+   ```
+5. ```sql
+   SELECT BillingCountry, COUNT(*) AS so_hd, ROUND(AVG(Total),2) AS tb
+   FROM Invoice GROUP BY 1 HAVING COUNT(*) >= 5 ORDER BY tb DESC;
+   ```
+6. ```sql
+   SELECT ROUND(100.0 * SUM(CASE WHEN Composer IS NULL THEN 1 ELSE 0 END) / COUNT(*), 1) FROM Track;  -- 27.9
+   ```
+   Hoặc gọn hơn: `ROUND(100.0 * (COUNT(*) - COUNT(Composer)) / COUNT(*), 1)`.
+7. ```sql
+   SELECT BillingCountry,
+          SUM(CASE WHEN Total >= 10 THEN 1 ELSE 0 END) AS hd_lon,
+          SUM(CASE WHEN Total <  10 THEN 1 ELSE 0 END) AS hd_nho
+   FROM Invoice GROUP BY 1 ORDER BY hd_lon DESC;
+   ```
 
 </details>
-
----
 
 ## 2.4 — JOIN: mô hình tư duy + 2 cái bẫy chết người {#join}
 
@@ -405,71 +562,140 @@ Trên Chinook:
 
 ## 2.5 — Subquery, CTE và bẫy NOT IN {#subquery-cte}
 
-**Định nghĩa.** Subquery = query lồng trong query. CTE (`WITH ... AS (...)`) = đặt tên cho bước trung gian, viết query như liệt kê các bước suy nghĩ.
+**Định nghĩa.** Subquery = query lồng trong query. CTE (`WITH ... AS (...)`) = đặt **tên** cho một bước trung gian, để query đọc như liệt kê các bước suy nghĩ.
 
-**So sánh trực tiếp:**
+### Ba vị trí đặt subquery
+
+Trên bàn tập, cùng một câu hỏi *"đơn nào lớn hơn mức trung bình?"*:
+
 ```sql
--- Subquery long: kho doc khi qua 2 tang
-SELECT * FROM (SELECT BillingCountry, SUM(Total) rev FROM Invoice GROUP BY 1) x WHERE x.rev > 100;
+-- 1. O WHERE - loc theo mot gia tri
+SELECT * FROM don WHERE tien > (SELECT AVG(tien) FROM don);        -- AVG = 56.7 -> ra HD-01 (90)
 
--- CTE: doc nhu tieng Viet
-WITH doanh_thu_quoc_gia AS (
-  SELECT BillingCountry AS quoc_gia, SUM(Total) AS doanh_thu
-  FROM Invoice GROUP BY 1
+-- 2. O FROM - bang dan xuat, BAT BUOC dat alias
+SELECT * FROM (SELECT khach_id, SUM(tien) AS tong FROM don GROUP BY 1) x WHERE x.tong > 100;
+
+-- 3. O SELECT - scalar, phai tra dung 1 gia tri
+SELECT don_id, tien, (SELECT AVG(tien) FROM don) AS tb_chung FROM don;
+```
+
+Vị trí 3 hữu ích khi cần **so từng dòng với một mốc chung** — mỗi dòng đều thấy giá trị trung bình bên cạnh.
+
+### Subquery lồng vs CTE — cùng kết quả, khác khả năng đọc
+
+```sql
+-- Subquery long: doc nguoc tu trong ra ngoai
+SELECT * FROM (
+  SELECT khach_id, SUM(tien) AS tong FROM don GROUP BY 1
+) x WHERE x.tong > 100;
+
+-- CTE: doc xuoi nhu tieng Viet
+WITH tong_theo_khach AS (
+  SELECT khach_id, SUM(tien) AS tong FROM don GROUP BY 1
 )
-SELECT * FROM doanh_thu_quoc_gia WHERE doanh_thu > 100 ORDER BY doanh_thu DESC;
+SELECT * FROM tong_theo_khach WHERE tong > 100;
 ```
-Quy tắc: lồng quá 2 tầng → chuyển sang CTE. Query dài mà đọc được quan trọng hơn query ngắn mà rối.
 
-**Bẫy `NOT IN` gặp NULL.** Đã chạy thật:
+Với 1 tầng thì khác biệt nhỏ. Với 3 tầng thì một bên không ai đọc nổi:
+
 ```sql
-WITH t(id) AS (VALUES (1),(2),(3)), x(v) AS (VALUES (2),(NULL))
-SELECT COUNT(*) FROM t WHERE id NOT IN (SELECT v FROM x);                  -- 0  (!!)
-SELECT COUNT(*) FROM t WHERE NOT EXISTS (SELECT 1 FROM x WHERE x.v = t.id); -- 2  (dung)
+WITH b1 AS (SELECT ... FROM ...),                 -- buoc 1: loc
+     b2 AS (SELECT ... FROM b1 GROUP BY ...),     -- buoc 2: tong hop
+     b3 AS (SELECT ..., ROW_NUMBER() OVER (...) FROM b2)   -- buoc 3: xep hang
+SELECT * FROM b3 WHERE rn <= 3;
 ```
-Lý do: `1 NOT IN (2, NULL)` = `1 != 2 AND 1 != NULL` = `TRUE AND UNKNOWN` = UNKNOWN → không dòng nào qua được. Kết quả trả về **rỗng hoàn toàn**, dễ bị hiểu nhầm là "không có ai thỏa điều kiện".
 
-Quy tắc: **luôn dùng `NOT EXISTS`** thay cho `NOT IN` khi subquery có thể chứa NULL.
+**Quy tắc: lồng quá 2 tầng → chuyển sang CTE.** Query dài mà đọc được tốt hơn query ngắn mà rối. Sau 2 tuần quay lại chính query của mình vẫn hiểu — đó mới là tiêu chuẩn.
 
-**Bài tập 2.5.**
-1. Khách chi tiêu cao hơn mức trung bình toàn bộ khách.
-2. Track có `UnitPrice` cao hơn trung bình của chính genre nó (correlated subquery).
-3. Top 3 genre theo doanh thu, rồi lấy chi tiết track thuộc 3 genre đó (CTE nhiều tầng).
-4. Khách chưa từng mua thể loại Rock — viết bằng `NOT EXISTS`, rồi viết lại bằng `NOT IN` và so kết quả.
+### Correlated subquery — chạy lại cho từng dòng
+
+```sql
+-- Track co gia cao hon trung binh CUA CHINH GENRE no
+SELECT t.Name, t.UnitPrice FROM Track t
+WHERE t.UnitPrice > (SELECT AVG(t2.UnitPrice) FROM Track t2 WHERE t2.GenreId = t.GenreId);
+```
+
+Subquery tham chiếu `t.GenreId` của bảng ngoài → phải chạy lại **cho từng dòng**. Đúng nhưng chậm. Với bảng lớn nên viết lại bằng window function:
+
+```sql
+SELECT * FROM (SELECT Name, UnitPrice, AVG(UnitPrice) OVER (PARTITION BY GenreId) AS tb_genre FROM Track)
+WHERE UnitPrice > tb_genre;
+```
+
+### Bẫy NOT IN gặp NULL {#bay-not-in}
+
+Bàn tập nhỏ nhất có thể — 3 số và 1 danh sách:
+
+```sql
+WITH t(id) AS (VALUES (1),(2),(3)),
+     x(v)  AS (VALUES (2),(NULL))
+SELECT COUNT(*) FROM t WHERE id NOT IN (SELECT v FROM x);                   -- ?
+SELECT COUNT(*) FROM t WHERE NOT EXISTS (SELECT 1 FROM x WHERE x.v = t.id); -- ?
+```
+
+Nhìn bằng mắt: `t` có 1, 2, 3. Loại đi 2. Còn lại **1 và 3** → đáp án phải là 2.
+
+```
+NOT IN     ->  0 dong   (!!)
+NOT EXISTS ->  2 dong   (dung)
+```
+
+**Vì sao:** `1 NOT IN (2, NULL)` được database dịch thành `1 != 2 AND 1 != NULL` = `TRUE AND UNKNOWN` = **UNKNOWN**. Không dòng nào qua được `WHERE`.
+
+Đây là cùng một cơ chế với bẫy NULL ở §2.2, nhưng nguy hiểm hơn: kết quả trả về **rỗng hoàn toàn**, rất dễ bị đọc nhầm thành "không có ai thỏa điều kiện" rồi báo cáo luôn.
+
+**Quy tắc: luôn dùng `NOT EXISTS`** khi subquery có thể chứa NULL. Hoặc nếu vẫn muốn `NOT IN` thì phải tự chặn: `NOT IN (SELECT v FROM x WHERE v IS NOT NULL)`.
+
+`EXISTS` vs `IN` ở dạng khẳng định thì an toàn như nhau, nhưng `EXISTS` thường nhanh hơn vì chỉ cần tìm thấy 1 dòng là dừng.
+
+### Bài tập 2.5
+
+Trên bàn tập:
+
+1. Viết bằng CTE: khách nào chi nhiều hơn mức trung bình của tất cả khách?
+2. `SELECT * FROM don WHERE khach_id NOT IN (SELECT id FROM khach WHERE diem > 60);` → ra gì? Nếu cột `diem` có NULL thì sao?
+
+Trên Chinook:
+
+3. Khách chi tiêu cao hơn mức trung bình toàn bộ khách.
+4. Top 3 genre theo doanh thu, rồi lấy chi tiết track thuộc 3 genre đó (CTE nhiều tầng).
+5. Khách **chưa từng** mua thể loại Rock — viết bằng `NOT EXISTS`, rồi thử `NOT IN`, so kết quả.
 
 <details>
 <summary>Đáp án 2.5</summary>
 
-```sql
--- 1
-WITH chi_tieu AS (SELECT CustomerId, SUM(Total) AS tong FROM Invoice GROUP BY 1)
-SELECT * FROM chi_tieu WHERE tong > (SELECT AVG(tong) FROM chi_tieu) ORDER BY tong DESC;
--- 2
-SELECT t.Name, t.UnitPrice, t.GenreId FROM Track t
-WHERE t.UnitPrice > (SELECT AVG(t2.UnitPrice) FROM Track t2 WHERE t2.GenreId = t.GenreId);
--- 3
-WITH rev_genre AS (
-  SELECT g.GenreId, g.Name AS genre, SUM(il.UnitPrice*il.Quantity) AS doanh_thu
-  FROM InvoiceLine il JOIN Track t ON t.TrackId = il.TrackId JOIN Genre g ON g.GenreId = t.GenreId
-  GROUP BY 1,2
-),
-top3 AS (SELECT * FROM rev_genre ORDER BY doanh_thu DESC LIMIT 3)
-SELECT top3.genre, t.Name AS track FROM top3 JOIN Track t ON t.GenreId = top3.GenreId LIMIT 20;
--- 4
-SELECT c.CustomerId, c.LastName FROM Customer c
-WHERE NOT EXISTS (
-  SELECT 1 FROM Invoice i
-  JOIN InvoiceLine il ON il.InvoiceId = i.InvoiceId
-  JOIN Track t ON t.TrackId = il.TrackId
-  JOIN Genre g ON g.GenreId = t.GenreId
-  WHERE i.CustomerId = c.CustomerId AND g.Name = 'Rock'
-);
-```
-Bản `NOT IN`: nếu danh sách con chứa NULL (ví dụ khi join hụt làm sinh NULL), kết quả trả rỗng. Chạy cả hai và giải thích chênh lệch là bài tập chính ở đây.
+1. ```sql
+   WITH chi AS (SELECT khach_id, SUM(tien) AS tong FROM don GROUP BY 1)
+   SELECT * FROM chi WHERE tong > (SELECT AVG(tong) FROM chi);
+   ```
+   Trung bình = (140+30)/2 = 85 → chỉ khách 1 (140) đạt. Chú ý: mẫu số là **2 khách có đơn**, không phải 3 khách trong bảng `khach` — Chi không có đơn nào nên không xuất hiện trong CTE.
+2. `diem > 60` chỉ có khách 1 (100 điểm) → `NOT IN (1)` → ra HD-03 của khách 2. Nếu `diem` có NULL thì bản thân subquery vẫn ổn (điều kiện `> 60` đã loại NULL). Nhưng nếu subquery là `SELECT id FROM khach` mà cột `id` có NULL thì kết quả rỗng ngay.
+3. ```sql
+   WITH chi_tieu AS (SELECT CustomerId, SUM(Total) AS tong FROM Invoice GROUP BY 1)
+   SELECT * FROM chi_tieu WHERE tong > (SELECT AVG(tong) FROM chi_tieu) ORDER BY tong DESC;
+   ```
+4. ```sql
+   WITH rev_genre AS (
+     SELECT g.GenreId, g.Name AS genre, SUM(il.UnitPrice*il.Quantity) AS doanh_thu
+     FROM InvoiceLine il JOIN Track t ON t.TrackId = il.TrackId JOIN Genre g ON g.GenreId = t.GenreId
+     GROUP BY 1,2
+   ),
+   top3 AS (SELECT * FROM rev_genre ORDER BY doanh_thu DESC LIMIT 3)
+   SELECT top3.genre, t.Name FROM top3 JOIN Track t ON t.GenreId = top3.GenreId LIMIT 20;
+   ```
+5. ```sql
+   SELECT c.CustomerId, c.LastName FROM Customer c
+   WHERE NOT EXISTS (
+     SELECT 1 FROM Invoice i
+     JOIN InvoiceLine il ON il.InvoiceId = i.InvoiceId
+     JOIN Track t ON t.TrackId = il.TrackId
+     JOIN Genre g ON g.GenreId = t.GenreId
+     WHERE i.CustomerId = c.CustomerId AND g.Name = 'Rock'
+   );
+   ```
+   Bản `NOT IN`: nếu danh sách con sinh ra NULL (do join hụt), kết quả trả rỗng. Chạy cả hai và giải thích chênh lệch chính là bài tập ở đây.
 
 </details>
-
----
 
 ## 2.6 — Window functions (kỹ năng phân biệt fresher và junior) {#window}
 
@@ -624,137 +850,397 @@ FROM Invoice;
 
 ## 2.7 — Ngày tháng, CASE WHEN, chia số và NULL {#date-case-null}
 
-**DATE_TRUNC** gom về đầu kỳ: `DATE_TRUNC('month', d)` biến 2023-03-17 thành 2023-03-01. Đây là cách chuẩn để gom theo tháng — **không** dùng chuỗi `'2023-03'` để so sánh lớn/nhỏ.
+### Bàn tập có ngày
 
-**Bảng lịch đủ kỳ** — báo cáo tháng phải có đủ 12 dòng kể cả tháng không có đơn:
 ```sql
-WITH cal AS (SELECT UNNEST(generate_series(DATE '2023-01-01', DATE '2023-12-01', INTERVAL 1 MONTH)) AS thang),
-rev AS (SELECT DATE_TRUNC('month', InvoiceDate) AS thang, SUM(Total) AS doanh_thu FROM Invoice GROUP BY 1)
-SELECT cal.thang, COALESCE(rev.doanh_thu, 0) AS doanh_thu
+CREATE TABLE don(don_id VARCHAR, ngay DATE, tien INT);
+INSERT INTO don VALUES ('HD-01', DATE '2024-01-15', 90),
+                       ('HD-02', DATE '2024-01-20', 50),
+                       ('HD-03', DATE '2024-03-02', 30);
+```
+
+Ba đơn: hai đơn tháng 1, **không có đơn nào tháng 2**, một đơn tháng 3.
+
+### DATE_TRUNC — gom về đầu kỳ
+
+```sql
+SELECT DATE_TRUNC('month', ngay) AS thang, SUM(tien) FROM don GROUP BY 1 ORDER BY 1;
+```
+
+```
+2024-01-01   140
+2024-03-01    30
+```
+
+**Tháng 2 biến mất.** Không sai về mặt SQL — không có dữ liệu thì không có dòng. Nhưng đưa lên biểu đồ đường thì tai hại: đường nối thẳng từ tháng 1 sang tháng 3, che mất đúng cái cần thấy là **tháng 2 bán được 0 đồng**.
+
+Đây là lỗi báo cáo hay gặp nhất mà không ai phát hiện, vì nhìn chart vẫn "bình thường".
+
+### Calendar table — bắt kỳ trống hiện ra
+
+```sql
+WITH cal AS (
+  SELECT UNNEST(generate_series(DATE '2024-01-01', DATE '2024-03-01', INTERVAL 1 MONTH)) AS thang
+),
+rev AS (
+  SELECT DATE_TRUNC('month', ngay) AS thang, SUM(tien) AS dt FROM don GROUP BY 1
+)
+SELECT strftime(cal.thang,'%Y-%m') AS thang, COALESCE(rev.dt, 0) AS doanh_thu
 FROM cal LEFT JOIN rev ON rev.thang = cal.thang ORDER BY 1;
 ```
-Không có bảng lịch thì tháng doanh thu 0 sẽ **biến mất** khỏi báo cáo, và chart đường sẽ nối thẳng qua chỗ trống — che mất đúng vấn đề cần thấy.
 
-**Bẫy chia số nguyên — khác nhau theo database (đã kiểm chứng):**
+```
+2024-01   140
+2024-02     0     <- hien ra roi
+2024-03    30
+```
 
-| DB | `SELECT 3/4` |
+Ba thứ phối hợp: `generate_series` tạo đủ kỳ · `LEFT JOIN` giữ mọi kỳ · `COALESCE` biến NULL thành 0. Mẫu này dùng lại ở mọi báo cáo theo thời gian.
+
+### Hàm ngày hay dùng
+
+| Hàm | Làm gì | Ví dụ |
+|---|---|---|
+| `DATE_TRUNC('month', d)` | cắt về đầu tháng/tuần/quý | `2024-01-15` → `2024-01-01` |
+| `EXTRACT(YEAR FROM d)` | lấy một phần | → `2024` |
+| `EXTRACT(DOW FROM d)` | thứ trong tuần | 0 = Chủ nhật |
+| `DATE_DIFF('day', a, b)` | khoảng cách | số ngày giữa 2 mốc |
+| `d + INTERVAL '7 days'` | cộng trừ | |
+| `strftime(d, '%Y-%m')` | định dạng để hiển thị | → `'2024-01'` |
+
+**Quy tắc:** gom nhóm bằng `DATE_TRUNC` (kiểu ngày, sắp xếp đúng). Chỉ đổi sang chuỗi ở **bước hiển thị cuối cùng**. Gom bằng chuỗi từ đầu sẽ sai khi so sánh lớn/nhỏ và khi cần cộng trừ ngày.
+
+### Bẫy chia số nguyên
+
+```sql
+SELECT 3/4;
+```
+
+| Database | Kết quả |
 |---|---|
-| SQLite | **0** |
-| PostgreSQL / SQL Server | **0** |
-| DuckDB / BigQuery / MySQL | 0.75 |
+| SQLite · PostgreSQL · SQL Server | **0** |
+| DuckDB · BigQuery · MySQL | 0.75 |
 
-Nghĩa là code chạy đúng trên DuckDB có thể cho conversion rate = 0 khi đưa lên Postgres. Viết an toàn ở mọi nơi:
-```sql
-COUNT(a) * 1.0 / NULLIF(COUNT(b), 0)
-```
-`NULLIF(x, 0)` biến 0 thành NULL → phép chia trả NULL thay vì lỗi "division by zero".
+Nghĩa là code tính conversion rate chạy đúng ở sân tập DuckDB có thể ra **0 hết** khi đưa lên Postgres. Và không có lỗi nào báo.
 
-**CASE WHEN** dùng 2 việc: phân nhóm và xoay bảng.
+Viết an toàn ở mọi nơi — nhân `1.0` để ép sang số thực:
+
 ```sql
--- phan nhom
-SELECT CASE WHEN Total >= 15 THEN 'Cao' WHEN Total >= 8 THEN 'Trung binh' ELSE 'Thap' END AS nhom,
-       COUNT(*) FROM Invoice GROUP BY 1;
--- xoay bang (pivot): moi quoc gia mot cot
-SELECT DATE_TRUNC('year', InvoiceDate) AS nam,
-       SUM(CASE WHEN BillingCountry = 'USA'    THEN Total ELSE 0 END) AS usa,
-       SUM(CASE WHEN BillingCountry = 'Canada' THEN Total ELSE 0 END) AS canada
-FROM Invoice GROUP BY 1 ORDER BY 1;
+SELECT COUNT(*) FILTER (WHERE tien > 40) * 1.0 / NULLIF(COUNT(*), 0) AS ty_le FROM don;   -- 0.667
 ```
 
-**Bài tập 2.7.** Viết bộ 12 query báo cáo tháng trong [Stage 2 — SQL](../stages/stage-2-sql.md) (mục Deliverable W8). Ba câu khó nhất:
-- Khách mới vs khách quay lại theo tháng
-- Khoảng cách trung bình giữa 2 lần mua
-- Top 5 khách đóng góp bao nhiêu % tổng doanh thu
+`NULLIF(x, 0)` biến 0 thành NULL → phép chia trả NULL thay vì lỗi "division by zero". Kết quả NULL trên báo cáo tốt hơn nhiều so với query chết giữa chừng.
+
+**Mẫu chuẩn cho mọi tỷ lệ, học thuộc:**
+
+```sql
+tu_so * 1.0 / NULLIF(mau_so, 0)
+```
+
+### CASE WHEN — hai công dụng
+
+**Phân nhóm (binning):**
+
+```sql
+SELECT CASE WHEN tien >= 80 THEN 'Cao'
+            WHEN tien >= 40 THEN 'Trung binh'
+            ELSE 'Thap' END AS nhom,
+       COUNT(*) FROM don GROUP BY 1;
+```
+
+Thứ tự điều kiện quan trọng: `CASE` dừng ở điều kiện đúng **đầu tiên**. Viết ngược từ nhỏ lên lớn thì mọi dòng rơi vào nhóm đầu.
+
+**Xoay bảng (pivot ngang):**
+
+```sql
+SELECT DATE_TRUNC('month', ngay) AS thang,
+       SUM(CASE WHEN tien >= 80 THEN tien ELSE 0 END) AS don_lon,
+       SUM(CASE WHEN tien <  80 THEN tien ELSE 0 END) AS don_nho
+FROM don GROUP BY 1 ORDER BY 1;
+```
+
+Từ dạng dọc (mỗi nhóm 1 dòng) thành dạng ngang (mỗi nhóm 1 cột). Đây là cách làm báo cáo "region × tháng" mà sếp hay yêu cầu.
+
+### COALESCE và NULLIF
+
+| Hàm | Làm gì | Dùng khi |
+|---|---|---|
+| `COALESCE(a, b, c)` | trả giá trị **đầu tiên khác NULL** | điền mặc định: `COALESCE(discount, 0)` |
+| `NULLIF(a, b)` | trả NULL nếu `a = b` | chặn chia 0: `NULLIF(mau_so, 0)` |
+
+### Bài tập 2.7
+
+1. Trên bàn tập, viết query ra đủ 3 tháng kèm cột "tăng trưởng so tháng trước". Tháng 2 doanh thu 0 thì tăng trưởng tháng 3 tính thế nào?
+2. `SELECT COUNT(*)/COUNT(DISTINCT don_id) FROM don;` — chạy trên Postgres ra gì, trên DuckDB ra gì?
+3. Viết `CASE WHEN` phân 3 nhóm nhưng cố tình sai thứ tự, giải thích kết quả sai ra sao.
+
+Trên Chinook — **deliverable W8: bộ 12 query báo cáo tháng**. Ba câu khó nhất:
+
+4. Khách mới vs khách quay lại theo tháng.
+5. Khoảng cách trung bình giữa 2 lần mua.
+6. Top 5 khách đóng góp bao nhiêu % tổng doanh thu.
 
 <details>
-<summary>Gợi ý 3 câu khó</summary>
+<summary>Đáp án 2.7</summary>
 
-```sql
--- Khach moi vs quay lai: lay ngay mua dau tien cua moi khach roi so voi thang dang xet
-WITH first_buy AS (SELECT CustomerId, MIN(DATE_TRUNC('month', InvoiceDate)) AS thang_dau FROM Invoice GROUP BY 1),
-m AS (SELECT DISTINCT CustomerId, DATE_TRUNC('month', InvoiceDate) AS thang FROM Invoice)
-SELECT m.thang,
-       COUNT(*) FILTER (WHERE m.thang = f.thang_dau) AS khach_moi,
-       COUNT(*) FILTER (WHERE m.thang > f.thang_dau) AS khach_quay_lai
-FROM m JOIN first_buy f ON f.CustomerId = m.CustomerId GROUP BY 1 ORDER BY 1;
---   FILTER (WHERE ...) la cach viet gon cua SUM(CASE WHEN ... THEN 1 ELSE 0 END), co o DuckDB/Postgres.
-
--- Top 5 khach dong gop bao nhieu %
-WITH sp AS (SELECT CustomerId, SUM(Total) AS chi FROM Invoice GROUP BY 1),
-r AS (SELECT *, ROW_NUMBER() OVER (ORDER BY chi DESC) AS hang, SUM(chi) OVER () AS tong FROM sp)
-SELECT ROUND(100 * SUM(chi) / MAX(tong), 1) AS pct_top5 FROM r WHERE hang <= 5;
-```
+1. Tháng 3 so tháng 2: `(30 − 0) / 0` → chia cho 0. Với `NULLIF` sẽ ra NULL, và **NULL là câu trả lời đúng** — không thể tính phần trăm tăng trưởng trên nền bằng 0. Trên báo cáo hiển thị "—" hoặc "n/a", **không** hiển thị 0% và tuyệt đối không hiển thị ∞.
+2. Postgres: `3/3` = 1 (may mắn đúng). Nhưng nếu là `2/3` thì Postgres ra **0** còn DuckDB ra 0.667. Luôn viết `* 1.0`.
+3. ```sql
+   CASE WHEN tien >= 40 THEN 'Trung binh' WHEN tien >= 80 THEN 'Cao' ELSE 'Thap' END
+   ```
+   Đơn 90 rơi vào 'Trung bình' vì điều kiện `>= 40` đúng trước. Nhóm 'Cao' **không bao giờ** có dòng nào. Lỗi này không báo lỗi, chỉ ra phân nhóm sai — kiểm bằng cách đếm số dòng mỗi nhóm, thấy nhóm nào bằng 0 thì nghi ngay.
+4. ```sql
+   WITH first_buy AS (SELECT CustomerId, MIN(DATE_TRUNC('month', InvoiceDate)) AS thang_dau FROM Invoice GROUP BY 1),
+   m AS (SELECT DISTINCT CustomerId, DATE_TRUNC('month', InvoiceDate) AS thang FROM Invoice)
+   SELECT m.thang,
+          COUNT(*) FILTER (WHERE m.thang = f.thang_dau) AS khach_moi,
+          COUNT(*) FILTER (WHERE m.thang > f.thang_dau) AS khach_quay_lai
+   FROM m JOIN first_buy f ON f.CustomerId = m.CustomerId GROUP BY 1 ORDER BY 1;
+   ```
+5. ```sql
+   WITH x AS (SELECT CustomerId, InvoiceDate,
+                     LAG(InvoiceDate) OVER (PARTITION BY CustomerId ORDER BY InvoiceDate) AS lan_truoc
+              FROM Invoice)
+   SELECT ROUND(AVG(DATE_DIFF('day', lan_truoc, InvoiceDate)), 1) FROM x WHERE lan_truoc IS NOT NULL;
+   ```
+6. ```sql
+   WITH sp AS (SELECT CustomerId, SUM(Total) AS chi FROM Invoice GROUP BY 1),
+   r AS (SELECT *, ROW_NUMBER() OVER (ORDER BY chi DESC) AS hang, SUM(chi) OVER () AS tong FROM sp)
+   SELECT ROUND(100 * SUM(chi) / MAX(tong), 1) AS pct_top5 FROM r WHERE hang <= 5;   -- 10.1%
+   ```
+   10,1% — thấp bất thường. Dữ liệu thương mại thật thường 30–50%. Nêu được nhận xét đó mới là phân tích, chỉ chạy ra số thì chưa.
 
 </details>
 
----
+## 2.8 — Ba mẫu phân tích thực chiến {#funnel-cohort-rfm}
 
-## 2.8 — Ba mẫu phân tích thực chiến (W9) {#funnel-cohort-rfm}
+Ba dạng này chiếm phần lớn bài test DA. Học **cấu trúc**, đừng học thuộc cú pháp.
 
-Đây là 3 dạng query mà hầu hết bài test DA đều hỏi. Học thuộc **cấu trúc**, không phải cú pháp.
+### Bàn tập sự kiện — 10 dòng
 
-### Funnel (phễu)
+```sql
+CREATE TABLE sk(user_id INT, buoc VARCHAR, ngay DATE);
+INSERT INTO sk VALUES
+ (1,'xem','2024-01-05'),(1,'gio','2024-01-05'),(1,'mua','2024-01-05'),
+ (2,'xem','2024-01-06'),(2,'gio','2024-01-06'),
+ (3,'xem','2024-01-07'),
+ (4,'xem','2024-02-02'),(4,'gio','2024-02-02'),(4,'mua','2024-02-03'),
+ (1,'mua','2024-02-10');
+```
+
+Nhìn bằng mắt trước khi viết query:
+- **User 1**: xem → giỏ → mua (tháng 1), rồi **mua lại** tháng 2
+- **User 2**: xem → giỏ, dừng lại, không mua
+- **User 3**: chỉ xem
+- **User 4**: xem → giỏ → mua (tháng 2)
+
+### Funnel — đếm user rơi rụng qua từng bước
+
+Cách ngây thơ, và vì sao nó thiếu:
+
+```sql
+SELECT buoc, COUNT(DISTINCT user_id) FROM sk GROUP BY 1;
+-- xem 4 · gio 3 · mua 2
+```
+
+Ra đúng số, nhưng **không tính được tỷ lệ chuyển đổi giữa các bước** vì mỗi bước nằm ở một dòng riêng. Mẫu chuẩn là gom cờ về mỗi user rồi mới tính:
+
 ```sql
 WITH b AS (
   SELECT user_id,
-         MAX(CASE WHEN event_type = 'view'     THEN 1 ELSE 0 END) AS b1,
-         MAX(CASE WHEN event_type = 'cart'     THEN 1 ELSE 0 END) AS b2,
-         MAX(CASE WHEN event_type = 'purchase' THEN 1 ELSE 0 END) AS b3
-  FROM events WHERE created_at >= '2023-01-01' GROUP BY 1
+         MAX(CASE WHEN buoc = 'xem' THEN 1 ELSE 0 END) AS b1,
+         MAX(CASE WHEN buoc = 'gio' THEN 1 ELSE 0 END) AS b2,
+         MAX(CASE WHEN buoc = 'mua' THEN 1 ELSE 0 END) AS b3
+  FROM sk GROUP BY 1
 )
-SELECT SUM(b1) AS xem, SUM(b2) AS them_gio, SUM(b3) AS mua,
-       ROUND(100.0*SUM(b2)/NULLIF(SUM(b1),0),1) AS cr_xem_gio,
-       ROUND(100.0*SUM(b3)/NULLIF(SUM(b2),0),1) AS cr_gio_mua
+SELECT SUM(b1) AS xem, SUM(b2) AS gio, SUM(b3) AS mua,
+       ROUND(100.0*SUM(b2)/SUM(b1)) AS cr_xem_gio,
+       ROUND(100.0*SUM(b3)/SUM(b2)) AS cr_gio_mua
 FROM b;
 ```
-Điểm phải nêu khi trình bày: funnel này **không** ép thứ tự thời gian (user mua mà không "view" vẫn được tính). Funnel chặt chẽ phải kiểm tra `timestamp` bước sau > bước trước. Nói ra được hạn chế này là điểm cộng lớn khi phỏng vấn.
 
-### Cohort retention
+```
+xem = 4    gio = 3    mua = 2
+cr_xem_gio = 75%      cr_gio_mua = 67%
+```
+
+Dùng `MAX(CASE WHEN ...)` chứ không `SUM` — vì user 1 mua **2 lần**, `SUM` sẽ đếm thành 2. `MAX` biến thành cờ 0/1: *"user này đã từng làm bước đó chưa"*.
+
+**Ba quyết định phải nêu khi trình bày** — không nêu là bị hỏi ngay:
+
+| Quyết định | Ở bàn tập này | Vì sao quan trọng |
+|---|---|---|
+| Cửa sổ thời gian | Không giới hạn | User 4 xem ngày 2/2, mua ngày 3/2 — nếu ép "trong cùng phiên" thì user này rơi khỏi phễu |
+| Có ép thứ tự không | **Không** | Query này chỉ hỏi "đã từng làm bước đó chưa", không kiểm tra `xem` có trước `mua` |
+| Đơn vị đếm | user duy nhất | Đếm theo session sẽ ra con số khác hoàn toàn |
+
+Funnel chặt chẽ phải kiểm `timestamp` bước sau > bước trước. Nêu được hạn chế này trước khi bị hỏi là điểm cộng lớn khi phỏng vấn.
+
+### Cohort retention — tách "sản phẩm tốt lên" khỏi "mua thêm user mới"
+
 ```sql
-WITH first_month AS (
-  SELECT user_id, DATE_TRUNC('month', MIN(created_at)) AS cohort FROM orders GROUP BY 1
+WITH fm AS (   -- buoc 1: moi user thuoc cohort nao (thang mua dau tien)
+  SELECT user_id, DATE_TRUNC('month', MIN(ngay)) AS cohort FROM sk WHERE buoc = 'mua' GROUP BY 1
 ),
-act AS (
-  SELECT o.user_id, f.cohort, DATE_DIFF('month', f.cohort, DATE_TRUNC('month', o.created_at)) AS thang_thu
-  FROM orders o JOIN first_month f ON f.user_id = o.user_id GROUP BY 1,2,3
+act AS (       -- buoc 2: moi thang user do con hoat dong khong
+  SELECT DISTINCT s.user_id, f.cohort,
+         DATE_DIFF('month', f.cohort, DATE_TRUNC('month', s.ngay)) AS thang_thu
+  FROM sk s JOIN fm f ON f.user_id = s.user_id WHERE s.buoc = 'mua'
 )
-SELECT cohort, thang_thu, COUNT(DISTINCT user_id) AS users,
-       ROUND(100.0 * COUNT(DISTINCT user_id)
-             / MAX(COUNT(DISTINCT user_id)) OVER (PARTITION BY cohort), 1) AS pct_giu_chan
+SELECT strftime(cohort,'%Y-%m') AS cohort, thang_thu, COUNT(*) AS users
 FROM act GROUP BY 1,2 ORDER BY 1,2;
 ```
 
-### RFM
+```
+2024-01   thang 0   1 user      <- user 1 mua lan dau thang 1
+2024-01   thang 1   1 user      <- user 1 quay lai thang 2  -> retention 100%
+2024-02   thang 0   1 user      <- user 4
+```
+
+**Cấu trúc 3 bước, nhớ cái này là viết lại được ở mọi dataset:**
+
+```
+first_month  →  activity  →  đếm theo (cohort, tháng thứ mấy)
+```
+
+Cách đọc bảng cohort:
+- **Đọc ngang** — một nhóm người theo thời gian → sản phẩm giữ chân tốt dần hay tệ dần?
+- **Đọc dọc** — so các nhóm ở cùng độ tuổi → chất lượng user mới có tốt lên không?
+- Cột tháng 0 luôn 100% theo định nghĩa — đừng khoe con số đó.
+
+### RFM — phân khúc dẫn tới hành động
+
 ```sql
 WITH base AS (
   SELECT user_id,
-         DATE_DIFF('day', MAX(created_at), CURRENT_DATE) AS recency,
-         COUNT(DISTINCT order_id)                        AS frequency,
-         SUM(amount)                                     AS monetary
-  FROM orders GROUP BY 1
+         DATE_DIFF('day', MAX(ngay), DATE '2024-03-01') AS recency,
+         COUNT(*)                                        AS frequency,
+         SUM(1)                                          AS monetary   -- that te: SUM(so tien)
+  FROM sk WHERE buoc = 'mua' GROUP BY 1
 )
 SELECT *,
-       NTILE(5) OVER (ORDER BY recency)          AS r,   -- moi mua = diem cao
-       NTILE(5) OVER (ORDER BY frequency DESC)   AS f,
-       NTILE(5) OVER (ORDER BY monetary  DESC)   AS m
+       NTILE(5) OVER (ORDER BY recency)        AS r,   -- moi mua = diem cao
+       NTILE(5) OVER (ORDER BY frequency DESC) AS f,
+       NTILE(5) OVER (ORDER BY monetary DESC)  AS m
 FROM base;
 ```
 
----
+Phân khúc thường dùng: **Champions** (555) · **Loyal** (R cao, F cao) · **At risk** (F, M cao nhưng R thấp — nhóm đáng cứu nhất) · **Lost** · **New**.
 
-## 2.9 — Kỹ năng debug query (không có trong stage file, nhưng phỏng vấn hay hỏi) {#debug-query}
+Giá trị của RFM nằm ở chỗ nối thẳng sang hành động: At risk → gửi ưu đãi giữ chân; Champions → mời chương trình thành viên. **Phân khúc mà mỗi nhóm không dẫn tới hành động khác nhau thì phân khúc vô nghĩa.**
 
-Khi query ra số lạ, kiểm tra theo thứ tự:
+### Bài tập 2.8
 
-1. **Đếm dòng ở từng bước.** Bọc mỗi CTE bằng `SELECT COUNT(*)` — bước nào số nhảy bất thường là bước có lỗi.
-2. **Kiểm tra grain sau JOIN.** `SELECT khoa, COUNT(*) FROM ket_qua GROUP BY 1 HAVING COUNT(*) > 1 LIMIT 5;` — có dòng trả về nghĩa là đã fan-out.
-3. **Soi NULL.** `SELECT COUNT(*) - COUNT(cot_nghi_ngo) FROM bang;`
-4. **Đối chiếu tổng.** Tổng chi tiết phải bằng tổng ở bảng cha. Lệch = fan-out hoặc mất dòng.
-5. **Thu nhỏ bài toán.** Lọc còn 1 khách hàng, tự tay tính bằng máy tính, so với query.
+Trên bàn tập 10 dòng:
 
-Câu hỏi phỏng vấn hay gặp: *"Sếp nói doanh thu dashboard không khớp với kế toán, bạn kiểm tra thế nào?"* → trả lời theo đúng 5 bước trên, cộng thêm: kiểm tra khoảng thời gian, múi giờ, định nghĩa doanh thu (gộp hay trừ hoàn hàng), và bộ lọc mặc định của dashboard.
+1. Nếu ép funnel theo thứ tự thời gian (bước sau phải sau bước trước), user 4 có còn trong phễu không?
+2. Đổi `MAX(CASE WHEN ...)` thành `SUM(CASE WHEN ...)` thì con số nào sai, sai bao nhiêu?
+3. Retention tháng 1 của cohort 2024-01 là bao nhiêu %? Cỡ mẫu bao nhiêu người — con số đó có đáng tin không?
 
----
+Trên BigQuery `thelook_ecommerce`:
+
+4. Funnel theo `event_type`, kèm tỷ lệ từng bước.
+5. Cohort retention theo tháng đăng ký, dạng ma trận.
+6. RFM đầy đủ + bảng phân khúc kèm hành động đề xuất.
+
+<details>
+<summary>Đáp án 2.8</summary>
+
+1. **Còn.** User 4 xem ngày 2/2, mua ngày 3/2 — bước sau đúng là sau bước trước. Nhưng nếu định nghĩa funnel là "trong cùng một phiên/cùng ngày" thì user 4 **rơi ra**, phễu còn `mua = 1` và conversion tụt từ 67% xuống 33%. Cùng dữ liệu, hai định nghĩa, hai kết luận — đó là lý do phải chốt định nghĩa trước khi báo cáo.
+2. Cột `mua`: `SUM` ra **3** thay vì 2, vì user 1 mua 2 lần. Kéo theo `cr_gio_mua` thành 100% thay vì 67% — báo cáo đẹp hơn thực tế.
+3. **100%** (1/1 user quay lại). Nhưng cỡ mẫu là **1 người** — con số này vô nghĩa. Bài học: cohort luôn phải kèm số user tuyệt đối; nhóm dưới ~30 người thì tỷ lệ % chỉ là nhiễu. Đây là lỗi hay gặp khi chia cohort quá nhỏ.
+
+</details>
+
+## 2.9 — Kỹ năng debug query {#debug-query}
+
+Không có trong stage file, nhưng phỏng vấn hay hỏi và đi làm dùng hằng ngày.
+
+**Tình huống:** query chạy xong, ra một con số. Con số đó **trông lạ**. Giờ làm gì?
+
+### Năm bước, theo đúng thứ tự
+
+**Bước 1 — Đếm dòng ở từng bước.** Bọc mỗi CTE bằng `SELECT COUNT(*)`, chạy riêng. Bước nào số nhảy bất thường là bước có lỗi.
+
+```sql
+WITH b1 AS (...), b2 AS (SELECT ... FROM b1 JOIN ...)
+SELECT (SELECT COUNT(*) FROM b1) AS sau_buoc_1,
+       (SELECT COUNT(*) FROM b2) AS sau_buoc_2;
+```
+
+**Bước 2 — Kiểm grain sau JOIN.** Có dòng trả về nghĩa là đã fan-out:
+
+```sql
+SELECT khoa, COUNT(*) FROM ket_qua GROUP BY 1 HAVING COUNT(*) > 1 LIMIT 5;
+```
+
+**Bước 3 — Soi NULL.** Cột nào thiếu bao nhiêu:
+
+```sql
+SELECT COUNT(*) - COUNT(cot_nghi_ngo) AS so_null FROM bang;
+```
+
+**Bước 4 — Đối chiếu tổng.** Tổng ở bảng chi tiết phải bằng tổng ở bảng cha. Lệch = fan-out hoặc mất dòng.
+
+```sql
+SELECT (SELECT SUM(Total) FROM Invoice)                    AS tu_bang_cha,     -- 2.328,60
+       (SELECT SUM(UnitPrice*Quantity) FROM InvoiceLine)   AS tu_bang_chi_tiet; -- phai khop
+```
+
+**Bước 5 — Thu nhỏ bài toán.** Lọc còn **1 khách hàng**, tự tính bằng máy tính tay, so với query. Đây là bước cuối cùng nhưng hiệu quả nhất — sai ở đâu lộ ra ngay.
+
+```sql
+SELECT * FROM don WHERE khach_id = 1;   -- chi 2 dong, tinh tay duoc
+```
+
+### Bảng tra triệu chứng → nguyên nhân
+
+| Triệu chứng | Nghi ngờ đầu tiên | Kiểm bằng |
+|---|---|---|
+| Doanh thu cao bất thường | Fan-out | Bước 2 và 4 |
+| Kết quả **rỗng hoàn toàn** | `NOT IN` gặp NULL, hoặc điều kiện NULL | §2.5, §2.2 |
+| Số dòng ít hơn dự kiến | `LEFT JOIN` bị `WHERE` biến thành `INNER` | §2.4 |
+| Tỷ lệ ra 0 hết | Chia số nguyên | §2.7 |
+| Số user bị thổi phồng | Quên `DISTINCT` | Bước 2 |
+| Báo cáo thiếu tháng | Không dùng calendar table | §2.7 |
+| Tổng các phần ≠ tổng chung | Measure non-additive | [L3 §3.4](/ly-thuyet/l3-bi#filter-context) |
+
+### Câu phỏng vấn kinh điển
+
+*"Sếp nói doanh thu trên dashboard không khớp với số của kế toán. Bạn kiểm tra thế nào?"*
+
+Trả lời theo 5 bước trên, cộng thêm 4 thứ **ngoài kỹ thuật**:
+
+1. **Khoảng thời gian** — hai bên có đang tính cùng kỳ không? Dashboard lấy theo ngày đặt hay ngày giao?
+2. **Múi giờ** — dữ liệu lưu UTC, kế toán tính theo giờ Việt Nam → lệch nguyên một ngày ở hai đầu kỳ.
+3. **Định nghĩa doanh thu** — gộp hay đã trừ hoàn hàng, hủy đơn, chiết khấu? GMV ≠ Revenue ≠ Net revenue.
+4. **Bộ lọc mặc định** — dashboard có đang ẩn đơn test, đơn nội bộ, hay một kênh nào đó không?
+
+Trong thực tế, nguyên nhân nằm ở nhóm 4 thứ này nhiều hơn là ở query. Nêu được cả hai phía mới là câu trả lời đủ.
+
+### Bài tập 2.9
+
+1. Query này trả về rỗng, tìm lỗi:
+   ```sql
+   SELECT * FROM Customer WHERE CustomerId NOT IN (SELECT SupportRepId FROM Customer);
+   ```
+2. Query này ra doanh thu gấp nhiều lần thực tế, chỉ ra chỗ sai và sửa:
+   ```sql
+   SELECT c.Country, SUM(i.Total) FROM Customer c
+   JOIN Invoice i ON i.CustomerId = c.CustomerId
+   JOIN InvoiceLine il ON il.InvoiceId = i.InvoiceId
+   GROUP BY 1;
+   ```
+3. Báo cáo tháng thiếu mất tháng 7, dữ liệu gốc kiểm tra thấy tháng 7 thật sự không có đơn nào. Query đã đúng chưa? Nên sửa thế nào?
+
+<details>
+<summary>Đáp án 2.9</summary>
+
+1. `SupportRepId` có thể chứa NULL → `NOT IN` với danh sách có NULL trả rỗng. Sửa: dùng `NOT EXISTS`, hoặc thêm `WHERE SupportRepId IS NOT NULL` vào subquery. (Ngoài ra bản thân query này còn sai logic: so `CustomerId` với `SupportRepId` là so hai loại thực thể khác nhau — nhân viên và khách hàng.)
+2. Bảng `InvoiceLine` được join vào nhưng **không dùng cột nào của nó**, chỉ làm nhân bản dòng → `i.Total` bị cộng lặp theo số dòng chi tiết. Sửa: **bỏ hẳn** `JOIN InvoiceLine`. Nếu thật sự cần dữ liệu chi tiết thì cộng `SUM(il.UnitPrice * il.Quantity)` thay vì `SUM(i.Total)`.
+3. Query **không sai** nhưng báo cáo **sai**. Không có dữ liệu thì `GROUP BY` không sinh dòng. Sửa bằng calendar table + `LEFT JOIN` + `COALESCE(..., 0)` để tháng 7 hiện lên với giá trị 0 — vì "bán được 0 đồng" là thông tin quan trọng, còn "không có dòng" thì người đọc tưởng là quên lấy dữ liệu.
+
+</details>
 
 ## Checklist tự chấm trước khi sang Stage 3
 
