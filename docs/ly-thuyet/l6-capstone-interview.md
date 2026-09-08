@@ -95,9 +95,22 @@ Vòng case study là chỗ rớt nhiều nhất, vì ứng viên nhảy thẳng 
 
 **Đề mẫu:** *"Doanh thu tháng này giảm 15% so tháng trước. Bạn làm gì?"*
 
+### Trước khi đọc tiếp: tự làm thử
+
+Đề: *"Doanh thu tháng này giảm 15% so tháng trước. Bạn làm gì?"*
+
+Đừng đọc xuống. Viết ra giấy trong 2 phút: **câu đầu tiên bạn nói ra là gì?**
+
+Phần lớn người mới viết một trong ba câu sau:
+- *"Em sẽ query dữ liệu doanh thu 12 tháng gần nhất..."* → nhảy vào công cụ
+- *"Có thể do mùa vụ..."* → đoán nguyên nhân khi chưa biết gì
+- *"Em sẽ vẽ biểu đồ xem xu hướng..."* → làm việc trước khi hiểu việc
+
+Cả ba đều trượt cùng một chỗ: **chưa biết con số 15% đó nghĩa là gì đã đi giải quyết nó.**
+
 **Bước 1 — Clarify (hỏi lại trước khi phân tích).** 15% so với tháng trước hay cùng kỳ năm trước? Doanh thu gộp hay đã trừ hoàn hàng? Giảm ở toàn bộ hay một mảng? Có thay đổi gì về sản phẩm/giá/marketing trong tháng không? Số liệu đã chốt hay còn đang cập nhật?
 
-*Riêng bước này đã lọc được phần lớn ứng viên. Người mới nhảy vào phân tích ngay; người có kinh nghiệm hỏi trước.*
+*Riêng bước này đã lọc được phần lớn ứng viên. Người mới nhảy vào phân tích ngay; người có kinh nghiệm hỏi trước. Trong việc thật cũng vậy — một nửa số "vấn đề" tan biến ngay ở bước hỏi lại.*
 
 **Bước 2 — Structure (chia bài toán).** Doanh thu = số đơn × AOV. Số đơn = số khách × tần suất. Cứ mỗi nhánh, hỏi: giảm ở đâu?
 ```

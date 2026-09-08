@@ -63,6 +63,45 @@ Và câu hỏi tiếp theo mới là phần analyst: đây là lỗi nhập li�
 
 ## 4.2 — Bảng chuyển đổi SQL ↔ Pandas (học thuộc bảng này) {#sql-pandas}
 
+**Nguyên tắc học pandas:** đừng học như ngôn ngữ mới. **Dịch từ SQL đã biết.** Mỗi khi bí, hỏi "câu này viết bằng SQL thì thế nào?" rồi tra sang.
+
+### Bàn tập song song
+
+Cùng một dữ liệu, viết cả hai bên, so kết quả. Đây là cách luyện nhanh nhất.
+
+```python
+import pandas as pd
+don = pd.DataFrame({
+    "don_id":   ["HD-01","HD-02","HD-03"],
+    "khach_id": [1, 1, 2],
+    "tien":     [90, 50, 30],
+})
+khach = pd.DataFrame({"id": [1,2,3], "ten": ["An","Binh","Chi"], "diem": [100,50,30]})
+```
+
+| Câu hỏi | SQL | Pandas | Kết quả |
+|---|---|---|---|
+| Đơn trên 40 | `SELECT * FROM don WHERE tien > 40` | `don[don.tien > 40]` | 2 dòng |
+| Tổng tiền mỗi khách | `SELECT khach_id, SUM(tien) FROM don GROUP BY 1` | `don.groupby("khach_id")["tien"].sum()` | 1→140, 2→30 |
+| Ghép tên khách | `... JOIN khach k ON k.id = d.khach_id` | `don.merge(khach, left_on="khach_id", right_on="id")` | 3 dòng |
+| Giữ cả khách chưa mua | `LEFT JOIN` từ `khach` | `khach.merge(don, left_on="id", right_on="khach_id", how="left")` | **4 dòng** |
+| Số khách duy nhất | `COUNT(DISTINCT khach_id)` | `don.khach_id.nunique()` | 2 |
+
+Chú ý dòng thứ 4: `how="left"` giữ Chi lại với phần bên phải là `NaN` — **y hệt `LEFT JOIN` sinh NULL** trong [Lesson 2](/ly-thuyet/l2-sql#join). Và **fan-out xảy ra y hệt**:
+
+```python
+khach.merge(don, left_on="id", right_on="khach_id")["diem"].sum()   # 250 - SAI, diem cua An bi cong 2 lan
+khach[khach.id.isin(don.khach_id)]["diem"].sum()                    # 150 - DUNG
+```
+
+Thói quen bắt buộc, giống hệt bên SQL: **đếm số dòng trước và sau mỗi `merge`**.
+
+```python
+print(len(khach), len(don))                       # 3 3
+m = khach.merge(don, left_on="id", right_on="khach_id")
+print(len(m))                                     # 3  <- kiem tra co dung ky vong khong
+```
+
 | Mục đích | SQL | Pandas |
 |---|---|---|
 | Chọn cột | `SELECT a, b` | `df[["a","b"]]` |

@@ -88,6 +88,31 @@ Con số thứ hai mới là sự thật đầy đủ. (Số này lấy từ ví
 
 **Định nghĩa.** p-value = xác suất quan sát được kết quả **ít nhất cực đoan như dữ liệu hiện có**, giả sử H0 (không có khác biệt) là đúng.
 
+### Bàn tập đồng xu
+
+Bỏ qua marketing và conversion một lát. Chỉ có một đồng xu.
+
+Nghi ngờ: *"đồng xu này có bị lệch không?"* Tung thử 10 lần, ra **7 mặt ngửa**. 70% ngửa — nghe như lệch thật. Nhưng đồng xu **hoàn toàn công bằng** cũng ra 7/10 khá thường xuyên.
+
+Câu hỏi đúng phải là: **"nếu đồng xu công bằng, khả năng ra kết quả lệch ít nhất như thế này là bao nhiêu?"** Đó chính là p-value.
+
+```python
+from scipy import stats
+stats.binomtest(7,  10,  0.5).pvalue     # 0.3438
+stats.binomtest(70, 100, 0.5).pvalue     # 0.000079
+```
+
+| Thí nghiệm | Tỷ lệ ngửa | p-value | Kết luận |
+|---|---|---|---|
+| 10 lần, 7 ngửa | 70% | **0,344** | Đồng xu công bằng cũng ra thế này 34% số lần → **không kết luận được gì** |
+| 100 lần, 70 ngửa | 70% | **0,000079** | Gần như không thể xảy ra nếu công bằng → **có bằng chứng đồng xu lệch** |
+
+**Cùng một tỷ lệ 70%, hai kết luận trái ngược.** Khác biệt duy nhất: cỡ mẫu.
+
+Đây là toàn bộ ý nghĩa của p-value — nó không đo "lệch bao nhiêu", nó đo **"bằng chứng có đủ mạnh chưa"**. Và cũng là lý do phải tính cỡ mẫu **trước** khi chạy A/B test: 10 lần tung thì dù kết quả thế nào cũng không kết luận được.
+
+Đổi tên biến là ra ngay bài toán thật: đồng xu → phiên bản B, mặt ngửa → khách mua hàng, 50% → tỷ lệ chuyển đổi hiện tại.
+
 | p-value KHÔNG phải là | Vì sao |
 |---|---|
 | Xác suất H0 đúng | p tính **với giả định** H0 đúng, không thể vừa giả định vừa kết luận về nó |
