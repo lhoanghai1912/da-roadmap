@@ -9,9 +9,14 @@ format: md
 
 # LESSON 3 — BI & Dashboard (W10–W12)
 
+:::tip Cách đọc trang này
+Từ khóa **in đậm có gạch chân** là thuật ngữ — bấm vào để nhảy sang [Từ điển](/glossary) xem định nghĩa kèm ví dụ.
+Cuối mỗi mục có khối **Chốt lại** tóm tắt điều quan trọng nhất. Đọc lướt các khối đó là nắm được xương sống của bài.
+:::
+
 Bổ trợ cho [Stage 3 — BI & Dashboard](../stages/stage-3-bi-dashboard.md). Trọng tâm: hiểu **khái niệm** BI (đúng cho mọi công cụ), không phải học thao tác của một phần mềm.
 
-Số thật dùng làm ví dụ (từ `superstore.csv`, đã chạy kiểm chứng): tổng doanh thu 2.297.201 · 5.009 đơn · AOV 458,6 · biên lợi nhuận Technology 17,4% · Office Supplies 17,0% · **Furniture 2,5%** · sub-category `Tables` doanh thu 206.966 nhưng **lỗ 17.725**.
+Số thật dùng làm ví dụ (từ `superstore.csv`, đã chạy kiểm chứng): tổng doanh thu 2.297.201 · 5.009 đơn · [AOV](/glossary#aov) 458,6 · biên lợi nhuận Technology 17,4% · Office Supplies 17,0% · **Furniture 2,5%** · sub-category `Tables` doanh thu 206.966 nhưng **lỗ 17.725**.
 
 ---
 
@@ -80,6 +85,11 @@ d) *"Công ty đang ở đâu so với kế hoạch năm?"* → hành động: �
 Điểm chung: **mỗi câu dẫn tới một hành động cụ thể**. Nếu không nghĩ ra được hành động nào, dashboard đó không cần tồn tại.
 
 </details>
+
+
+:::note Chốt lại
+Dashboard trả lời **một** câu hỏi và dẫn tới **một** hành động. Mỗi con số phải có mốc so sánh — kỳ trước, cùng kỳ năm trước, hoặc target. Không nghĩ ra được hành động nào sau khi xem thì dashboard đó không cần tồn tại.
+:::
 
 ## 3.2 — Measure vs Dimension (khái niệm gốc của mọi công cụ BI) {#measure-dimension}
 
@@ -154,7 +164,7 @@ SELECT ROUND(SUM(tien)*1.0/COUNT(DISTINCT don_id),1) AS AOV_dung,  -- 1.375
        ROUND(AVG(tien),1)                            AS AOV_sai;   -- 1.100
 ```
 
-`AVG(tien)` là trung bình mỗi **dòng**, không phải mỗi **đơn** — đúng lỗi grain ở [L1 §1.1](/ly-thuyet/l1-foundation#grain). Trên Superstore: 458,6 (đúng) vs 229,9 (sai).
+`AVG(tien)` là trung bình mỗi **dòng**, không phải mỗi **đơn** — đúng lỗi [grain](/glossary#grain) ở [L1 §1.1](/ly-thuyet/l1-foundation#grain). Trên Superstore: 458,6 (đúng) vs 229,9 (sai).
 
 ### Dimension đặc biệt: cột số dùng để nhóm
 
@@ -188,9 +198,14 @@ Trên bàn tập 5 dòng, viết công thức đúng và tính ra số:
 
 </details>
 
-## 3.3 — Star schema: tại sao dashboard cần mô hình dữ liệu {#star-schema}
 
-**Định nghĩa.** **Fact table** ghi sự kiện đã xảy ra (nhiều dòng, có số để cộng, chứa khóa ngoại). **Dimension table** mô tả (ít dòng, dùng để lọc và cắt lát). Fact ở giữa nối ra các dim xung quanh = **star schema**.
+:::note Chốt lại
+Measure đo, dimension cắt lát — hai khái niệm này đúng cho mọi công cụ BI. Loại sai nhiều nhất là **tỷ số**: luôn tính `SUM(tử)/SUM(mẫu)`, không bao giờ `AVG(tỷ số)`, vì cách sai gán trọng số bằng nhau cho đơn 10đ và đơn 2.000đ.
+:::
+
+## 3.3 — [Star schema](/glossary#star-schema): tại sao dashboard cần mô hình dữ liệu {#star-schema}
+
+**Định nghĩa.** **Fact table** ghi sự kiện đã xảy ra (nhiều dòng, có số để cộng, chứa [khóa ngoại](/glossary#foreign-key)). **Dimension table** mô tả (ít dòng, dùng để lọc và cắt lát). Fact ở giữa nối ra các dim xung quanh = **star schema**.
 
 ### Bàn tập — bảng phẳng có gì sai
 
@@ -297,7 +312,12 @@ Với công việc DA, gần như luôn chọn **star**. Snowflake tiết kiệm
 
 </details>
 
-## 3.4 — Filter context: vì sao tổng các phần khác tổng chung {#filter-context}
+
+:::note Chốt lại
+Bảng phẳng lặp dữ liệu, đếm sai, và **không trả lời được câu hỏi về cái không xảy ra** (khách chưa mua gì). Tách fact/dim rồi luôn kiểm tổng để chắc không mất dòng. Date dimension là bảng dim đáng giá nhất vì nó làm kỳ trống hiện ra.
+:::
+
+## 3.4 — [Filter context](/glossary#filter-context): vì sao tổng các phần khác tổng chung {#filter-context}
 
 **Định nghĩa.** Mỗi biểu đồ tính toán trong phạm vi bộ lọc đang áp lên nó (filter dashboard + filter riêng của chart + phạm vi ngày).
 
@@ -337,7 +357,7 @@ Cùng một bảng, cùng một dashboard: doanh thu khớp, số khách lệch.
 |---|---|---|
 | **Additive** | doanh thu, số đơn, số lượng | ✅ Tổng 12 tháng = cả năm |
 | **Non-additive** | số khách duy nhất, số user hoạt động | ❌ Tổng 12 tháng > cả năm |
-| **Tỷ số** | biên lợi nhuận, tỷ lệ chuyển đổi | ❌ Phải tính lại từ tử/mẫu, không lấy trung bình |
+| **Tỷ số** | biên lợi nhuận, [tỷ lệ chuyển đổi](/glossary#conversion-rate) | ❌ Phải tính lại từ tử/mẫu, không lấy trung bình |
 
 Đây là cùng một chuyện với [grain ở Lesson 1](/ly-thuyet/l1-foundation#grain): khách là thực thể ở grain cao hơn dòng bán hàng, nên đếm thẳng là đếm trùng.
 
@@ -360,6 +380,11 @@ Cùng một bảng, cùng một dashboard: doanh thu khớp, số khách lệch.
 3. *"Card đếm số người khác nhau đã mua trong cả kỳ — mỗi người chỉ tính một lần dù mua nhiều tháng. Cột theo tháng đếm số người mua trong từng tháng, nên ai mua 3 tháng sẽ được tính ở cả 3 tháng. Vì vậy cộng 12 tháng luôn lớn hơn con số tổng, và đó là hành vi đúng chứ không phải lỗi."*
 
 </details>
+
+
+:::note Chốt lại
+Số trên dashboard "không khớp" thường không phải lỗi: khác bộ lọc, measure non-additive, hoặc làm tròn. Đếm duy nhất và tỷ số **không cộng được giữa các kỳ** — đây là cùng một chuyện với grain ở Lesson 1.
+:::
 
 ## 3.5 — Thiết kế: bố cục, màu, mật độ thông tin {#thiet-ke}
 
@@ -402,7 +427,7 @@ Nguyên tắc: **tổng quan trước, chi tiết sau**. Người xem quyết đ
 
 ### Mật độ
 
-Tối đa **5–7 thành phần** một trang. Nhiều hơn thì tách trang, đặt tên trang theo câu hỏi ("Tổng quan", "Phễu", "Cohort") chứ không theo loại chart.
+Tối đa **5–7 thành phần** một trang. Nhiều hơn thì tách trang, đặt tên trang theo câu hỏi ("Tổng quan", "Phễu", "[Cohort](/glossary#cohort)") chứ không theo loại chart.
 
 ### Chart junk — bỏ hết
 
@@ -444,6 +469,11 @@ Vẽ tay trước tiết kiệm rất nhiều thời gian — sửa bố cục t
 
 </details>
 
+
+:::note Chốt lại
+Bài test 5 giây là thước đo rẻ nhất: người lạ nhìn 5 giây không nói được xu hướng thì lỗi ở **bố cục**, không phải màu. Một màu nhấn, phần còn lại xám, tối đa 5–7 thành phần một trang.
+:::
+
 ## 3.6 — Looker Studio và Metabase: chọn cái nào cho việc gì {#looker-metabase}
 
 | | Looker Studio | Metabase |
@@ -465,7 +495,7 @@ docker run -d -p 3000:3000 -v metabase-data:/metabase.db --name metabase metabas
 
 | Việc | Làm ở đâu |
 |---|---|
-| JOIN nhiều bảng, tính cohort, funnel | **SQL** (hoặc view/model) |
+| JOIN nhiều bảng, tính cohort, [funnel](/glossary#funnel) | **SQL** (hoặc view/model) |
 | Lọc theo thời gian, region | BI |
 | Tính `SUM(Profit)/SUM(Sales)` | BI (calculated field đơn giản) |
 | Logic phân khúc RFM 5 tầng | **SQL** |
@@ -485,7 +515,7 @@ Blend trong Looker Studio ≈ `LEFT JOIN`, nhưng hạn chế hơn:
 | mọi kiểu join | chủ yếu left |
 | join nhiều điều kiện | 1 khóa |
 | lồng nhiều tầng | tối đa 5 nguồn, khó debug |
-| thấy được số dòng trước/sau | **không thấy** → fan-out xảy ra âm thầm |
+| thấy được số dòng trước/sau | **không thấy** → [fan-out](/glossary#fan-out) xảy ra âm thầm |
 
 Dòng cuối là rủi ro lớn nhất: [fan-out](/ly-thuyet/l2-sql#fan-out) trong BI khó phát hiện hơn nhiều so với trong SQL, vì không có chỗ để `COUNT(*)` kiểm tra.
 
@@ -494,6 +524,11 @@ Dòng cuối là rủi ro lớn nhất: [fan-out](/ly-thuyet/l2-sql#fan-out) tro
 Không chạy native trên macOS. Nếu nhắm ngân hàng/doanh nghiệp lớn ở VN thì bổ sung sau W16 bằng máy ảo Windows.
 
 Tin tốt: mọi khái niệm ở lesson này — measure, dimension, filter context, star schema, additive/non-additive — **chuyển sang Power BI gần như nguyên vẹn**. Chỉ khác cú pháp DAX. Học chắc khái niệm ở đây thì học Power BI sau chỉ mất 2–3 tuần.
+
+
+:::note Chốt lại
+Tính nặng làm ở **tầng SQL**, BI chỉ hiển thị — logic nằm trong BI thì không đọc được, không version control được, không tái dùng được. Blend nhiều tầng là dấu hiệu nên lùi lại viết một query.
+:::
 
 ## 3.7 — Spec Portfolio #1 và tiêu chí chấm {#spec-portfolio-1}
 
@@ -546,6 +581,11 @@ Ba insight mẫu đạt chuẩn cho Superstore:
 
 [Ảnh dashboard]
 **TL;DR:** 3 dòng.
+
+
+:::note Chốt lại
+Insight đạt chuẩn có **số · so sánh · hàm ý hành động**. Đề xuất đạt chuẩn có **hành động · phạm vi thử · metric đo · điều kiện dừng**. Thiếu bất kỳ phần nào thì người đọc không làm gì được với nó.
+:::
 
 ## Câu hỏi kinh doanh
 ## Dữ liệu (nguồn · khoảng thời gian · số dòng · grain)

@@ -9,6 +9,11 @@ format: md
 
 # LESSON 4 — Python & Pandas cho phân tích (W13–W16)
 
+:::tip Cách đọc trang này
+Từ khóa **in đậm có gạch chân** là thuật ngữ — bấm vào để nhảy sang [Từ điển](/glossary) xem định nghĩa kèm ví dụ.
+Cuối mỗi mục có khối **Chốt lại** tóm tắt điều quan trọng nhất. Đọc lướt các khối đó là nắm được xương sống của bài.
+:::
+
 Bổ trợ cho [Stage 4 — Python](../stages/stage-4-python.md). Nguyên tắc học: **không học Python như lập trình viên**. Chỉ học đủ phần phục vụ phân tích: đọc dữ liệu → làm sạch → nhóm → vẽ → viết kết luận.
 
 Mọi số trong file này đã chạy thật trên `superstore.csv` (đọc bằng `encoding='cp1252'`).
@@ -32,7 +37,12 @@ df.shape        # (9994, 21)
 
 ---
 
-## 4.1 — DataFrame: bảng SQL trong bộ nhớ {#dataframe}
+
+:::note Chốt lại
+Đọc file lạ thì việc đầu tiên là xử lý mã hóa và kiểu dữ liệu, trước khi phân tích. `encoding="cp1252"` và `parse_dates=[...]` tiết kiệm rất nhiều thời gian debug về sau.
+:::
+
+## 4.1 — [DataFrame](/glossary#dataframe): bảng SQL trong bộ nhớ {#dataframe}
 
 **Định nghĩa.** `DataFrame` = bảng 2 chiều có tên cột và **chỉ mục dòng** (index). `Series` = một cột.
 
@@ -87,7 +97,7 @@ Tìm ra 8 dòng trùng rồi thì làm gì? Ba lựa chọn, chọn sai là hỏ
 
 ### Bài tập 4.1
 
-1. Chạy 7 lệnh trên Olist `orders.csv`. Viết 5 dòng nhận xét: grain, khoảng thời gian, cột nào thiếu nhiều nhất, cột nào đọc sai kiểu.
+1. Chạy 7 lệnh trên Olist `orders.csv`. Viết 5 dòng nhận xét: [grain](/glossary#grain), khoảng thời gian, cột nào thiếu nhiều nhất, cột nào đọc sai kiểu.
 2. Trên Superstore, tìm 8 dòng trùng theo `(Order ID, Product ID)` và in ra xem chúng khác nhau ở cột nào.
 3. `df.describe()` trên Superstore — cột nào có `min` hoặc `max` trông bất thường? Kiểm tra xem đó là lỗi hay dữ liệu thật.
 
@@ -102,6 +112,11 @@ dup[key + ["Sales","Quantity","Discount","Profit"]]
 Nếu hai dòng giống hệt **mọi cột** → nghiêng về lỗi nhập liệu lặp. Nếu khác `Quantity` hoặc `Discount` → nhiều khả năng là hai dòng hợp lệ của cùng sản phẩm trong một đơn.
 
 </details>
+
+
+:::note Chốt lại
+Bảy lệnh khám phá, ba phút, đủ biết dataset có dùng được không. Cột ID nhân tạo **che giấu dòng trùng** — luôn kiểm trùng theo khóa nghiệp vụ. Và tìm ra dòng trùng chỉ là nửa việc; nửa còn lại là **đi hỏi vì sao**, không tự ý xóa.
+:::
 
 ## 4.2 — Bảng chuyển đổi SQL ↔ Pandas (học thuộc bảng này) {#sql-pandas}
 
@@ -129,7 +144,7 @@ khach = pd.DataFrame({"id": [1,2,3], "ten": ["An","Binh","Chi"], "diem": [100,50
 | Giữ cả khách chưa mua | `LEFT JOIN` từ `khach` | `khach.merge(don, left_on="id", right_on="khach_id", how="left")` | **4 dòng** |
 | Số khách duy nhất | `COUNT(DISTINCT khach_id)` | `don.khach_id.nunique()` | 2 |
 
-Chú ý dòng thứ 4: `how="left"` giữ Chi lại với phần bên phải là `NaN` — **y hệt `LEFT JOIN` sinh NULL** trong [Lesson 2](/ly-thuyet/l2-sql#join). Và **fan-out xảy ra y hệt**:
+Chú ý dòng thứ 4: `how="left"` giữ Chi lại với phần bên phải là `NaN` — **y hệt `LEFT JOIN` sinh NULL** trong [Lesson 2](/ly-thuyet/l2-sql#join). Và **[fan-out](/glossary#fan-out) xảy ra y hệt**:
 
 ```python
 khach.merge(don, left_on="id", right_on="khach_id")["diem"].sum()   # 250 - SAI, diem cua An bi cong 2 lan
@@ -197,6 +212,11 @@ Chỉ 3 nhóm lỗ trong 17 sub-category. Tables lỗ gấp 5 lần Bookcases �
 </details>
 
 ---
+
+
+:::note Chốt lại
+Học pandas bằng cách **dịch từ SQL đã biết**, đừng học như ngôn ngữ mới. Mọi bẫy bên SQL đều có bản sao bên pandas — `merge` gây fan-out y hệt `JOIN`, nên thói quen đếm số dòng trước/sau vẫn nguyên giá trị.
+:::
 
 ## 4.3 — loc / iloc: nguồn nhầm lẫn kinh điển {#loc-iloc}
 
@@ -292,6 +312,11 @@ Trên Superstore:
 
 </details>
 
+
+:::note Chốt lại
+`.loc` theo **nhãn**, `.iloc` theo **vị trí** — chúng chỉ giống nhau khi index chưa bị lọc. Sau khi lọc, index không được đánh lại, nên dùng vị trí thì phải `reset_index(drop=True)`. Và luôn `.copy()` khi định sửa một lát cắt.
+:::
+
 ## 4.4 — Làm sạch dữ liệu (phần chiếm nhiều thời gian nhất khi đi làm) {#lam-sach}
 
 **Định nghĩa.** Làm sạch = đưa dữ liệu về trạng thái tin được, **và ghi lại mọi thay đổi**. Vế sau quan trọng ngang vế trước.
@@ -386,6 +411,11 @@ Nhóm cuối phải tự nghĩ ra, không có hàm sẵn. Với mỗi dataset, v
 
 </details>
 
+
+:::note Chốt lại
+Câu hỏi đúng với ô thiếu không phải "điền gì" mà là **"vì sao thiếu"** — thiếu có hệ thống thì điền `mean` là bịa dữ liệu. Mọi bước xóa/sửa phải có log "trước → sau"; notebook không có log thì người đọc buộc phải tin, mà không ai tin số của người lạ.
+:::
+
 ## 4.5 — Visualization: vẽ để hiểu, rồi vẽ để kể {#visualization}
 
 **Hai loại chart khác nhau hoàn toàn**, đừng lẫn lộn:
@@ -399,7 +429,7 @@ Nhóm cuối phải tự nghĩ ra, không có hàm sẵn. Với mỗi dataset, v
 
 Người mới hay bỏ qua giai đoạn 1 và đánh bóng ngay 3 chart đầu tiên nghĩ ra — nên bỏ lỡ phát hiện thật.
 
-### Bộ 5 chart cho mọi EDA
+### Bộ 5 chart cho mọi [EDA](/glossary#eda)
 
 ```python
 df["Sales"].plot.hist(bins=60)                                   # 1. phan phoi
@@ -436,7 +466,7 @@ ax.set_title("Phan phoi Sales lech phai manh: median 54$, mean 230$")
 ❌ `"Doanh thu theo Category"` — nhãn, người đọc tự tìm ý nghĩa
 ✅ `"Furniture chiếm 32% doanh thu nhưng chỉ 6% lợi nhuận"` — thông điệp
 
-Ba chi tiết nhỏ trong đoạn code trên tạo khác biệt lớn: **cắt trục** để thấy phần chính (không bị outlier kéo giãn), **vạch median** làm mốc đọc, **tiêu đề có số**.
+Ba chi tiết nhỏ trong đoạn code trên tạo khác biệt lớn: **cắt trục** để thấy phần chính (không bị [outlier](/glossary#outlier) kéo giãn), **vạch [median](/glossary#median)** làm mốc đọc, **tiêu đề có số**.
 
 ### Bài tập 4.5
 
@@ -445,6 +475,11 @@ Ba chi tiết nhỏ trong đoạn code trên tạo khác biệt lớn: **cắt t
 3. Lấy 5 chart trong notebook của mình, viết lại toàn bộ tiêu đề theo kiểu "tiêu đề là kết luận".
 
 ---
+
+
+:::note Chốt lại
+Vẽ 20 chart để **tìm**, giữ 3–5 chart để **kể**. Heatmap tương quan chỉ dùng để chọn cặp biến đáng xem, không dùng để kết luận. Tiêu đề chart phải là câu kết luận có số.
+:::
 
 ## 4.6 — Quy trình EDA chuẩn (dùng cho Portfolio #2) {#quy-trinh-eda}
 
@@ -469,11 +504,11 @@ Viết câu hỏi trước, rồi mới kiểm tra dữ liệu có trả lời �
 
 | Câu hỏi | Giả thuyết | Cách kiểm chứng |
 |---|---|---|
-| Giao chậm ảnh hưởng điểm đánh giá thế nào? | Đơn trễ hơn dự kiến có điểm TB thấp hơn ≥ 1 sao | So `review_score` TB theo nhóm (đúng hạn / trễ), kèm phân phối và cỡ mẫu từng nhóm |
+| Giao chậm ảnh hưởng điểm đánh giá thế nào? | Đơn trễ hơn dự kiến có điểm TB thấp hơn ≥ 1 sao | So `review_score` TB theo nhóm (đúng hạn / trễ), kèm phân phối và [cỡ mẫu](/glossary#sample-size) từng nhóm |
 | Bang nào doanh thu lớn nhưng dịch vụ kém nhất? | SP dẫn đầu doanh thu nhưng giao lâu do khoảng cách | Bảng: doanh thu × thời gian giao TB × điểm đánh giá theo bang |
 | Danh mục nào hay bị 1 sao? | Hàng cồng kềnh, do vỡ và giao chậm | Tỷ lệ đơn 1 sao theo `product_category`, chỉ lấy nhóm ≥ 100 đơn để tránh nhiễu mẫu nhỏ |
 
-Chú ý cột 3: mỗi cách kiểm chứng đều nêu rõ **cỡ mẫu tối thiểu**. Không có điều đó thì sẽ gặp đúng lỗi "cohort 1 người ra retention 100%" ở [L2 §2.8](/ly-thuyet/l2-sql#funnel-cohort-rfm).
+Chú ý cột 3: mỗi cách kiểm chứng đều nêu rõ **cỡ mẫu tối thiểu**. Không có điều đó thì sẽ gặp đúng lỗi "[cohort](/glossary#cohort) 1 người ra [retention](/glossary#retention) 100%" ở [L2 §2.8](/ly-thuyet/l2-sql#funnel-cohort-rfm).
 
 ### Tiêu chuẩn kỹ thuật bắt buộc
 
@@ -486,6 +521,11 @@ Notebook chạy được lần đầu nhưng không chạy lại được là no
 1. Viết mục 1 (Câu hỏi & giả thuyết) cho Portfolio #2 **trước khi** viết dòng code nào. Tối thiểu 3 câu hỏi, mỗi câu kèm giả thuyết và cách kiểm chứng có nêu cỡ mẫu.
 2. Với mỗi câu hỏi, kiểm tra dữ liệu Olist có trả lời được không. Câu nào không → viết vào mục Hạn chế ngay.
 3. Chạy `Restart & Run All` trên notebook hiện tại. Lỗi ở đâu, sửa.
+
+
+:::note Chốt lại
+Viết câu hỏi **trước khi** mở dữ liệu — mở trước thì sẽ chỉ hỏi những câu dữ liệu sẵn sàng trả lời. Câu nào dữ liệu không trả lời được thì đưa xuống mục Hạn chế, và chính danh sách đó đã là một phát hiện. Notebook phải chạy sạch bằng Restart & Run All.
+:::
 
 ## Checklist trước khi sang Stage 5
 

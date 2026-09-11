@@ -9,6 +9,11 @@ format: md
 
 # LESSON 2 — SQL từ số 0 đến phỏng vấn được (W3–W9)
 
+:::tip Cách đọc trang này
+Từ khóa **in đậm có gạch chân** là thuật ngữ — bấm vào để nhảy sang [Từ điển](/glossary) xem định nghĩa kèm ví dụ.
+Cuối mỗi mục có khối **Chốt lại** tóm tắt điều quan trọng nhất. Đọc lướt các khối đó là nắm được xương sống của bài.
+:::
+
 Bổ trợ cho [Stage 2 — SQL](../stages/stage-2-sql.md). Mỗi khái niệm: **định nghĩa** → **ví dụ đã chạy thật** (Chinook, kết quả in kèm) → **bài tập** → **đáp án**.
 
 Chinook dùng ở đây: 11 bảng · 412 hóa đơn · 59 khách · 24 quốc gia · 3.503 track (977 track `Composer` NULL) · 8 nhân viên · hóa đơn từ 2021-01-01 đến 2025-12-22.
@@ -66,7 +71,7 @@ Ba điều cần thấy ngay, chỉ bằng mắt:
 - Cột `diem` thuộc về **khách**, không thuộc về đơn
 - 3 khách, 3 đơn — trùng hợp về số lượng, đừng để nó đánh lừa
 
-Mọi khái niệm khó trong bài (JOIN, fan-out, window) sẽ thử trên 2 bảng này trước, rồi mới áp lên Chinook.
+Mọi khái niệm khó trong bài (JOIN, [fan-out](/glossary#fan-out), window) sẽ thử trên 2 bảng này trước, rồi mới áp lên Chinook.
 
 ---
 
@@ -115,7 +120,7 @@ Cùng logic đó giải thích thêm hai lỗi kinh điển:
 | Viết sai | Vì sao lỗi | Sửa |
 |---|---|---|
 | `WHERE COUNT(*) > 5` | Aggregate tính ở bước 3, `WHERE` ở bước 2 — chưa có gì để đếm | Dùng `HAVING COUNT(*) > 5` |
-| `WHERE ROW_NUMBER() OVER (...) = 1` | Window ở bước 6, sau `WHERE` | Bọc CTE rồi lọc ở tầng ngoài, hoặc `QUALIFY` |
+| `WHERE ROW_NUMBER() OVER (...) = 1` | Window ở bước 6, sau `WHERE` | Bọc [CTE](/glossary#cte) rồi lọc ở tầng ngoài, hoặc `QUALIFY` |
 
 **Mẹo tự chữa lỗi:** gặp báo lỗi "column not found" hoặc "aggregate not allowed here", hỏi ngay *"mệnh đề này chạy ở bước mấy, thứ mình đang gọi ra đời ở bước mấy?"*. Bước gọi phải **sau** bước sinh ra.
 
@@ -143,6 +148,11 @@ e) **Lỗi** — `tien` không nằm trong `GROUP BY` và cũng không được 
 f) **Lỗi** — sau `DISTINCT` (bước 7) chỉ còn cột `khach_id`, không còn `tien` để sắp xếp.
 
 </details>
+
+
+:::note Chốt lại
+Thứ tự viết khác thứ tự chạy. Nhớ bảng 9 bước thì tự chữa được phần lớn lỗi: gặp "column not found" hay "aggregate not allowed", hỏi ngay *mệnh đề này chạy bước mấy, thứ mình gọi ra đời bước mấy*.
+:::
 
 ## 2.2 — SELECT, WHERE và bẫy NULL {#bay-null}
 
@@ -249,6 +259,11 @@ Trên Chinook:
 
 </details>
 
+
+:::note Chốt lại
+Mọi phép so sánh với NULL đều ra **UNKNOWN**, và `WHERE` chỉ giữ TRUE — nên `!= 'x'` âm thầm nuốt mất dòng NULL. Chỉ `IS NULL` mới đúng. Ba biến thể `COUNT` trả lời ba câu hỏi khác nhau, chọn nhầm là trả lời nhầm câu của sếp.
+:::
+
 ## 2.3 — GROUP BY, HAVING và các hàm tổng hợp {#group-by-having}
 
 **Định nghĩa.** `GROUP BY` gom các dòng có cùng giá trị thành **một nhóm**, rồi hàm aggregate tính ra **một số cho mỗi nhóm**. Số dòng kết quả = số nhóm, không phải số dòng gốc.
@@ -266,7 +281,7 @@ khach_id=1   so_don=2   tong_tien=140     (HD-01 + HD-02 gop lai)
 khach_id=2   so_don=1   tong_tien=30
 ```
 
-Ba dòng vào, hai dòng ra. **Chi tiết từng đơn biến mất** — muốn giữ chi tiết thì phải dùng window function (§2.6).
+Ba dòng vào, hai dòng ra. **Chi tiết từng đơn biến mất** — muốn giữ chi tiết thì phải dùng [window function](/glossary#window-function) (§2.6).
 
 ### WHERE lọc dòng, HAVING lọc nhóm
 
@@ -323,7 +338,7 @@ DuckDB/PostgreSQL có cách viết gọn hơn, cùng ý nghĩa:
 SELECT COUNT(*) FILTER (WHERE tien > 40) AS don_lon FROM don;
 ```
 
-Kỹ thuật này là nền của **pivot bằng CASE WHEN** (§2.7) và của **funnel** (§2.8). Học kỹ.
+Kỹ thuật này là nền của **pivot bằng CASE WHEN** (§2.7) và của **[funnel](/glossary#funnel)** (§2.8). Học kỹ.
 
 ### Bài tập 2.3
 
@@ -368,6 +383,11 @@ Trên Chinook:
    ```
 
 </details>
+
+
+:::note Chốt lại
+`WHERE` lọc dòng trước khi gom, `HAVING` lọc nhóm sau khi gom — dùng được `WHERE` thì luôn ưu tiên vì lọc sớm chạy nhanh hơn. Aggregate bỏ qua NULL nên mẫu số có thể nhỏ hơn bạn tưởng. Mẫu `SUM(CASE WHEN ...)` là nền của cả pivot lẫn funnel.
+:::
 
 ## 2.4 — JOIN: mô hình tư duy + 2 cái bẫy chết người {#join}
 
@@ -449,7 +469,7 @@ AND i.BillingCountry = 'Brazil';                                                
 
 **Quy tắc nhớ:** điều kiện lọc **bảng phải** → đặt vào `ON`. Điều kiện lọc **bảng trái** → đặt vào `WHERE`.
 
-Ngoại lệ hữu ích: `WHERE b.id IS NULL` chính là **anti-join** — tìm cái *không* có. Trên bàn tập, đó là cách tìm ra Chi.
+Ngoại lệ hữu ích: `WHERE b.id IS NULL` chính là **[anti-join](/glossary#anti-join)** — tìm cái *không* có. Trên bàn tập, đó là cách tìm ra Chi.
 
 ### Bẫy 2 — Fan-out {#fan-out}
 
@@ -525,7 +545,7 @@ Trên **bàn tập 2 bảng**, không chạy query, tự đoán rồi kiểm:
 Trên Chinook:
 
 5. Tên khách + tổng tiền từng hóa đơn.
-6. Doanh thu theo nghệ sĩ (5 bảng) — cẩn thận cộng đúng grain.
+6. Doanh thu theo nghệ sĩ (5 bảng) — cẩn thận cộng đúng [grain](/glossary#grain).
 7. Playlist và số track, giữ cả playlist rỗng.
 
 <details>
@@ -559,6 +579,11 @@ Trên Chinook:
    Dùng `COUNT(pt.TrackId)` chứ **không** `COUNT(*)` — `COUNT(*)` đếm cả dòng NULL nên playlist rỗng sẽ ra 1 thay vì 0.
 
 </details>
+
+
+:::note Chốt lại
+JOIN sinh một dòng cho **mỗi cặp khớp** — đó là nguồn gốc của cả hai cái bẫy. Điều kiện lọc bảng phải đặt vào `ON`, lọc bảng trái đặt vào `WHERE`. Và **đếm số dòng trước/sau mỗi JOIN** là thói quen bắt buộc, vì fan-out không báo lỗi, chỉ thổi phồng số.
+:::
 
 ## 2.5 — Subquery, CTE và bẫy NOT IN {#subquery-cte}
 
@@ -696,6 +721,11 @@ Trên Chinook:
    Bản `NOT IN`: nếu danh sách con sinh ra NULL (do join hụt), kết quả trả rỗng. Chạy cả hai và giải thích chênh lệch chính là bài tập ở đây.
 
 </details>
+
+
+:::note Chốt lại
+Lồng quá 2 tầng thì chuyển sang CTE — query dài mà đọc được tốt hơn query ngắn mà rối. Và luôn dùng `NOT EXISTS` thay `NOT IN` khi subquery có thể chứa NULL, vì `NOT IN` trả về **rỗng hoàn toàn**, rất dễ bị đọc nhầm thành "không có ai thỏa điều kiện".
+:::
 
 ## 2.6 — Window functions (kỹ năng phân biệt fresher và junior) {#window}
 
@@ -848,6 +878,11 @@ FROM Invoice;
 
 ---
 
+
+:::note Chốt lại
+Window **giữ nguyên số dòng**, `GROUP BY` gộp dòng lại — đó là toàn bộ khác biệt. Dùng window khi cần cả chi tiết lẫn tổng hợp trên cùng một dòng. Không lọc được window trong `WHERE`; phải bọc CTE hoặc dùng `QUALIFY`.
+:::
+
 ## 2.7 — Ngày tháng, CASE WHEN, chia số và NULL {#date-case-null}
 
 ### Bàn tập có ngày
@@ -861,7 +896,7 @@ INSERT INTO don VALUES ('HD-01', DATE '2024-01-15', 90),
 
 Ba đơn: hai đơn tháng 1, **không có đơn nào tháng 2**, một đơn tháng 3.
 
-### DATE_TRUNC — gom về đầu kỳ
+### [DATE_TRUNC](/glossary#date-trunc) — gom về đầu kỳ
 
 ```sql
 SELECT DATE_TRUNC('month', ngay) AS thang, SUM(tien) FROM don GROUP BY 1 ORDER BY 1;
@@ -921,7 +956,7 @@ SELECT 3/4;
 | SQLite · PostgreSQL · SQL Server | **0** |
 | DuckDB · BigQuery · MySQL | 0.75 |
 
-Nghĩa là code tính conversion rate chạy đúng ở sân tập DuckDB có thể ra **0 hết** khi đưa lên Postgres. Và không có lỗi nào báo.
+Nghĩa là code tính [conversion rate](/glossary#conversion-rate) chạy đúng ở sân tập DuckDB có thể ra **0 hết** khi đưa lên Postgres. Và không có lỗi nào báo.
 
 Viết an toàn ở mọi nơi — nhân `1.0` để ép sang số thực:
 
@@ -961,7 +996,7 @@ FROM don GROUP BY 1 ORDER BY 1;
 
 Từ dạng dọc (mỗi nhóm 1 dòng) thành dạng ngang (mỗi nhóm 1 cột). Đây là cách làm báo cáo "region × tháng" mà sếp hay yêu cầu.
 
-### COALESCE và NULLIF
+### [COALESCE](/glossary#coalesce) và [NULLIF](/glossary#nullif)
 
 | Hàm | Làm gì | Dùng khi |
 |---|---|---|
@@ -1011,6 +1046,11 @@ Trên Chinook — **deliverable W8: bộ 12 query báo cáo tháng**. Ba câu kh
    10,1% — thấp bất thường. Dữ liệu thương mại thật thường 30–50%. Nêu được nhận xét đó mới là phân tích, chỉ chạy ra số thì chưa.
 
 </details>
+
+
+:::note Chốt lại
+Kỳ không có dữ liệu sẽ **biến mất** khỏi báo cáo nếu không dùng calendar table — và biểu đồ vẫn trông bình thường. Luôn viết tỷ lệ theo mẫu `tu_so * 1.0 / NULLIF(mau_so, 0)` để an toàn với cả chia số nguyên lẫn chia cho 0.
+:::
 
 ## 2.8 — Ba mẫu phân tích thực chiến {#funnel-cohort-rfm}
 
@@ -1076,7 +1116,7 @@ Dùng `MAX(CASE WHEN ...)` chứ không `SUM` — vì user 1 mua **2 lần**, `S
 
 Funnel chặt chẽ phải kiểm `timestamp` bước sau > bước trước. Nêu được hạn chế này trước khi bị hỏi là điểm cộng lớn khi phỏng vấn.
 
-### Cohort retention — tách "sản phẩm tốt lên" khỏi "mua thêm user mới"
+### [Cohort](/glossary#cohort) [retention](/glossary#retention) — tách "sản phẩm tốt lên" khỏi "mua thêm user mới"
 
 ```sql
 WITH fm AS (   -- buoc 1: moi user thuoc cohort nao (thang mua dau tien)
@@ -1148,9 +1188,14 @@ Trên BigQuery `thelook_ecommerce`:
 
 1. **Còn.** User 4 xem ngày 2/2, mua ngày 3/2 — bước sau đúng là sau bước trước. Nhưng nếu định nghĩa funnel là "trong cùng một phiên/cùng ngày" thì user 4 **rơi ra**, phễu còn `mua = 1` và conversion tụt từ 67% xuống 33%. Cùng dữ liệu, hai định nghĩa, hai kết luận — đó là lý do phải chốt định nghĩa trước khi báo cáo.
 2. Cột `mua`: `SUM` ra **3** thay vì 2, vì user 1 mua 2 lần. Kéo theo `cr_gio_mua` thành 100% thay vì 67% — báo cáo đẹp hơn thực tế.
-3. **100%** (1/1 user quay lại). Nhưng cỡ mẫu là **1 người** — con số này vô nghĩa. Bài học: cohort luôn phải kèm số user tuyệt đối; nhóm dưới ~30 người thì tỷ lệ % chỉ là nhiễu. Đây là lỗi hay gặp khi chia cohort quá nhỏ.
+3. **100%** (1/1 user quay lại). Nhưng [cỡ mẫu](/glossary#sample-size) là **1 người** — con số này vô nghĩa. Bài học: cohort luôn phải kèm số user tuyệt đối; nhóm dưới ~30 người thì tỷ lệ % chỉ là nhiễu. Đây là lỗi hay gặp khi chia cohort quá nhỏ.
 
 </details>
+
+
+:::note Chốt lại
+Ba dạng này học **cấu trúc**, không học cú pháp. Với funnel, ba quyết định (cửa sổ thời gian · ép thứ tự · đơn vị đếm) quyết định con số ra bao nhiêu — nêu rõ trước khi báo cáo. Với cohort, luôn kèm số tuyệt đối vì tỷ lệ trên nhóm nhỏ là nhiễu. Với RFM, phân khúc không dẫn tới hành động khác nhau thì vô nghĩa.
+:::
 
 ## 2.9 — Kỹ năng debug query {#debug-query}
 
@@ -1241,6 +1286,11 @@ Trong thực tế, nguyên nhân nằm ở nhóm 4 thứ này nhiều hơn là �
 3. Query **không sai** nhưng báo cáo **sai**. Không có dữ liệu thì `GROUP BY` không sinh dòng. Sửa bằng calendar table + `LEFT JOIN` + `COALESCE(..., 0)` để tháng 7 hiện lên với giá trị 0 — vì "bán được 0 đồng" là thông tin quan trọng, còn "không có dòng" thì người đọc tưởng là quên lấy dữ liệu.
 
 </details>
+
+
+:::note Chốt lại
+Số lạ thì đếm dòng từng bước, kiểm grain sau JOIN, soi NULL, đối chiếu tổng, rồi thu nhỏ về 1 khách để tính tay. Và nhớ: khi số không khớp với bộ phận khác, nguyên nhân thường nằm ở **định nghĩa, kỳ, múi giờ, bộ lọc mặc định** nhiều hơn là ở query.
+:::
 
 ## Checklist tự chấm trước khi sang Stage 3
 

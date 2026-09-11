@@ -9,6 +9,11 @@ format: md
 
 # LESSON 1 — Nền tảng dữ liệu (W1–W2)
 
+:::tip Cách đọc trang này
+Từ khóa **in đậm có gạch chân** là thuật ngữ — bấm vào để nhảy sang [Từ điển](/glossary) xem định nghĩa kèm ví dụ.
+Cuối mỗi mục có khối **Chốt lại** tóm tắt điều quan trọng nhất. Đọc lướt các khối đó là nắm được xương sống của bài.
+:::
+
 Bổ trợ cho [Stage 1 — Nền tảng](../stages/stage-1-foundation.md). Stage file nói **làm gì**; file này nói **là gì, ví dụ ra sao, tự kiểm tra thế nào**.
 
 Mỗi mục có 4 phần: **Định nghĩa** → **Ví dụ thật** (số lấy từ `data/superstore.csv`, đã chạy kiểm chứng) → **Bài tập** → **Đáp án** (bấm mở sau khi tự làm).
@@ -25,7 +30,7 @@ Số nền của dataset — kiểm chứng bằng lệnh ở cuối file: 9.994
 
 ---
 
-## 1.1 — Grain (độ mịn): khái niệm quan trọng nhất {#grain}
+## 1.1 — [Grain](/glossary#grain) (độ mịn): khái niệm quan trọng nhất {#grain}
 
 **Định nghĩa.** Grain là câu trả lời cho câu hỏi *"một dòng trong bảng này đại diện cho cái gì?"*. Viết ra bằng **một câu đầy đủ** trước khi tính bất cứ thứ gì.
 
@@ -170,7 +175,7 @@ Dùng **bàn tập 3 dòng** ở trên, trả lời bằng lời, không chạy 
 Rồi chuyển sang dữ liệu thật:
 
 4. Viết grain của bảng `Invoice` và `InvoiceLine` (Chinook).
-5. Tính AOV của Superstore — mẫu số là 9.994 hay 5.009?
+5. Tính [AOV](/glossary#aov) của Superstore — mẫu số là 9.994 hay 5.009?
 6. "Trung bình mỗi khách mua bao nhiêu đơn?" — tử số, mẫu số lấy ở grain nào?
 
 <details>
@@ -184,6 +189,11 @@ Rồi chuyển sang dữ liệu thật:
 6. Tử số = `COUNT(DISTINCT "Order ID")` = 5.009. Mẫu số = `COUNT(DISTINCT "Customer ID")` = 793 → 6,3 đơn/khách trong 4 năm.
 
 </details>
+
+
+:::note Chốt lại
+Grain là câu hỏi đầu tiên với mọi bảng, không phải câu hỏi phụ. Trả lời sai thì mọi con số sau đó sai và **không có lỗi nào báo ra**. Viết grain thành một câu đầy đủ, nêu đủ ngữ cảnh, trước khi tính bất cứ thứ gì.
+:::
 
 ## 1.2 — Kiểu dữ liệu và NULL {#kieu-du-lieu-null}
 
@@ -271,7 +281,12 @@ Google Sheets hành xử giống hệt: `AVERAGE` của 3 ô `10 / trống / 20`
 
 </details>
 
-## 1.3 — Mean vs Median: câu phỏng vấn xuất hiện nhiều nhất {#mean-median}
+
+:::note Chốt lại
+Công cụ **đoán** kiểu dữ liệu, và đoán sai thường xuyên — cùng một file, DuckDB và pandas cho hai kết quả khác nhau. Luôn soát lại `dtypes` trước khi phân tích. Và nhớ: không phải cứ kiểu số là cộng được — số định danh và tỷ lệ thì không.
+:::
+
+## 1.3 — Mean vs [Median](/glossary#median): câu phỏng vấn xuất hiện nhiều nhất {#mean-median}
 
 **Định nghĩa.** Mean = tổng ÷ số lượng. Median = giá trị đứng giữa khi đã sắp xếp. Mean bị giá trị cực đoan kéo, median thì không.
 
@@ -334,7 +349,7 @@ Mean không phải lúc nào cũng xấu:
 |---|---|---|
 | Cần cộng dồn / lập ngân sách | **mean** | `mean × số đơn = tổng doanh thu`. Median không có tính chất này |
 | Mô tả "khách điển hình" | **median** | không bị vài đơn lớn kéo |
-| Dữ liệu đối xứng, ít outlier | mean | đơn giản, quen thuộc |
+| Dữ liệu đối xứng, ít [outlier](/glossary#outlier) | mean | đơn giản, quen thuộc |
 | So sánh giữa các nhóm lệch | **median** hoặc cả hai | tránh kết luận ngược |
 
 ### Bài tập 1.3
@@ -358,6 +373,11 @@ Trên Superstore:
 4. **458,6$** — nhưng đó là AOV (doanh thu ÷ số đơn duy nhất), không phải mean của cột `Sales`. Câu trả lời đầy đủ: *"Giá trị trung bình một đơn hàng là 458$. Tuy nhiên phân phối rất lệch: nửa số dòng bán hàng dưới 55$, trong khi đơn lớn nhất tới 22.638$. Nên xem thêm median và nhóm đơn lớn riêng."* Chú ý câu này dùng đúng grain — nếu trả lời 229,9$ là đã nhầm sang grain dòng.
 
 </details>
+
+
+:::note Chốt lại
+So mean với median là cách kiểm độ lệch rẻ nhất. Chênh nhiều = phân phối lệch = **mean không đại diện cho cái điển hình**. Với dữ liệu doanh thu, mặc định báo median kèm P90; dùng mean khi cần cộng dồn.
+:::
 
 ## 1.4 — Outlier và quy tắc IQR {#iqr-outlier}
 
@@ -449,6 +469,11 @@ Trên Superstore:
 
 </details>
 
+
+:::note Chốt lại
+Quy tắc 1,5×IQR là **quy ước**, không phải chân lý — nó gắn cờ 11,7% dữ liệu Superstore. Khi quá nhiều điểm bị gắn cờ thì vấn đề nằm ở quy tắc, không ở dữ liệu. Chỉ loại outlier khi **chứng minh được là lỗi**; còn lại thì tách nhóm phân tích riêng.
+:::
+
 ## 1.5 — Tương quan và bẫy nhân quả {#tuong-quan}
 
 **Định nghĩa.** Hệ số tương quan r ∈ [−1, 1] đo mức độ hai biến **số** đi cùng nhau theo quan hệ **tuyến tính**. Chữ "tuyến tính" là chỗ hầu hết người mới bỏ qua, và nó gây ra sai lầm lớn nhất.
@@ -513,7 +538,7 @@ Hang kho ban  ──►  bien loi nhuan von da thap  ──►  LO
       └──────────►  hay bi chiet khau sau     ──►  CHIET KHAU CAO
 ```
 
-Chiết khấu và lỗ có thể **cùng là hậu quả** của "hàng khó bán", chứ không phải cái này gây ra cái kia. Biến gây nhiễu đó gọi là **confounder**.
+Chiết khấu và lỗ có thể **cùng là hậu quả** của "hàng khó bán", chứ không phải cái này gây ra cái kia. Biến gây nhiễu đó gọi là **[confounder](/glossary#confounder)**.
 
 ### Ba câu hỏi trước khi nói "A gây ra B"
 
@@ -540,9 +565,14 @@ Chiết khấu và lỗ có thể **cùng là hậu quả** của "hàng khó b�
 1. Sai vì **ngoại suy ra ngoài khoảng dữ liệu**. Trong khoảng 1–4 giờ thì kết luận đúng, nhưng áp cho giờ thứ 8 thì ngược hoàn toàn. Đây là lỗi rất hay gặp: lấy một đoạn của quan hệ phi tuyến rồi khái quát thành quy luật chung.
 2. `corr(Sales, Profit)` dương nhưng không sát 1 — vì có đơn doanh thu cao mà vẫn lỗ (chiết khấu sâu). `corr(Quantity, Profit)` rất yếu — bán nhiều không đồng nghĩa lãi nhiều; đơn giá và chiết khấu mới quyết định.
 3. `Ship Date` và `Order Date` tương quan gần như hoàn hảo — nhưng là quan hệ **định nghĩa** (ship luôn sau order), không phải nhân quả kinh doanh. Hoặc: doanh thu theo tháng và số đơn theo tháng — cả hai cùng bị chi phối bởi mùa vụ.
-4. Xem đoạn "Cách viết kết luận đúng" ở trên. Điểm mấu chốt: mô tả **cái quan sát được** (số liệu theo nhóm, cỡ mẫu, mức nhất quán), nêu **biến gây nhiễu khả dĩ**, rồi đề xuất **cách kiểm chứng** — thay vì tuyên bố nhân quả.
+4. Xem đoạn "Cách viết kết luận đúng" ở trên. Điểm mấu chốt: mô tả **cái quan sát được** (số liệu theo nhóm, [cỡ mẫu](/glossary#sample-size), mức nhất quán), nêu **biến gây nhiễu khả dĩ**, rồi đề xuất **cách kiểm chứng** — thay vì tuyên bố nhân quả.
 
 </details>
+
+
+:::note Chốt lại
+Hệ số r chỉ bắt quan hệ **tuyến tính** — r = 0,284 vẫn có thể che một quan hệ gần như hoàn hảo. Luôn vẽ chart và cắt nhóm trước khi tin hệ số. Và kể cả khi quan hệ đã rõ, vẫn phải nêu biến gây nhiễu trước khi nói tới nhân quả.
+:::
 
 ## 1.6 — Chọn đúng loại chart {#chon-chart}
 
@@ -619,6 +649,11 @@ f) **Card lớn + delta %** kèm mũi tên. Không cần chart. Chú ý: nếu t
 g) (b) *"West dẫn đầu lợi nhuận với 108K$, gấp 2,4 lần South"* — (d) *"Từ mức chiết khấu 30%, lợi nhuận trung bình chuyển sang âm"*.
 
 </details>
+
+
+:::note Chốt lại
+Chart chọn theo **loại câu hỏi**, không theo thẩm mỹ. Dùng sai loại là bắt người đọc tự dịch, và họ sẽ dịch sai. Tiêu đề chart phải là câu kết luận có số — đọc tiêu đề là hiểu, không cần nhìn chart.
+:::
 
 ## 1.7 — Pivot table và tăng trưởng MoM {#pivot-mom}
 
@@ -701,6 +736,11 @@ Vì sao cách 2 sai: nó gán trọng số **bằng nhau** cho đơn 5$ và đơ
 
 </details>
 
+
+:::note Chốt lại
+Phần trăm tăng trưởng trên nền nhỏ luôn phải kèm **số tuyệt đối** — +200% có thể vẫn đang thấp hơn cùng kỳ 70%. Và tỷ số trong pivot phải tính bằng `SUM(tử)/SUM(mẫu)`, không bao giờ lấy trung bình của các tỷ số.
+:::
+
 ## 1.8 — Đọc một dataset lạ trong 15 phút {#doc-dataset-la}
 
 Quy trình áp dụng cho **mọi** dataset. Làm đúng thứ tự, đừng nhảy cóc.
@@ -760,6 +800,11 @@ Chinook là cửa hàng nhạc số. Những thứ không có: chi phí bản qu
 Một câu hỏi đắt giá mà Chinook **không** trả lời được: *"Bán 1 track thì thực sự lãi bao nhiêu?"* — vì `UnitPrice` là giá bán, không có giá vốn. Đây cũng là giới hạn của Superstore, nhưng ở Superstore người ta hay quên vì đã có sẵn cột `Profit` trông như thật.
 
 </details>
+
+
+:::note Chốt lại
+Tám bước đầu là kỹ thuật, ai cũng làm được. **Bước 9 — dữ liệu này không trả lời được gì — mới là phần được trả lương.** Nêu được giới hạn trước khi bị hỏi là dấu hiệu của người hiểu dữ liệu của mình.
+:::
 
 ## Lệnh tự kiểm chứng mọi con số trong file này
 
