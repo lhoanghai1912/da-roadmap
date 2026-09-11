@@ -9,6 +9,11 @@ format: md
 
 # LESSON 5 — Thống kê suy diễn & A/B Test (W17–W19)
 
+:::tip Cách đọc trang này
+Từ khóa **in đậm có gạch chân** là thuật ngữ — bấm vào để nhảy sang [Từ điển](/glossary) xem định nghĩa kèm ví dụ.
+Cuối mỗi mục có khối **Chốt lại** tóm tắt điều quan trọng nhất. Đọc lướt các khối đó là nắm được xương sống của bài.
+:::
+
 Bổ trợ cho [Stage 5 — Thống kê & A/B](../stages/stage-5-statistics-abtest.md). Mục tiêu thật của 3 tuần này: **biết khi nào KHÔNG được kết luận**. Đó mới là thứ phân biệt analyst với người chạy công thức.
 
 Mọi con số ví dụ dưới đây đã được tính thật bằng `scipy.stats` — công thức kèm theo để tự chạy lại.
@@ -33,7 +38,7 @@ Vế cuối là điểm khác với thống kê mô tả ở L1. Mô tả nói v
 
 Đây là lý do A/B test cần rất nhiều người, và là lý do "chạy thêm 2 ngày cho chắc" thường vô ích — muốn giảm một nửa sai số phải chạy **gấp 4 thời gian**.
 
-### Sampling bias quan trọng hơn cỡ mẫu
+### Sampling bias quan trọng hơn [cỡ mẫu](/glossary#sample-size)
 
 Mẫu lệch thì n lớn chỉ làm ta **tự tin hơn vào con số sai**.
 
@@ -58,13 +63,18 @@ c) **Non-response bias.** Người quá bực thường bỏ đi im lặng, khô
 
 ---
 
-## 5.2 — CLT: vì sao dùng được phân phối chuẩn cho dữ liệu lệch {#clt}
+
+:::note Chốt lại
+Sai số giảm theo `1/√n` — muốn chính xác gấp đôi phải tăng mẫu **gấp 4**. Nhưng mẫu lệch thì n lớn chỉ làm ta tự tin hơn vào con số sai, nên **kiểm cách lấy mẫu trước khi quan tâm cỡ mẫu**.
+:::
+
+## 5.2 — [CLT](/glossary#clt): vì sao dùng được phân phối chuẩn cho dữ liệu lệch {#clt}
 
 **Định nghĩa.** Dù tổng thể lệch thế nào, **phân phối của trung bình mẫu** sẽ tiệm cận phân phối chuẩn khi n đủ lớn.
 
 ### Bàn tập mô phỏng
 
-Câu hỏi hay gặp: doanh thu lệch phải cực mạnh ([L1 §1.3](/ly-thuyet/l1-foundation#mean-median): mean 230 vs median 54), sao vẫn dùng t-test được?
+Câu hỏi hay gặp: doanh thu lệch phải cực mạnh ([L1 §1.3](/ly-thuyet/l1-foundation#mean-median): mean 230 vs [median](/glossary#median) 54), sao vẫn dùng t-test được?
 
 Vì t-test làm việc trên **trung bình mẫu**, không phải trên từng giá trị.
 
@@ -98,7 +108,7 @@ Hai điều quan sát được:
 |---|---|
 | Phân phối gần đối xứng | 30 là đủ |
 | Lệch vừa | 100+ |
-| **Lệch nặng, có outlier lớn** (doanh thu có đơn 20.000$) | 1.000+, và vẫn nên kiểm tra |
+| **Lệch nặng, có [outlier](/glossary#outlier) lớn** (doanh thu có đơn 20.000$) | 1.000+, và vẫn nên kiểm tra |
 | Đuôi rất nặng | CLT hội tụ **rất chậm** → dùng bootstrap |
 
 Khi nghi ngờ: bootstrap (không giả định phân phối) hoặc kiểm định phi tham số (Mann-Whitney).
@@ -118,13 +128,18 @@ Khi nghi ngờ: bootstrap (không giả định phân phối) hoặc kiểm đ�
 
 </details>
 
+
+:::note Chốt lại
+CLT là lý do dùng được phân phối chuẩn cho dữ liệu doanh thu lệch phải — vì nó làm việc trên **trung bình mẫu**, không trên từng giá trị. Nhưng nó không phải phép màu: dữ liệu lệch nặng cần n lớn hơn nhiều, và khi nghi ngờ thì dùng bootstrap.
+:::
+
 ## 5.3 — Khoảng tin cậy: cách báo cáo đúng {#khoang-tin-cay}
 
 **Định nghĩa.** CI 95% = khoảng ước lượng được tạo bằng một quy trình mà, nếu lặp lại việc lấy mẫu nhiều lần, khoảng đó sẽ chứa giá trị thật khoảng 95% số lần.
 
 ### Bàn tập — cùng tỷ lệ, hai độ rộng khác hẳn
 
-Đo tỷ lệ chuyển đổi, cả hai lần đều ra đúng 5%:
+Đo [tỷ lệ chuyển đổi](/glossary#conversion-rate), cả hai lần đều ra đúng 5%:
 
 ```python
 import math
@@ -184,7 +199,12 @@ Con số thứ hai mới là sự thật đầy đủ. Số này lấy từ ví 
 
 </details>
 
-## 5.4 — p-value: định nghĩa đúng và cách giải thích cho sếp {#p-value}
+
+:::note Chốt lại
+Cùng một tỷ lệ có thể đi kèm hai mức tin cậy khác nhau **10 lần** — con số trần trụi giấu mất thông tin quan trọng nhất là "mình chắc đến đâu". Mọi ước lượng đưa cho người ra quyết định đều phải kèm khoảng.
+:::
+
+## 5.4 — [p-value](/glossary#p-value): định nghĩa đúng và cách giải thích cho sếp {#p-value}
 
 **Định nghĩa.** p-value = xác suất quan sát được kết quả **ít nhất cực đoan như dữ liệu hiện có**, giả sử H0 (không có khác biệt) là đúng.
 
@@ -230,7 +250,12 @@ Nhận xét: bài viết này không dùng chữ "giả thuyết không", không
 
 ---
 
-## 5.5 — Sai lầm loại I/II, power, MDE {#power-mde}
+
+:::note Chốt lại
+p-value đo **bằng chứng có đủ mạnh chưa**, không đo mức độ lớn của tác động. Cùng tỷ lệ 70%, 10 lần tung thì không kết luận được gì còn 100 lần thì kết luận chắc chắn — khác biệt duy nhất là cỡ mẫu. Đó cũng là lý do phải tính cỡ mẫu trước khi chạy.
+:::
+
+## 5.5 — Sai lầm loại I/II, [power](/glossary#power), [MDE](/glossary#mde) {#power-mde}
 
 ### Bàn tập — bảng 2×2 của mọi kiểm định
 
@@ -303,6 +328,11 @@ Vì sao bội số của 7: hành vi cuối tuần khác ngày thường. Chạy
 
 </details>
 
+
+:::note Chốt lại
+MDE là **quyết định kinh doanh**, không phải kỹ thuật — phải hỏi sếp "tăng bao nhiêu thì mới đáng triển khai". Từ MDE ra cỡ mẫu, từ cỡ mẫu ra thời gian chạy, làm tròn lên bội số 7 ngày. Nhớ quy luật: MDE giảm một nửa → mẫu gấp 4.
+:::
+
 ## 5.6 — Đọc kết quả A/B test: một ví dụ đầy đủ {#doc-ket-qua-ab}
 
 **Dữ liệu:** A: 10.000 người, 500 chuyển đổi (5,00%). B: 10.000 người, 560 chuyển đổi (5,60%).
@@ -328,14 +358,19 @@ print(z, 2*(1-stats.norm.cdf(abs(z))), (p2-p1)-1.96*se, (p2-p1)+1.96*se)
 
 **Cách kết luận đúng:**
 
-> *"B cho conversion 5,60% so với 5,00% của A — cao hơn tương đối 12%. Tuy nhiên p = 0,058 (trên ngưỡng 0,05) và khoảng tin cậy 95% cho mức tăng là từ −0,02% đến +1,22%, tức vẫn bao gồm khả năng không có cải thiện. Chưa đủ bằng chứng để triển khai. Hai lựa chọn: (1) chạy thêm ~5 ngày để đạt cỡ mẫu cần cho MDE 0,5%, hoặc (2) dừng nếu chi phí duy trì thí nghiệm lớn hơn giá trị kỳ vọng."*
+> *"B cho conversion 5,60% so với 5,00% của A — cao hơn tương đối 12%. Tuy nhiên p = 0,058 (trên ngưỡng 0,05) và [khoảng tin cậy](/glossary#confidence-interval) 95% cho mức tăng là từ −0,02% đến +1,22%, tức vẫn bao gồm khả năng không có cải thiện. Chưa đủ bằng chứng để triển khai. Hai lựa chọn: (1) chạy thêm ~5 ngày để đạt cỡ mẫu cần cho MDE 0,5%, hoặc (2) dừng nếu chi phí duy trì thí nghiệm lớn hơn giá trị kỳ vọng."*
 
 **Ba cách kết luận SAI ở tình huống này:**
 1. "p = 0,058 gần 0,05 rồi, coi như có ý nghĩa" → ngưỡng phải chốt trước, không co giãn sau khi nhìn số.
 2. "Không có ý nghĩa thống kê nghĩa là hai phiên bản như nhau" → sai: không có bằng chứng khác biệt ≠ có bằng chứng không khác biệt. CI cho thấy mức tăng tới 1,22% vẫn hoàn toàn khả dĩ.
-3. "Chạy thêm đến khi p < 0,05" → đây là peeking, làm hỏng toàn bộ tính hợp lệ (mục 5.7).
+3. "Chạy thêm đến khi p < 0,05" → đây là [peeking](/glossary#peeking-problem), làm hỏng toàn bộ tính hợp lệ (mục 5.7).
 
 ---
+
+
+:::note Chốt lại
+Kết luận phải kèm **khoảng tin cậy**, không chỉ p-value. "Không có ý nghĩa thống kê" **không** đồng nghĩa "hai phiên bản như nhau" — nó chỉ nghĩa là dữ liệu hiện có chưa đủ để phân biệt.
+:::
 
 ## 5.7 — Bốn cái bẫy phá hỏng A/B test {#bon-bay}
 
@@ -362,7 +397,7 @@ Vì sao: mỗi lần nhìn là một cơ hội để nhiễu ngẫu nhiên tình
 - Nếu bắt buộc theo dõi liên tục: dùng sequential testing (alpha spending) — chia nhỏ ngân sách α cho mỗi lần nhìn
 - Được phép xem **guardrail metric** hằng ngày (để dừng nếu có sự cố), nhưng **không** dùng nó để quyết định thắng thua
 
-### Bẫy 2 — SRM (Sample Ratio Mismatch)
+### Bẫy 2 — [SRM](/glossary#srm) (Sample Ratio Mismatch)
 
 Thiết kế chia 50/50 nhưng thực tế ra 10.000 vs 9.400. Nghe như chuyện nhỏ. Không phải.
 
@@ -381,7 +416,7 @@ Có SRM thì toàn bộ kết quả vứt đi. Không cứu được bằng th�
 
 Người dùng phản ứng tích cực chỉ vì thấy **lạ**, không phải vì tính năng tốt hơn. Hiệu ứng tan sau 1–2 tuần.
 
-**Cách phát hiện:** vẽ chênh lệch giữa hai nhóm **theo ngày**. Nếu khoảng cách thu hẹp dần thì nghi novelty.
+**Cách phát hiện:** vẽ chênh lệch giữa hai nhóm **theo ngày**. Nếu khoảng cách thu hẹp dần thì nghi [novelty](/glossary#novelty-effect).
 
 ```
 Ngay 1-3:   B hon A 15%
@@ -391,7 +426,7 @@ Ngay 8-14:  B hon A  2%    <- novelty, khong phai cai tien that
 
 **Cách xử lý:** chạy đủ dài (tối thiểu 2 tuần), và tách riêng nhóm **user mới** (chưa từng thấy giao diện cũ nên không có cảm giác "lạ").
 
-### Bẫy 4 — Simpson's paradox
+### Bẫy 4 — [Simpson](/glossary#simpson-s-paradox)'s paradox
 
 Số thật:
 
@@ -433,6 +468,11 @@ Trong A/B test, đây thường là dấu hiệu của **phân bổ nhóm không
 
 </details>
 
+
+:::note Chốt lại
+Kiểm **SRM đầu tiên**, trước cả metric chính — có SRM thì mọi kết quả vứt đi. Peeking đẩy báo động giả từ 4,7% lên 14,3%, nên chốt ngày dừng từ đầu. Và luôn tách nhóm theo các chiều chính trước khi báo cáo, vì con số gộp có thể đảo ngược hoàn toàn.
+:::
+
 ## 5.8 — Checklist thiết kế A/B test (dùng cho Portfolio #3) {#checklist-ab}
 
 **Trước khi chạy** — thiếu bất kỳ mục nào thì chưa được chạy:
@@ -453,7 +493,7 @@ Trong A/B test, đây thường là dấu hiệu của **phân bổ nhóm không
 - [ ] Vẽ chênh lệch theo ngày (bắt novelty)
 - [ ] Kết luận rõ: triển khai / không triển khai / chạy tiếp — kèm lý do kinh doanh, không chỉ lý do thống kê
 
-**Spec Portfolio #3** (dataset gợi ý: Cookie Cats trên Kaggle — retention D1/D7 khi đổi cổng chặn từ level 30 sang 40):
+**Spec Portfolio #3** (dataset gợi ý: Cookie Cats trên Kaggle — [retention](/glossary#retention) D1/D7 khi đổi cổng chặn từ level 30 sang 40):
 1. Nêu giả thuyết và metric chính (retention D7)
 2. Kiểm tra SRM
 3. Tính cỡ mẫu **cần thiết** và so với cỡ mẫu **thực có**
@@ -462,6 +502,11 @@ Trong A/B test, đây thường là dấu hiệu của **phân bổ nhóm không
 6. Kết luận kèm hạn chế: thời gian chạy, novelty, khả năng dữ liệu bị nhiễu bởi người chơi nhiều thiết bị
 
 ---
+
+
+:::note Chốt lại
+Thiếu bất kỳ mục nào trong danh sách "trước khi chạy" thì **chưa được chạy**. Thí nghiệm thiết kế sai không cứu được bằng phân tích giỏi — mọi thứ quyết định ở khâu thiết kế.
+:::
 
 ## Checklist trước khi sang Stage 6
 

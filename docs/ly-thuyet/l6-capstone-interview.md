@@ -9,6 +9,11 @@ format: md
 
 # LESSON 6 — Capstone, CV & Phỏng vấn (W20–W24)
 
+:::tip Cách đọc trang này
+Từ khóa **in đậm có gạch chân** là thuật ngữ — bấm vào để nhảy sang [Từ điển](/glossary) xem định nghĩa kèm ví dụ.
+Cuối mỗi mục có khối **Chốt lại** tóm tắt điều quan trọng nhất. Đọc lướt các khối đó là nắm được xương sống của bài.
+:::
+
 Bổ trợ cho [Stage 6 — Capstone & Job prep](../stages/stage-6-capstone-jobprep.md). Giai đoạn này không học thêm công cụ mới. Việc duy nhất: **biến những gì đã làm thành thứ người khác tin được trong 5 phút**.
 
 ---
@@ -17,7 +22,7 @@ Bổ trợ cho [Stage 6 — Capstone & Job prep](../stages/stage-6-capstone-jobp
 
 Ba dạng này đã học kỹ thuật ở [L2 §2.8](/ly-thuyet/l2-sql#funnel-cohort-rfm). Ở đây học cách **đọc kết quả và biến thành đề xuất** — phần quyết định điểm số của capstone.
 
-### Funnel — đọc số rơi rụng
+### [Funnel](/glossary#funnel) — đọc số rơi rụng
 
 Giả sử chạy xong ra:
 
@@ -51,9 +56,9 @@ Rơi nhiều nhất về **số tuyệt đối** là bước 1 (65.000 người)
 | 2024-03 | 100% | 38% | — | — |
 | 2024-04 | 100% | 31% | — | — |
 
-**Đọc ngang** (một nhóm theo thời gian): retention giảm mạnh ở tháng 1 rồi **phẳng dần** từ tháng 2 — dấu hiệu tốt, nghĩa là ai đã ở lại qua tháng 2 thì có xu hướng ở lại lâu.
+**Đọc ngang** (một nhóm theo thời gian): [retention](/glossary#retention) giảm mạnh ở tháng 1 rồi **phẳng dần** từ tháng 2 — dấu hiệu tốt, nghĩa là ai đã ở lại qua tháng 2 thì có xu hướng ở lại lâu.
 
-**Đọc dọc** (cùng cột, các cohort khác nhau): cột "Tháng 1" đi từ 42% → 45% → 38% → **31%**. Chất lượng user mới đang **xấu dần** qua từng tháng.
+**Đọc dọc** (cùng cột, các [cohort](/glossary#cohort) khác nhau): cột "Tháng 1" đi từ 42% → 45% → 38% → **31%**. Chất lượng user mới đang **xấu dần** qua từng tháng.
 
 Đọc dọc là thứ mà báo cáo doanh thu tổng **không bao giờ cho thấy** — doanh thu vẫn có thể tăng đều trong khi chất lượng user mới đang sụp, vì tiền marketing bù vào.
 
@@ -81,6 +86,11 @@ Nếu bảng của bạn không có 2 cột cuối (**Hành động**, **Đo b�
 2. Bảng cohort của bạn: đọc dọc cho thấy chất lượng user mới đang tốt lên hay xấu đi? Nêu con số.
 3. Viết bảng RFM đủ 5 cột như mẫu trên, mỗi phân khúc một hành động **khác nhau**.
 
+
+:::note Chốt lại
+Chạy ra được funnel/cohort/RFM mới là nửa việc. Nửa còn lại là **đọc**: bước rơi nhiều nhất không phải bước đáng sửa nhất; đọc dọc bảng cohort để thấy chất lượng user mới; phân khúc không dẫn tới hành động khác nhau thì vô nghĩa.
+:::
+
 ## 6.2 — README mà nhà tuyển dụng đọc trong 3 phút {#readme-chuan}
 
 Repo gốc nói đúng một điều: **CV được đọc 30 giây, portfolio được xem 5 phút.** README là thứ quyết định 5 phút đó.
@@ -103,6 +113,11 @@ Nhà tuyển dụng xem 20 portfolio một buổi. Cái nào bắt họ phải �
 
 **TL;DR** (3 dòng): tìm ra gì · quan trọng ra sao · đề xuất gì
 ![dashboard](anh.png)          <- ANH NGAY DAU, truoc moi thu khac
+
+
+:::note Chốt lại
+Tiêu đề README nói **bạn tìm ra gì**, không phải bạn đã làm gì. Ảnh đặt ngay đầu. Và mục Hạn chế không phải chỗ thừa nhận yếu kém — người có kinh nghiệm đọc nó **đầu tiên** để đánh giá bạn có hiểu dữ liệu của mình không.
+:::
 
 ## Câu hỏi kinh doanh
 ## Dữ liệu (nguồn · khoảng thời gian · số dòng · grain · bộ lọc)
@@ -203,6 +218,11 @@ Phần "tác động ước tính" là thứ phân biệt analyst với người
 2. Quay video 5 phút trình bày capstone. Xem lại và đếm: bao nhiêu lần nói "ừm" · có nói kết luận trong 60 giây đầu không · có câu nào không kèm số không.
 3. Chọn 3 chart giữ lại, viết lý do vì sao bỏ những cái còn lại.
 
+
+:::note Chốt lại
+Nói kết luận trong 60 giây đầu (BLUF). Buổi trình bày phải chịu được việc **bị ngắt bất cứ lúc nào**. Ba chart tốt hơn mười hai chart, và đề xuất phải quy đổi ra tác động bằng số.
+:::
+
 ## 6.4 — Khung trả lời case study (5 bước) {#case-study}
 
 Vòng case study là chỗ rớt nhiều nhất, vì ứng viên nhảy thẳng vào SQL.
@@ -226,7 +246,7 @@ Cả ba đều trượt cùng một chỗ: **chưa biết con số 15% đó ngh�
 
 *Riêng bước này đã lọc được phần lớn ứng viên. Người mới nhảy vào phân tích ngay; người có kinh nghiệm hỏi trước. Trong việc thật cũng vậy — một nửa số "vấn đề" tan biến ngay ở bước hỏi lại.*
 
-**Bước 2 — Structure (chia bài toán).** Doanh thu = số đơn × AOV. Số đơn = số khách × tần suất. Cứ mỗi nhánh, hỏi: giảm ở đâu?
+**Bước 2 — Structure (chia bài toán).** Doanh thu = số đơn × [AOV](/glossary#aov). Số đơn = số khách × tần suất. Cứ mỗi nhánh, hỏi: giảm ở đâu?
 ```
 Doanh thu ↓15%
 ├── Số đơn ↓?          ├── Khách mới ↓?  (marketing? mùa vụ?)
@@ -241,9 +261,14 @@ Doanh thu ↓15%
 
 **Bước 5 — Measure.** Đo bằng metric nào, trong bao lâu, ngưỡng nào coi là thành công.
 
-**Bài tập 6.3.** Viết đầy đủ 5 bước cho 3 đề: (a) tỷ lệ chuyển đổi giảm từ 3% xuống 2,4% trong 1 tuần; (b) sếp muốn biết có nên mở rộng sang thị trường mới; (c) tính năng mới ra 1 tháng, cần đánh giá thành công hay thất bại.
+**Bài tập 6.3.** Viết đầy đủ 5 bước cho 3 đề: (a) [tỷ lệ chuyển đổi](/glossary#conversion-rate) giảm từ 3% xuống 2,4% trong 1 tuần; (b) sếp muốn biết có nên mở rộng sang thị trường mới; (c) tính năng mới ra 1 tháng, cần đánh giá thành công hay thất bại.
 
 ---
+
+
+:::note Chốt lại
+Bước **Clarify** là chỗ lọc phần lớn ứng viên — hỏi lại trước khi phân tích. Và luôn kiểm khả năng **lỗi dữ liệu** trước khi kết luận vấn đề kinh doanh: một tag tracking hỏng cũng làm doanh thu "giảm 15%".
+:::
 
 ## 6.5 — 20 câu phỏng vấn kỹ thuật {#cau-hoi-phong-van}
 
@@ -256,14 +281,14 @@ Mỗi câu ≤ 90 giây. Cột "Ý bắt buộc phải nêu" là thứ người 
 | 1 | `WHERE` vs `HAVING`? | lọc dòng trước gom / lọc nhóm sau gom · dùng được `WHERE` thì ưu tiên vì lọc sớm chạy nhanh hơn |
 | 2 | `COUNT(*)` vs `COUNT(col)`? | đếm dòng / bỏ NULL · **ví dụ số**: Chinook 3.503 vs 2.526 |
 | 3 | `INNER` vs `LEFT JOIN`? | kèm bẫy điều kiện ở `WHERE` biến LEFT thành INNER · **số 412/35/89** |
-| 4 | Fan-out là gì, xử lý sao? | **2.328,60 → 20.848,62** · 3 cách sửa |
+| 4 | [Fan-out](/glossary#fan-out) là gì, xử lý sao? | **2.328,60 → 20.848,62** · 3 cách sửa |
 | 5 | Window khác `GROUP BY` chỗ nào? | giữ nguyên số dòng · ví dụ 2 dòng vs 3 dòng |
 | 6 | `ROW_NUMBER` / `RANK` / `DENSE_RANK`? | 1,2,3 · 1,1,3 · 1,1,2 |
-| 7 | Vì sao không lọc window ở `WHERE`? | thứ tự thực thi · bọc CTE hoặc `QUALIFY` |
+| 7 | Vì sao không lọc window ở `WHERE`? | thứ tự thực thi · bọc [CTE](/glossary#cte) hoặc `QUALIFY` |
 | 8 | `NOT IN` vs `NOT EXISTS`? | NULL làm `NOT IN` trả **rỗng hoàn toàn** |
 | 9 | Viết top-N mỗi nhóm | CTE + `ROW_NUMBER` + lọc `rn <= N` |
 | 10 | Viết cohort retention | 3 bước: `first_month` → `activity` → tỷ lệ |
-| 11 | Tối ưu query chậm | chọn cột thay `SELECT *` · lọc partition · tổng hợp trước khi join · tránh correlated subquery · đọc query plan |
+| 11 | Tối ưu query chậm | chọn cột thay `SELECT *` · lọc [partition](/glossary#partition) · tổng hợp trước khi join · tránh correlated subquery · đọc query plan |
 | 12 | Khử trùng giữ bản mới nhất | `ROW_NUMBER() ... ORDER BY updated_at DESC` rồi lọc `= 1` |
 
 ### Phân tích & metric
@@ -271,11 +296,11 @@ Mỗi câu ≤ 90 giây. Cột "Ý bắt buộc phải nêu" là thứ người 
 | # | Câu hỏi | Ý bắt buộc phải nêu |
 |---|---|---|
 | 13 | Định nghĩa DAU/retention | đủ **5 trường** · nêu điểm mơ hồ cần chốt với business ("D7 là đúng ngày 7 hay trong vòng 7 ngày") |
-| 14 | Mean vs median? | ví dụ số: doanh thu 230 vs 54 · lương 69,2 vs 12 |
-| 15 | Correlation ≠ causation | ví dụ discount/profit · nêu **confounder** cụ thể |
-| 16 | Giải thích p-value cho non-tech | bản ≤150 từ ở [§5.4](/ly-thuyet/l5-stats#p-value) · không dùng chữ "bác bỏ giả thuyết không" |
-| 17 | Tính sample size | baseline · MDE · alpha · power · **quy luật MDE giảm ½ → mẫu ×4** |
-| 18 | Khi nào dừng A/B test? | ngày chốt trước · nêu **peeking** và con số 4,7% → 14,3% |
+| 14 | Mean vs [median](/glossary#median)? | ví dụ số: doanh thu 230 vs 54 · lương 69,2 vs 12 |
+| 15 | Correlation ≠ causation | ví dụ discount/profit · nêu **[confounder](/glossary#confounder)** cụ thể |
+| 16 | Giải thích [p-value](/glossary#p-value) cho non-tech | bản ≤150 từ ở [§5.4](/ly-thuyet/l5-stats#p-value) · không dùng chữ "bác bỏ giả thuyết không" |
+| 17 | Tính sample size | baseline · [MDE](/glossary#mde) · alpha · [power](/glossary#power) · **quy luật MDE giảm ½ → mẫu ×4** |
+| 18 | Khi nào dừng A/B test? | ngày chốt trước · nêu **[peeking](/glossary#peeking-problem)** và con số 4,7% → 14,3% |
 | 19 | Dashboard không khớp kế toán | 5 bước debug + 4 nguyên nhân ngoài kỹ thuật (kỳ, múi giờ, định nghĩa doanh thu, bộ lọc mặc định) |
 | 20 | Sếp đòi con số bạn biết sẽ bị hiểu sai | đưa số **kèm ngữ cảnh** · nêu giới hạn · đề xuất cách đo tốt hơn · **không** từ chối, cũng không đưa số trần trụi |
 
@@ -291,6 +316,11 @@ Mỗi câu ≤ 90 giây. Cột "Ý bắt buộc phải nêu" là thứ người 
 1. Tự trả lời 20 câu, bấm giờ. Ghi lại câu nào quá 90 giây.
 2. Quay video trả lời 3 câu khó nhất (4, 16, 18). Xem lại: có dùng số không?
 3. Nhờ người không biết SQL nghe câu 16. Họ hiểu không?
+
+
+:::note Chốt lại
+Mỗi câu ≤ 90 giây, và sáu câu bắt buộc phải có **con số cụ thể** — trả lời chay bằng định nghĩa là mất điểm. Cách luyện đúng: viết ra giấy, đọc to, bấm giờ.
+:::
 
 ## 6.6 — CV cho DA fresher {#cv-fresher}
 
@@ -349,6 +379,11 @@ Quy tắc: **không liệt kê thứ mình không dám bị hỏi sâu.** Ghi "M
 
 Bài 3 làm được hai việc: biết thị trường thật cần gì, và **tự kiểm chứng lại phần thị trường** mà lộ trình này thừa nhận là lấy từ repo gốc, chưa xác minh độc lập.
 
+
+:::note Chốt lại
+Projects đứng trên học vấn, mỗi project ba dòng: **làm gì → tìm ra gì (có số) → đề xuất gì**. Bỏ mọi từ không kiểm chứng được. Và không liệt kê kỹ năng mình không dám bị hỏi sâu.
+:::
+
 ## 6.7 — CHECKPOINT 4: sẵn sàng ứng tuyển {#checkpoint-4}
 
 - [ ] 4 project public trên GitHub, mỗi cái có README đúng cấu trúc + ảnh
@@ -365,3 +400,8 @@ Bài 3 làm được hai việc: biết thị trường thật cần gì, và **
 Làm bài tập tự chấm tương ứng: [Bài tập Stage 6](../bai-tap/stage-6.mdx)
 
 Hết 6 lesson. Quay lại [Tổng quan lộ trình](../intro.md) để soát lại 4 checkpoint.
+
+:::note Chốt lại
+Nộp hồ sơ là **một phần của việc học**, không phải bước sau khi học xong. Vòng phỏng vấn đầu tiên dạy nhiều hơn hai tuần tự ôn.
+:::
+
